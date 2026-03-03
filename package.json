@@ -1,0 +1,25 @@
+{
+  "name": "budget-reddit",
+  "version": "1.0.0",
+  "description": "IS113 Web Application Development AY2025/2026 Semester 2 Group Project",
+  "homepage": "https://github.com/Ch1am/budget-reddit#readme",
+  "bugs": {
+    "url": "https://github.com/Ch1am/budget-redditissues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ch1am/budget-reddit.git"
+  },
+  "license": "ISC",
+  "author": "Jing Yuan, Marcus, Wing Yee, Pang, Russell",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "test": "npm run dev",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "ejs": "^4.0.1",
+    "express": "^5.2.1"
+  }
+}

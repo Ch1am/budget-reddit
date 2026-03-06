@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Budget Reddit</title>
+        <link rel="stylesheet" href="/css/landing.css">
+    </head>
+
+    <body>
+        <nav>
+            <a href="/home" class="logo">Budget Reddit</a>
+
+            <form action="/home" method="GET" class="nav-search">
+                <input type="text" name="query" placeholder="Search posts..." value="<%= query ? query : "" %>">
+                <button type="submit">Search</button>
+            </form>
+
+            <div class="nav-auth">
+                <a href="/login" class="login-btn">Log In</a>
+                <a href="/signup" class="signup-btn">Sign Up</a>
+            </div>
+        </nav>
+
+        <section class="hero">
+            <h1>Welcome to Budget Reddit</h1>
+            <p>A place where you can share memes without thinking about the consequences! Post, vote, comment and share your thoughts like there's no tomorrow</p>
+        </section>
+
+        <section class="posts">
+            <h2>Trending Posts</h2>
+
+            <% posts.forEach(post => { %>
+                <article class="post-card">
+                    <div class="post-body">
+                        <!-- Meta data of post -->
+                        <div class="post-meta">
+                            <span>u/<%= post.author %></span>
+                            &nbsp;&bull;&nbsp;
+                            <time datetime="<%= post.createdAt %>"><%= timeAgo( post.createdAt ) %></time>
+                        </div>
+
+                        <!-- Title of post -->
+                        <a href="/posts/<%= post.id %>" class="post-title"><%= post.title %></a>
+                        
+                        <!-- Image of post (only if applicable)-->
+                        <% if (post.image) { %>
+                            <img src="<%= post.image %>" alt="<%= post.title %>" class="post-image">
+                        <% } %>
+
+                        <!-- Snippet of text (what is being displayed, should be short (cut from main text)) -->
+                        <p class="post-snippet">
+                            <%= post.snippet %> <a href="/posts/<%= post.id %>" class="read-more">read more</a>
+                        </p>
+
+                        <div class="post-actions">
+                            <div class="vote-pill">
+                                <form action="/posts/<%= post.id %>/upvote" method="POST">
+                                    <button type="submit" class="vote-up">
+                                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                                            <path d="M12 20V4M5 11l7-7 7 7"/>
+                                        </svg>
+                                    </button>
+                                </form>
+                                
+                                <span class="vote-count"><%= post.votes %></span>
+                                
+                                <form action="/posts/<%= post.id %>/downvote" method="POST">
+                                    <button type="submit" class="vote-down">
+                                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                                            <path d="M12 4v16M5 13l7 7 7-7"/>
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
+                            
+                            <a href="/posts/<%= post.id %>#comments" class="pill-btn">
+                                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.486 2 2 5.925 2 10.75c0 2.21 1.006 4.258 2.704 5.827l-1.488 4.25a1 1 0 0 0 1.258 1.258l4.037-1.346c1.107.41 2.316.636 3.585.636 5.514 0 10-3.925 10-8.75S17.514 2 12 2zm0 15.5c-1.114 0-2.204-.21-3.218-.619a1 1 0 0 0-.67-.042l-2.618.872.936-2.674a1 1 0 0 0-.106-.856C4.944 12.871 4 11.87 4 10.75 4 6.942 7.589 4 12 4s8 2.942 8 6.75-3.589 6.75-8 6.75z"/></svg> 
+                                <%= post.commentCount %>
+                            </a>
+                            
+                            <form action="/posts/<%= post.id %>/share" method="POST">
+                                <button type="submit" class="pill-btn">
+                                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M21.707 11.293l-8-8A1 1 0 0 0 12 4v4.1C5.64 8.54 2 14.12 2 21a1 1 0 0 0 1.68.74c2.81-2.58 6.06-3.61 8.32-3.71V20a1 1 0 0 0 1.707.707l8-8a1 1 0 0 0 0-1.414zM14 17.586V16a1 1 0 0 0-1-1c-2.9 0-6.42 1.34-9.36 4.18.9-3.9 3.5-7.38 8.88-8.15a1 1 0 0 0 .48-.22 1 1 0 0 0 .31-.76V5.414L19.586 11 14 16.586z"/></svg> 
+                                    Share
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </article>
+            <% }) %>
+        </section>
+
+        <footer>
+            <div class="footer-links">
+            <a href="/about">About</a>
+            <a href="/contact">Contact</a>
+            <a href="/support">Support</a>
+            </div>
+            <small>&copy; <%= new Date().getFullYear() %> Budget Reddit. All rights reserved.</small>
+        </footer>
+    </body>
+
+</html>

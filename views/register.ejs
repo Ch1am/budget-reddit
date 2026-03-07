@@ -1,0 +1,87 @@
+ <!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Register</title>
+        <link rel="stylesheet" href="/css/register.css">
+    </head>
+    <body>
+        <form action="/register" method="post">
+            <div class = "register-card">
+                <h1>Register</h1><br>
+                <div class = "input-group">
+                    <p class = "name">Name<br>
+                        <input type = "name" name = "regisname" value='<%= typeof name != 'undefined' ?name:'' %>' >
+                    </p> 
+                </div>
+                <% if (nameerrormsg) { %>
+                    <p class="error-message">⚠️<%= nameerrormsg %></p>
+                <% } %>
+                <div class = "input-group">
+                    <p class = "email">
+                        Email<br>
+                        <input type = "email" name = "regisemail" value='<%= typeof newemail != 'undefined' ?newemail:'' %>'>
+                    </p> 
+                </div>
+                <% if (newemailerrormsg) { %>
+                    <p class="error-message">⚠️<%= newemailerrormsg %></p>
+                <% } else if (emailusedmsg) {%>
+                        <p class="error-message">⚠️<%= emailusedmsg %></p>
+                <% } %>
+                <div class = "input-group">
+                    <p class = "password">
+                        Password<br>
+                        <input type = "password" name = "regispassword" value='<%= typeof newpassword != 'undefined' ?newpassword:'' %>'>
+                    </p> 
+                </div>
+                <% if (newpassworderrormsg ) { %>
+                    <p class="error-message">⚠️<%= newpassworderrormsg %></p>
+                <% } %>
+                <div class = "input-group">
+                    <p class = "password">
+                        Confirm Password<br>
+                        <input type = "password" name = "regisconfirmpassword" value='<%= typeof confirmpassword != 'undefined' ?confirmpassword:'' %>'>
+                    </p> 
+                </div>
+                <% if (confirmpasswordmsg) { %>
+                    <p class="error-message">⚠️<%= confirmpasswordmsg %></p>
+                <% }  %>
+                <% if (passwordmatchmsg ) { %>
+                    <p class="error-message">⚠️<%= passwordmatchmsg %></p>
+                <% } %>
+                <button class = "btn-login" type = "submit">Register</button>
+            </div>
+        </form>
+        <!-- <div class = "register-card">
+        <h1>Register</h1><br>
+        <div class = "input-group">
+            <p class = "name">
+                Name<br>
+                <input type = "name" name = "regisname" >
+            </p> 
+        </div>
+        <div class = "input-group">
+            <p class = "email">
+                Email<br>
+                <input type = "email" name = "regisemail">
+            </p> 
+        </div>
+        
+        <div class = "input-group">
+            <p class = "password">
+                Password<br>
+                <input type = "password" name = "regispassword">
+            </p> 
+        </div>
+        <div class = "input-group">
+            <p class = "password">
+                Confirm Password<br>
+                <input type = "password" name = "regisconfirmpassword">
+            </p> 
+        </div>
+        <button class = "btn-login" type = "submit">Register</button>
+        </div> -->
+    </body>
+</html>
+
+

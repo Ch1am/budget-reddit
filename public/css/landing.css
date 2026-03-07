@@ -1,0 +1,356 @@
+:root {
+    --navy:        #0d1b3e;
+    --navy-mid:    #1a2f5e;
+    --navy-light:  #243a72;
+    --pink:        #a8174a;
+    --pink-mid:    #c01f57;
+    --pink-light:  #d4235f;
+    --white:       #ffffff;
+    --off-white:   #f4f4f8;
+    --border:      #d0d4e0;
+    --text-main:   #0d1b3e;
+    --text-muted:  #5a6380;
+    --text-light:  #8892aa;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Georgia, serif;
+    background: var(--off-white);
+    color: var(--text-main);
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+nav {
+    background: var(--navy);
+    padding: 14px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 3px solid var(--pink);
+}
+
+.logo {
+    color: var(--white);
+    text-decoration: none;
+    font-size: 22px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.nav-search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    max-width: 420px;
+}
+
+.nav-search input {
+    flex: 1;
+    padding: 8px 16px;
+    border: 1px solid var(--navy-light);
+    border-radius: 4px;
+    font-size: 14px;
+    background: var(--navy-mid);
+    color: var(--white);
+    outline: none;
+}
+
+.nav-search input::placeholder {
+    color: var(--text-light);
+}
+
+.nav-search input:focus {
+    border-color: var(--pink-light);
+}
+
+.nav-search button {
+    padding: 8px 18px;
+    background: var(--pink);
+    color: var(--white);
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.nav-search button:hover {
+    background: var(--pink-mid);
+}
+
+.nav-auth {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.login-btn {
+    padding: 6px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: bold;
+    text-decoration: none;
+    cursor: pointer;
+    border: 2px solid var(--pink-light);
+    color: var(--pink-light);
+    background: transparent;
+}
+
+.login-btn:hover {
+    background: var(--pink-light);
+    color: var(--white);
+}
+
+.signup-btn {
+    padding: 6px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: bold;
+    text-decoration: none;
+    cursor: pointer;
+    background: var(--pink);
+    color: var(--white);
+    border: 2px solid var(--pink);
+}
+
+.signup-btn:hover {
+    background: var(--pink-mid);
+    border-color: var(--pink-mid);
+}
+
+.hero {
+    background: var(--navy-mid);
+    color: var(--white);
+    text-align: center;
+    padding: 60px 24px;
+    border-bottom: 3px solid var(--pink);
+}
+
+.hero h1 {
+    font-size: 42px;
+    font-weight: bold;
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
+}
+
+.hero p {
+    font-size: 18px;
+    color: var(--border);
+}
+
+.posts {
+    max-width: 780px;
+    margin: 32px auto;
+    padding: 0 16px;
+}
+
+.posts h2 {
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--navy);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--pink);
+}
+
+.post-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-bottom: 12px;
+    overflow: hidden;
+}
+
+.post-card:hover {
+    border-color: var(--navy-light);
+}
+
+.post-body {
+    padding: 14px 18px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.post-meta {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.post-meta time {
+    color: var(--text-light);
+}
+
+.post-title {
+    font-size: 17px;
+    font-weight: bold;
+    color: var(--navy);
+    text-decoration: none;
+    line-height: 1.4;
+}
+
+.post-title:hover {
+    color: var(--pink);
+}
+
+.post-snippet {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+.post-comments {
+    font-size: 13px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.post-image {
+    width: 100%;
+    max-height: 420px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.post-comments:hover {
+    color: var(--pink);
+}
+
+.post-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px; /* Reduced from 8px for a tighter cluster */
+    margin-top: 8px;
+}
+
+.post-actions form {
+    display: contents;
+}
+
+/* Force the SVGs to be slightly smaller (18px) without editing HTML */
+.post-actions svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* THE SHARED PILL BASE: Smaller, minimalist, NOT bold */
+.vote-pill, .pill-btn {
+    display: inline-flex;
+    align-items: center;
+    height: 28px; /* Reduced from 36px */
+    background: var(--off-white);
+    border-radius: 16px; /* Perfect pill (half of 32px height) */
+    font-size: 13px;
+    font-weight: normal;
+    color: var(--text-muted);
+    border: none;
+    text-decoration: none;
+    box-sizing: border-box;
+}
+
+.vote-pill {
+    padding: 0 2px; 
+}
+
+.vote-count {
+    min-width: 24px; 
+    text-align: center;
+    font-weight: normal;
+    color: var(--text-main);
+    pointer-events: none;
+}
+
+/* Up/Down Arrow Buttons */
+.vote-up, .vote-down {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px; 
+    height: 26px; 
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+    padding: 0;
+}
+
+.vote-up:hover {
+    color: #FF4500;
+    background-color: rgba(255, 69, 0, 0.1);
+}
+
+.vote-down:hover {
+    color: #7193FF;
+    background-color: rgba(113, 147, 255, 0.1);
+}
+
+.pill-btn {
+    padding: 0 10px; 
+    gap: 5px; 
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+    font-family: inherit;
+}
+
+.pill-btn:hover {
+    background-color: var(--border);
+    color: var(--navy);
+}
+
+.read-more {
+    font-size: 13px;
+    color: var(--pink-light);
+    text-decoration: none;
+    margin-left: auto;
+}
+
+.read-more:hover {
+    color: var(--pink);
+}
+
+footer {
+    background: var(--navy);
+    color: var(--text-light);
+    text-align: center;
+    padding: 28px 16px;
+    margin-top: 48px;
+    border-top: 3px solid var(--pink);
+}
+
+.footer-links {
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+}
+
+.footer-links a {
+    color: var(--border);
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.footer-links a:hover {
+    color: var(--pink-light);
+}
+
+footer small {
+    font-size: 13px;
+    color: var(--text-light);
+}

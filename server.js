@@ -4,6 +4,7 @@ const path = require("path");
 
 
 // utilize routes here
+const authentication = require("./routes/authentication");
 const homeRoute = require("./routes/home");
 const settingsRoute = require("./routes/settings.js")
 
@@ -13,6 +14,7 @@ server.set("view engine", "ejs");
 
 
 // use the routes you initialize above here
+server.use("/", authentication);
 server.use("/home", homeRoute);
 server.use("/settings", settingsRoute);
 

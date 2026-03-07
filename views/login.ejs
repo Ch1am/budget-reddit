@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Login</title>
+        <link rel="stylesheet" href="/css/login.css">
+    </head>
+    <body>
+        <form action = "/login" method = "post">
+        <div class = "login-card">
+        <h1>Login</h1><br>
+        <div class = "input-group">
+            <span class = "icon">📧</span>
+            <input type = "email" name = "email" placeholder = "Email" value = "<%= filledemail%>">
+        </div>
+        <% if (emailerrormessage) { %>
+            <p class="error-message">⚠️<%= emailerrormessage %></p>
+        <% } %>
+        <div class = "input-group">
+            <span class = "icon">🔒</span>
+            <input type = "password" name = "password" placeholder = "********" value = "<%= filledpassword%>">
+        </div>
+        <% if (passworderrormessage) { %>
+            <p class="error-message">⚠️<%= passworderrormessage %></p>
+        <% } %>
+
+        <button class = "btn-login" type = "submit">LOGIN</button>
+        <p class = "signup-text">
+            Don't have an account? <a href = "/register">Sign Up</a>
+        </p>
+        </div>
+        </form>
+    </body>
+</html>
+
+

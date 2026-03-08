@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Login</title>
+        <link rel="stylesheet" href="/css/login.css">
+    </head>
+    <body>
+        <div class="card">
+        <div class="card-image">
+            <img src="<%= post.imageUrl %>" alt="<%= post.title %>" />
+        </div>
+        <div class="card-content">
+            <h2 class="card-title"><%= post.title %></h2>
+            <p class="card-description"><%= post.description %></p>
+            <span class="card-username">@<%= post.username %></span>
+        </div>
+        </div>
+    </body>
+</html>

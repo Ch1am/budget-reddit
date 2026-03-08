@@ -41,7 +41,6 @@ router.get('/create', (req, res) => {
 router.get('/view/:id', (req, res) => {
   res.render('post-gallery', {
     posts: mockPosts,
-    user: { username: 'russell_dev' },  // simulate logged in user
     sort: req.query.sort || 'hot',
     currentPage: 1,
     totalPages: 1

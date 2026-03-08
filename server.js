@@ -7,6 +7,7 @@ const path = require("path");
 const authentication = require("./routes/authentication");
 const homeRoute = require("./routes/home");
 const settingsRoute = require("./routes/settings.js")
+const postRoutes = require('./routes/posts');
 
 server.use("/", express.static(path.join(__dirname, "public")));
 server.use(express.urlencoded({ extended: true }));
@@ -17,6 +18,7 @@ server.set("view engine", "ejs");
 server.use("/", authentication);
 server.use("/home", homeRoute);
 server.use("/settings", settingsRoute);
+server.use('/posts', postRoutes);
 
 const hostname = "127.0.0.1";
 const port = 8000;

@@ -10,7 +10,8 @@ const posts = [
         votes: 242,
         commentCount: 134,
         createdAt: "2025-03-06T08:00:00Z",
-        image: null
+        image: null,
+        voters:[]
     },
     {
         id: 2,
@@ -20,7 +21,8 @@ const posts = [
         votes: 185,
         commentCount: 97,
         createdAt: "2025-03-06T05:00:00Z",
-        image: null
+        image: null,
+        voters:[]
     },
     {
         id: 3,
@@ -30,7 +32,8 @@ const posts = [
         votes: 98,
         commentCount: 62,
         createdAt: "2025-03-06T09:30:00Z",
-        image: "/uploads/meme1.jpg"
+        image: "/uploads/meme1.jpg",
+        voters:[]
     },
     {
         id: 4,
@@ -40,7 +43,8 @@ const posts = [
         votes: 310,
         commentCount: 201,
         createdAt: "2025-03-05T14:00:00Z",
-        image: "/uploads/meme2.webp"
+        image: "/uploads/meme2.webp",
+        voters:[]
     },
     {
         id: 5,
@@ -50,7 +54,8 @@ const posts = [
         votes: 76,
         commentCount: 45,
         createdAt: "2025-03-06T07:15:00Z",
-        image: null
+        image: null,
+        voters:[]
     },
     {
         id: 6,
@@ -60,7 +65,8 @@ const posts = [
         votes: 159,
         commentCount: 88,
         createdAt: "2025-03-06T06:00:00Z",
-        image: "/uploads/meme1.jpg"
+        image: "/uploads/meme1.jpg",
+        voters:[]
     },
     {
         id: 7,
@@ -70,7 +76,8 @@ const posts = [
         votes: 204,
         commentCount: 119,
         createdAt: "2025-03-05T20:00:00Z",
-        image: null
+        image: null,
+        voters:[]
     },
     {
         id: 8,
@@ -80,21 +87,90 @@ const posts = [
         votes: 431,
         commentCount: 276,
         createdAt: "2025-03-05T10:00:00Z",
-        image: "/uploads/meme1.jpg"
+        image: "/uploads/meme1.jpg",
+        voters:[]
     }
 ];
 
 
 
 router.get("/", (req, res) => {
+
+      const username = 'russell_dev'; // replace with sessionID later
+    //just to test if i up/downvote, whether the button will remain highlighted
+  const postsWithVotes = posts.map((post) => {
+    const existingVote = post.voters.find((voter) => voter.username === username);
+    return {
+      ...post,
+      userVote: existingVote ? existingVote.voteType : null
+    };
+  });
+
     let data = req.query.query
     data = data ? data : undefined
 
     res.render("landing", {
-        posts, 
+       posts: postsWithVotes, 
         query: data,
         timeAgo
     })
 })
+
+// POST upvote
+router.post('/:id/upvote', (req, res) => {
+  const post = posts.find((p) => String(p.id) === String(req.params.id));
+  const username = 'russell_dev'; // replace with req.session.user.username later
+
+  if (post) {
+    const existingVote = post.voters.find((v) => v.username === username);
+    if (existingVote) {
+      if (existingVote.voteType === 'upvote') {
+        // clicking upvote again = remove vote
+        post.votes--;
+        post.voters = post.voters.filter((v) => v.username !== username);
+      } else {
+        // switching from downvote to upvote
+        post.votes += 2;
+        existingVote.voteType = 'upvote';
+      }
+    } else {
+      // first time voting
+      post.voters.push({ username, voteType: 'upvote' });
+      post.votes++;
+    }
+  }
+  res.redirect('/home');
+});
+
+// POST downvote
+router.post('/:id/downvote', (req, res) => {
+  const post = posts.find((p) => String(p.id) === String(req.params.id));
+  const username = 'russell_dev'; // replace with req.session.user.username later
+
+  if (post) {
+    const existingVote = post.voters.find((v) => v.username === username);
+    if (existingVote) {
+      if (existingVote.voteType === 'downvote') {
+        // clicking downvote again = remove vote
+        post.votes++;
+        post.voters = post.voters.filter((v) => v.username !== username);
+      } else {
+        // switching from upvote to downvote
+        post.votes -= 2;
+        existingVote.voteType = 'downvote';
+      }
+    } else {
+      // first time voting
+      post.voters.push({ username, voteType: 'downvote' });
+      post.votes--;
+    }
+  }
+  res.redirect('/home');
+});
+
+// POST share (stub)
+router.post('/:id/share', (req, res) => {
+  res.redirect('/home');
+});
 
 module.exports = router;

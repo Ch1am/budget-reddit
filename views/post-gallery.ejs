@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Meme Gallery</title>
+  <title>MemeIt</title>
   <link rel="stylesheet" href="/css/post-gallery.css">
 </head>
 
@@ -12,7 +12,7 @@
   <!-- navbar, split into 2 divs for CSS to split left n right side -->
   <nav>
     <div>
-      <a href="/posts">Vault of Memes</a>
+      <a href="/posts">MemeIt</a>
     </div>
 
     <div>
@@ -27,11 +27,12 @@
   <a href="/posts/create" class="post-btn">+ Post Meme</a>
 
 
-  <!-- indiv meme lines -->
+  <!-- indiv meme cards -->
   <% posts.forEach((post) => {  %>
 
   <div class="memeLine">
-    <!-- upvote-->
+
+    <!-- upvote btn-->
     <div class="votes">
       <form action="/posts/<%= post.id %>/vote" method="POST">
         <input type="hidden" name="voteType" value="upvote">
@@ -45,7 +46,7 @@
       <!-- overall upvotes count -->
       <p><%= post.upvotes - post.downvotes %></p>
 
-      <!-- downvote -->
+      <!-- downvote btn -->
       <form action="/posts/<%= post.id %>/vote" method="POST">
         <input type="hidden" name="voteType" value="downvote">
         <% if (post.userVote === 'downvote') { %>

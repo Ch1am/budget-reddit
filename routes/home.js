@@ -3,10 +3,10 @@ const router = express.Router();
 const homeController = require('../controllers/homeController')
 
 //GET all post and display
-router.get("/", homeController.displayPost)
+router.get("/", homeController.displayAllPost)
 
 // POST upvote
-router.post('/:id/upvote', homeController.upvote);
+router.post('/:id/upvote', homeController .upvote);
 
 // POST downvote
 router.post('/:id/downvote', homeController.downvote);

@@ -26,44 +26,64 @@
     "title": "Is the 50/30/20 budgeting rule still relevant in todays economy?",
     "snippet": "With rent and groceries skyrocketing, I argue the old 50/30/20 rule is outdated. Here is what I think works better now...",
     "author": "frugalfrank",
-    "votes": 98,
+    "votes": 97,
     "commentCount": 62,
     "createdAt": "2025-03-06T09:30:00Z",
     "image": "/uploads/meme1.jpg",
-    "voters": []
+    "voters": [
+      {
+        "username": "russell_dev",
+        "voteType": "downvote"
+      }
+    ]
   },
   {
     "id": "4",
     "title": "I paid off $35,000 of debt in 2 years — here is my full breakdown",
     "snippet": "People kept asking me how I did it so I decided to write it all out. Spoiler: it was not fun but it was absolutely worth it...",
     "author": "debtfree_dave",
-    "votes": 310,
+    "votes": 309,
     "commentCount": 201,
     "createdAt": "2025-03-05T14:00:00Z",
     "image": "/uploads/meme2.webp",
-    "voters": []
+    "voters": [
+      {
+        "username": "russell_dev",
+        "voteType": "downvote"
+      }
+    ]
   },
   {
     "id": "5",
     "title": "Emergency fund — how much is actually enough?",
     "snippet": "Everyone says 3 to 6 months of expenses but nobody talks about what counts as an expense. Here is how I calculated mine...",
     "author": "penny_wise",
-    "votes": 76,
+    "votes": 77,
     "commentCount": 45,
     "createdAt": "2025-03-06T07:15:00Z",
     "image": null,
-    "voters": []
+    "voters": [
+      {
+        "username": "russell_dev",
+        "voteType": "upvote"
+      }
+    ]
   },
   {
     "id": "6",
     "title": "Grocery budget hacks that actually work for a family of 4",
     "snippet": "We cut our grocery bill from $900 to $480 a month without eating badly. Meal prepping was only part of the solution...",
     "author": "thrifty_mom",
-    "votes": 159,
+    "votes": 160,
     "commentCount": 88,
     "createdAt": "2025-03-06T06:00:00Z",
     "image": "/uploads/meme1.jpg",
-    "voters": []
+    "voters": [
+      {
+        "username": "russell_dev",
+        "voteType": "upvote"
+      }
+    ]
   },
   {
     "id": "7",
@@ -86,5 +106,70 @@
     "createdAt": "2025-03-05T10:00:00Z",
     "image": "/uploads/meme1.jpg",
     "voters": []
+  },
+  {
+    "id": "9",
+    "title": "123123",
+    "image": null,
+    "tag": "4214",
+    "snippet": "232",
+    "author": "guest",
+    "votes": 0,
+    "voters": [],
+    "commentCount": 0,
+    "createdAt": "2026-03-09T06:54:29.560Z"
+  },
+  {
+    "id": "10",
+    "title": "anotha 1",
+    "image": null,
+    "tag": "wanotha",
+    "snippet": "anotha 1",
+    "author": "guest",
+    "votes": 1,
+    "voters": [
+      {
+        "username": "russell_dev",
+        "voteType": "upvote"
+      }
+    ],
+    "commentCount": 0,
+    "createdAt": "2026-03-09T06:54:41.945Z"
+  },
+  {
+    "id": "11",
+    "title": "wewe",
+    "image": null,
+    "tag": null,
+    "snippet": "",
+    "author": "guest",
+    "votes": 0,
+    "voters": [],
+    "commentCount": 0,
+    "createdAt": "2026-03-09T06:55:00.064Z"
+  },
+  {
+    "id": "12",
+    "title": "123123new new new",
+    "image": null,
+    "tag": "24wew",
+    "snippet": "new new",
+    "author": "guest",
+    "votes": 0,
+    "voters": [],
+    "commentCount": 0,
+    "createdAt": "2026-03-09T07:01:34.700Z"
+  },
+  {
+    "id": "13",
+    "title": "why are u poopoo",
+    "image": null,
+    "tag": "peepeepoopoo",
+    "snippet": "weewoo",
+    "author": "guest",
+    "votes": 0,
+    "voters": [],
+    "commentCount": 0,
+    "createdAt": "2026-03-09T07:16:09.078Z"
   }
 ]

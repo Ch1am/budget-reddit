@@ -1,11 +1,13 @@
-const posts = require('../data/posts.json');
-const timeAgo = require("../functions/timeAgo")
+const postModel = require('../models/postModel');
+const timeAgo = require("../functions/timeAgo") 
 
-exports.displayPost = (req, res) => {
-
+//displayAllPost diplays everything from newest order in the array (added last in the array)
+exports.displayAllPost = async (req, res) => {
+const posts = await postModel.getAll()
+const reversedPosts = posts.slice().reverse() //this reverse line just flips the array so the newst post is at the top
       const username = 'russell_dev'; // replace with sessionID later
     //just to test if i up/downvote, whether the button will remain highlighted
-  const postsWithVotes = posts.map((post) => {
+  const postsWithVotes = reversedPosts.map((post) => {
     const existingVote = post.voters.find((voter) => voter.username === username);
     return {
       ...post,
@@ -23,52 +25,53 @@ exports.displayPost = (req, res) => {
     })
 }
 
-exports.upvote = (req, res) => {
+exports.upvote = async (req, res) => {
+  const id = req.params.id
+  const posts = await postModel.getAll();
   const post = posts.find((p) => String(p.id) === String(req.params.id));
-  const username = 'russell_dev'; // replace with session user later when implemented
+  const username = 'russell_dev';
 
   if (post) {
     const existingVote = post.voters.find((v) => v.username === username);
     if (existingVote) {
       if (existingVote.voteType === 'upvote') {
-        // clicking upvote again = remove vote
         post.votes--;
         post.voters = post.voters.filter((v) => v.username !== username);
       } else {
-        // switching from downvote to upvote
         post.votes += 2;
         existingVote.voteType = 'upvote';
       }
     } else {
-      // first time voting
       post.voters.push({ username, voteType: 'upvote' });
       post.votes++;
     }
+    await postModel.insertAll(posts);
   }
-  res.redirect('/home');
-}
+    res.redirect(`/home#post-${id}`);
+};
 
-exports.downvote = (req, res) => {
+exports.downvote = async (req, res) => {
+  const id = req.params.id
+  const posts = await postModel.getAll();
   const post = posts.find((p) => String(p.id) === String(req.params.id));
-  const username = 'russell_dev'; // replace with req.session.user.username later
+  const username = 'russell_dev';
 
   if (post) {
     const existingVote = post.voters.find((v) => v.username === username);
     if (existingVote) {
       if (existingVote.voteType === 'downvote') {
-        // clicking downvote again = remove vote
         post.votes++;
         post.voters = post.voters.filter((v) => v.username !== username);
       } else {
-        // switching from upvote to downvote
         post.votes -= 2;
         existingVote.voteType = 'downvote';
       }
     } else {
-      // first time voting
       post.voters.push({ username, voteType: 'downvote' });
       post.votes--;
     }
+    await postModel.insertAll(posts);
   }
-  res.redirect('/home');
-}
+    res.redirect(`/home#post-${id}`);
+};
+

@@ -29,9 +29,9 @@
   </section>
 
   <section class="posts">
-    <h2>Trending Posts</h2>
+    <h2>Newest Posts</h2>
     <% posts.forEach(post => { %>
-    <article class="post-card">
+    <article class="post-card" id="post-<%= post.id %>">
       <div class="post-body">
         <!-- Meta data of post -->
         <div class="post-meta">

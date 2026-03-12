@@ -4,12 +4,16 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Budget Reddit</title>
-        <link rel="stylesheet" href="/css/landing.css">
+        <!-- style sheets are removed temporarily
+            <link rel="stylesheet" href="/css/landing.css"> 
+        -->
     </head>
 
     <body>
         <nav>
-            <a href="/home" class="logo">Budget Reddit</a>
+            <h1>
+                <a href="/home" class="logo">Budget Reddit</a>
+            </h1>
 
             <form action="/home" method="GET" class="nav-search">
                 <input type="text" name="query" placeholder="Search posts..." value="<%= query ? query : "" %>">

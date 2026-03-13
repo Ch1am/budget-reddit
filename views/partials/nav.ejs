@@ -1,0 +1,16 @@
+<nav>
+  <a href="/home" class="logo">Budget Reddit</a>
+
+  <form action="/home" method="GET" class="nav-search">
+    <input type="text" name="query" placeholder="Search posts..." value="<%= query ? query : '' %>">
+    <button type="submit">Search</button>
+  </form>
+
+  <div class="top-right">
+    <a href="/posts/create" class="post-btn">+ Post Meme</a>
+    <a href="/myposts" class="myposts-btn">My Post</a>
+    <a href="/setting" class="setting-btn">
+      <img src="icons/setting.svg">
+    </a>
+  </div>
+</nav>

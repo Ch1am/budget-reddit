@@ -58,32 +58,22 @@
     "title": "Emergency fund — how much is actually enough?",
     "snippet": "Everyone says 3 to 6 months of expenses but nobody talks about what counts as an expense. Here is how I calculated mine...",
     "author": "penny_wise",
-    "votes": 77,
+    "votes": 76,
     "commentCount": 45,
     "createdAt": "2025-03-06T07:15:00Z",
     "image": null,
-    "voters": [
-      {
-        "username": "russell_dev",
-        "voteType": "upvote"
-      }
-    ]
+    "voters": []
   },
   {
     "id": "6",
     "title": "Grocery budget hacks that actually work for a family of 4",
     "snippet": "We cut our grocery bill from $900 to $480 a month without eating badly. Meal prepping was only part of the solution...",
     "author": "thrifty_mom",
-    "votes": 160,
+    "votes": 159,
     "commentCount": 88,
     "createdAt": "2025-03-06T06:00:00Z",
     "image": "/uploads/meme1.jpg",
-    "voters": [
-      {
-        "username": "russell_dev",
-        "voteType": "upvote"
-      }
-    ]
+    "voters": []
   },
   {
     "id": "7",
@@ -126,13 +116,8 @@
     "tag": "wanotha",
     "snippet": "anotha 1",
     "author": "guest",
-    "votes": 1,
-    "voters": [
-      {
-        "username": "russell_dev",
-        "voteType": "upvote"
-      }
-    ],
+    "votes": 0,
+    "voters": [],
     "commentCount": 0,
     "createdAt": "2026-03-09T06:54:41.945Z"
   },
@@ -143,8 +128,13 @@
     "tag": null,
     "snippet": "",
     "author": "guest",
-    "votes": 0,
-    "voters": [],
+    "votes": 1,
+    "voters": [
+      {
+        "username": "russell_dev",
+        "voteType": "upvote"
+      }
+    ],
     "commentCount": 0,
     "createdAt": "2026-03-09T06:55:00.064Z"
   },
@@ -155,8 +145,13 @@
     "tag": "24wew",
     "snippet": "new new",
     "author": "guest",
-    "votes": 0,
-    "voters": [],
+    "votes": 1,
+    "voters": [
+      {
+        "username": "russell_dev",
+        "voteType": "upvote"
+      }
+    ],
     "commentCount": 0,
     "createdAt": "2026-03-09T07:01:34.700Z"
   },
@@ -167,12 +162,17 @@
     "tag": "peepeepoopoo",
     "snippet": "weewoo",
     "author": "guest",
-    "votes": 0,
-    "voters": [],
+    "votes": -1,
+    "voters": [
+      {
+        "username": "russell_dev",
+        "voteType": "downvote"
+      }
+    ],
     "commentCount": 0,
     "createdAt": "2026-03-09T07:16:09.078Z"
   },
-    {
+  {
     "id": "14",
     "title": "why are u12312 poweweweweopoo",
     "image": null,

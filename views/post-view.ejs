@@ -2,31 +2,24 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Create Post</title>
+  <title><%= post.title %></title>
+  <%- include('partials/nav') %>
 </head>
 <body>
+   <% if (!selected || selected.length===0) { %>
+    <h1>Error</h1>
+    <% } else { %>
+            <h1><%= post.title %></h1>
+  
+            <!-- Use the ID -->
+            <p>Post ID: <%= id %></p>     <!-- "123" -->
+            
+            <!-- Or use it in forms -->
+            <form action="/post/<%= id %>/upvote" method="POST">
+                <button type="submit">Upvote</button>
+            </form>
+      <% } %>
 
-  <h1>Create a Post</h1>
-
-  <form action="/posts/create" method="POST">
-
-    <label>Title</label><br>
-    <input type="text" name="title" required><br><br>
-
-    <label>Image file</label><br>
-    <input type="file" name="image"><br><br>
-
-    <label>Tag</label><br>
-    <input type="text" name="tag"><br><br>
-
-    <label>Description</label><br>
-    <textarea name="snippet" rows="4" cols="40"></textarea><br><br>
-
-    <button type="submit">Post</button>
-
-  </form>
-
-  <a href="/home">Cancel</a>
 
 </body>
 </html>

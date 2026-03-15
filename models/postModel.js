@@ -1,6 +1,7 @@
 const fs = require("node:fs/promises");
 const path = require("path");
 const postsPath = path.join(__dirname, "../data/posts.json");
+const mongoose = require("mongoose");
 
 //Function getAll retrieves all data in posts.json || needs to be updated when move over to MongoDB
 const getAll = async () => {

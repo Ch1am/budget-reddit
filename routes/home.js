@@ -2,8 +2,8 @@ const express = require("express");
 const router = express.Router();
 const homeController = require('../controllers/homeController')
 
-//GET all post and display
-router.get("/", homeController.displayAllPost)
+//GET route to display the list of posts
+router.get("/",homeController.displayAllPost);
 
 // POST upvote
 router.post('/:id/upvote', homeController .upvote);

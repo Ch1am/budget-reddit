@@ -23,7 +23,8 @@ server.set("view engine", "ejs");
 server.use("/", authentication);
 server.use("/home", homeRoute);
 server.use("/settings", settingsRoute);
-server.use('/posts', postRoutes);
+server.use('/post', postRoutes);
+
 
 
 // async function to connect to DB

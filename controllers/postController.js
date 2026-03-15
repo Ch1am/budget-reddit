@@ -1,4 +1,27 @@
 const Post = require('../models/postModel')
+const timeAgo = require("../functions/timeAgo") 
+
+exports.getSinglePost = async (req, res) => {
+  try {
+    const post = await Post.getPostById(req.params.id);
+    
+    if (!post) {
+      return res.status(404).render('post-view', { 
+      post: [],
+      timeAgo 
+    });
+    }
+    
+    res.render('post-view', { 
+      post: post,
+      timeAgo 
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error reading post');
+  }
+};
+
 
 exports.createPost = async (req, res) => {
   const { title, image, tag, snippet } = req.body;

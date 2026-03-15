@@ -6,18 +6,14 @@
   <%- include('partials/nav') %>
 </head>
 <body>
-   <% if (!selected || selected.length===0) { %>
-    <h1>Error</h1>
+   <% if (!post || post.length===0) { %>
+    <h1>POST does not extist</h1>
     <% } else { %>
             <h1><%= post.title %></h1>
   
             <!-- Use the ID -->
-            <p>Post ID: <%= id %></p>     <!-- "123" -->
+            <p>Post ID: <%= post._id %></p>     <!-- "123" -->
             
-            <!-- Or use it in forms -->
-            <form action="/post/<%= id %>/upvote" method="POST">
-                <button type="submit">Upvote</button>
-            </form>
       <% } %>
 
 

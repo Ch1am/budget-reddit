@@ -9,7 +9,7 @@ const voterSchema = new mongoose.Schema({
 });
 
 const postSchema = new mongoose.Schema({
-  author:       { type: String, required: true },
+  author:       { type: String, required: true ,default: "guest"},
   title:        { type: String, required: true },
   snippet:      { type: String, required: true },
   image:        { type: String, default: null },  // file path or URL
@@ -24,7 +24,7 @@ const postSchema = new mongoose.Schema({
 const Post = mongoose.model('Post',postSchema, 'posts');
 
 
-//Function getAll retrieves all data in posts.json || needs to be updated when move over to MongoDB
+//Function getAllPost retrieves all data in posts.json
 const getAllPost = async () => {
     return await Post.find().lean();
 };
@@ -35,4 +35,10 @@ const insertAll = async (posts) =>{
     await fs.writeFile(postsPath, jsonData);
 }
 
-module.exports = {getAllPost, insertAll };
+//Function to get sigle post by id
+const getPostById = async (id) => {
+  return await Post.findById(id).lean();
+};
+
+
+module.exports = {getAllPost, getPostById, insertAll };

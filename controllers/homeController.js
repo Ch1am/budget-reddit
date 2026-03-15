@@ -33,7 +33,7 @@ exports.displayAllPost = async (req, res) => {
     
 }
 
-
+// russell old upvote code
 exports.upvote = async (req, res) => {
   const id = req.params.id
   const posts = await postModel.getAll();

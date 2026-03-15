@@ -1,7 +1,6 @@
 const dotenv = require('dotenv');
 // Specify the path to the environment variablef file 'config.env'
 dotenv.config({ path: './config.env' });
-console.log('DB:', process.env.DB);
 
 const express = require("express");
 const server = express();
@@ -44,7 +43,7 @@ async function connectDB() {
 
 
 function startServer() {
-  const hostname = "localhost"; // Define server hostname
+  const hostname = "127.0.0.1"; // Define server hostname
   const port = 8000;// Define port number
  
   // Start the server and listen on the specified hostname and port

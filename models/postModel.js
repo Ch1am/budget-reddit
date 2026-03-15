@@ -17,7 +17,7 @@ const postSchema = new mongoose.Schema({
   votes:        { type: Number, default: 0 },
   voters:       [voterSchema],
   commentCount: { type: Number, default: 0 },
-  createdAt:    { type: String }
+  createdAt:    { type: Date }
 });
 
 
@@ -26,7 +26,7 @@ const Post = mongoose.model('Post',postSchema, 'posts');
 
 //Function getAll retrieves all data in posts.json || needs to be updated when move over to MongoDB
 const getAllPost = async () => {
-    return await Post.find();
+    return await Post.find().lean();
 };
 
 //Function insertAll takes in array of posts, converts into Json strings and writes to posts.json || needs to be updated when move over to MongoDB

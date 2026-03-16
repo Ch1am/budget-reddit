@@ -354,3 +354,26 @@ footer small {
     font-size: 13px;
     color: var(--text-light);
 }
+
+.post-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background-color: #104aea;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.post-btn:hover {
+  background-color: #1b71e9;
+}
+
+.vote-pill .vote-up.selected {
+  color: #ff0000 !important;
+}
+.vote-pill .vote-down.selected {
+    color: #8800ff !important;
+}

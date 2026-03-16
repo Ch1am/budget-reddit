@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Create Post</title>
+  <%- include('partials/nav') %>
+</head>
+<body>
+
+  <h1>Create a Post</h1>
+
+  <form action="/posts/create" method="POST">
+
+    <label>Title</label><br>
+    <input type="text" name="title" required><br><br>
+
+    <label>Image file</label><br>
+    <input type="file" name="image"><br><br>
+
+    <label>Tag</label><br>
+    <input type="text" name="tag"><br><br>
+
+    <label>Description</label><br>
+    <textarea name="snippet" rows="4" cols="40"></textarea><br><br>
+
+    <button type="submit">Post</button>
+
+  </form>
+
+  <a href="/home">Cancel</a>
+
+</body>
+</html>

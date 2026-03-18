@@ -21,7 +21,7 @@ const postSchema = new mongoose.Schema({
 });
 
 
-const Post = mongoose.model('Post',postSchema, 'posts');
+const Post = mongoose.model('Post', postSchema, 'posts');
 
 
 //Function getAllPost retrieves all data in posts.json
@@ -31,13 +31,13 @@ const getAllPost = async () => {
 
 //Function insertAll takes in array of posts, converts into Json strings and writes to posts.json || needs to be updated when move over to MongoDB
 const insertAll = async (posts) =>{
-    const jsonData = JSON.stringify(posts, null, 2);
-    await fs.writeFile(postsPath, jsonData);
+	const jsonData = JSON.stringify(posts, null, 2);
+	await fs.writeFile(postsPath, jsonData);
 }
 
 //Function to get sigle post by id
 const getPostById = async (id) => {
-  return await Post.findById(id).lean();
+	return await Post.findById(id).lean();
 };
 
 

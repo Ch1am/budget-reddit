@@ -1,55 +1,59 @@
+<h2>Newest Posts</h2>
+<% posts.forEach(post=> { %>
+  <article class="post-card" id="post-<%= post._id %>" onclick="window.location.href='/post/<%= post._id %>'">
+    <!--- User and time created -->
+    <div class="post-meta">
+      <span>u/<%= post.author %></span>
+      &nbsp;&bull;&nbsp;
+      <time datetime="<%= post.createdAt %>">
+        <%= timeAgo( post.createdAt ) %>
+      </time>
+    </div>
+    <!-- Post title -->
+    <a href="/post/<%= post._id %>" class="post-title">
+      <%= post.title %>
+    </a>
+<% if (post.imageBase64) { %>
+  <img src="data:<%= post.imageType %>;base64,<%= post.imageBase64 %>" alt="<%= post.title %>" class="post-image">
+<% } %>
+        <!-- Desc Snippet-->
+        <p class="post-snippet">
+          <%= post.snippet %> <a href="/post/<%= post._id %>" class="read-more">read more</a>
+        </p>
 
-    <h2>Newest Posts</h2>
-    <% posts.forEach(post => { %>
-        <article class="post-card" id="post-<%= post._id %>" onclick="window.location.href='/post/<%= post._id %>'">
-          <!--- User and time created -->
-          <div class="post-meta">
-            <span>u/<%= post.author %></span>
-            &nbsp;&bull;&nbsp;
-            <time datetime="<%= post.createdAt %>"><%= timeAgo( post.createdAt ) %></time>
+        <!--all not working at all bruh-->
+        <div class="post-actions">
+          <!--Voting div-->
+          <div class="vote-pill">
+            <form action="/home/<%= post._id %>/upvote" method="POST">
+              <% if (post.userVote==='upvote' ) { %>
+                <button type="submit" class="vote-up selected">
+                  <% } else { %>
+                    <button type="submit" class="vote-up">
+                      <% } %>
+                        <img src="icons/vote_up_arrow.svg" alt="upvote" width="20" height="20" />
+                    </button>
+            </form>
+            <span class="vote-count">
+              <%= post.votes %>
+            </span>
+            <form action="/home/<%= post._id %>/downvote" method="POST">
+              <% if (post.userVote==='downvote' ) { %>
+                <button onclick=window.location.reload() type="submit" class="vote-down selected">
+                  <% } else { %>
+                    <button type="submit" class="vote-down">
+                      <% } %>
+                        <img src="icons/vote_down_arrow.svg" alt="downvote" width="20" height="20" />
+                    </button>
+            </form>
           </div>
-          <!-- Post title -->
-          <a href="/posts/<%= post._id %>" class="post-title"><%= post.title %></a>
-          <% if (post.image) { %>
-            <img src="<%= post.image %>" alt="<%=post.image %>" class="post-image">
-          <% } %>
-          <!-- Desc Snippet-->
-          <p class="post-snippet">
-            <%= post.snippet %> <a href="/posts/<%= post._id %>" class="read-more">read more</a>
-          </p>
-          
-          <!--all not working at all bruh-->
-          <div class="post-actions">
-            <!--Voting div-->
-            <div class="vote-pill">
-              <form action="/home/<%= post._id %>/upvote" method="POST">
-                <% if (post.userVote === 'upvote') { %>
-                  <button type="submit" class="vote-up selected">
-                <% } else { %>
-                  <button type="submit" class="vote-up">
-                <% } %>
-                  <img src="icons/vote_up_arrow.svg" alt="upvote" width="20" height="20"/>
-                </button>
-              </form>
-              <span class="vote-count"><%= post.votes %></span>
-              <form action="/home/<%= post._id %>/downvote" method="POST">
-                <% if (post.userVote === 'downvote') { %>
-                  <button onclick=window.location.reload() type="submit" class="vote-down selected">
-                <% } else { %>
-                  <button type="submit" class="vote-down">
-                <% } %>
-                    <img src="icons/vote_down_arrow.svg" alt="downvote" width="20" height="20"/>
-                  </button>
-              </form>
-            </div>
-            <!--Comment div-->
-            <a href="/home/<%= post._id %>#comments" class="pill-btn">
-              <img src="icons/comment.svg" alt="comment" width="20" height="20"/>
-              <%= post.commentCount %>
-            </a>
-          </div>
-          
+          <!--Comment div-->
+          <a href="/home/<%= post._id %>#comments" class="pill-btn">
+            <img src="icons/comment.svg" alt="comment" width="20" height="20" />
+            <%= post.commentCount %>
+          </a>
+        </div>
 
-        </article>
-    <% }) %>
-    
+
+  </article>
+  <% }) %>

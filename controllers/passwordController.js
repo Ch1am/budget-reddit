@@ -111,11 +111,15 @@ exports.register = async (req, res) => {
             if (!result) {
                 res.send("There was an error when creating your account.")
             } else {
-                res.send(`You account has been created. Welcome to memeit, ${result.name}!<br><br>You will be redirected tp the login page in 3 seconds..`)
-
-                setTimeout(() => {
-                    res.redirect("/login")
-                })
+                res.send(`
+                    Your account has been created. Welcome to memeit, ${result.name}!<br><br>
+                    You will be redirected to the login page in 3 seconds...
+                    <script>
+                        setTimeout(() => {
+                            window.location.href = "/login";
+                        }, 3000);
+                    </script>
+                `);
             }
         }
     } catch (error) {

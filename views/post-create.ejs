@@ -9,19 +9,19 @@
 
   <h1>Create a Post</h1>
 
-  <form action="/posts/create" method="POST">
+  <form action="/post/create" method="POST" enctype="multipart/form-data">
 
     <label>Title</label><br>
     <input type="text" name="title" required><br><br>
 
     <label>Image file</label><br>
-    <input type="file" name="image"><br><br>
+    <input type="file" name="image" accept="image/*"><br><br>
 
     <label>Tag</label><br>
     <input type="text" name="tag"><br><br>
 
     <label>Description</label><br>
-    <textarea name="snippet" rows="4" cols="40"></textarea><br><br>
+    <textarea name="snippet" rows="4" cols="40" required></textarea><br><br>
 
     <button type="submit">Post</button>
 

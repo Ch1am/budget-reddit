@@ -1,16 +1,17 @@
 const express = require('express');
 const router = express.Router();
-const postController = require('../controllers/postController')
+const multer = require('multer');
+const postController = require('../controllers/postController');
+const upload = multer({storage:multer.memoryStorage()})
+
+//GET for post creation view
+router.get('/create', postController.getCreatePost);
+
+// POST create form
+router.post('/create', upload.single('image'),postController.createPost);
 
 //GET to see single post
 router.get('/:id', postController.getSinglePost);
 
-//GET for post creation view
-router.get('/create', (req, res) => {
-  res.render('post-create');
-});
-
-// POST create form
-router.post('/create', postController.createPost);
 
 module.exports = router;

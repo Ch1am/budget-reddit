@@ -1,21 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
-  <title><%= post.title %></title>
+  <title>
+    <%= post.title %>
+  </title>
   <%- include('partials/nav') %>
 </head>
+
 <body>
-   <% if (!post || post.length===0) { %>
-    <h1>POST does not extist</h1>
+  <% if (!post || post.length===0) { %>
+    <h1>POST does not exist</h1>
     <% } else { %>
-            <h1><%= post.title %></h1>
-  
-            <!-- Use the ID -->
-            <p>Post ID: <%= post._id %></p>     <!-- "123" -->
-            
-      <% } %>
+      <h1>
+        <%= post.title %>
+      </h1>
+      <% if (post.imageBase64) { %>
+        <img src="data:<%= post.imageType %>;base64,<%= post.imageBase64 %>" alt="<%= post.title %>" class="post-image">
+        <% } %>
+          <!-- Use the ID -->
+          <p>Post ID: <%= post._id %>
+          </p> <!-- "123" -->
+
+          <% } %>
 
 
 </body>
+
 </html>

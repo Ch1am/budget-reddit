@@ -20,7 +20,7 @@ const postSchema = new mongoose.Schema({
 });
 
 
-const Post = mongoose.model('Post',postSchema, 'posts');
+const Post = mongoose.model('Post', postSchema, 'posts');
 
 
 //Function getAllPost retrieves all data
@@ -30,7 +30,7 @@ const getAllPost = async () => {
 
 //Function to get sigle post by id
 const getPostById = async (id) => {
-  return await Post.findById(id).lean();
+	return await Post.findById(id).lean();
 };
 
 //Function createPost to create a new post and insert into mongo

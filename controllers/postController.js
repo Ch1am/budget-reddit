@@ -49,8 +49,6 @@ exports.getCreatePost = async (req, res) => {
 }
 
 exports.createPost = async (req, res) => {
-  console.log('req.file:', req.file); // check if multer is receiving the file
-  console.log('req.body:', req.body);
   const { title, tag, snippet } = req.body;
 
   if (!title || !snippet) {

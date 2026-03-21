@@ -1,6 +1,7 @@
 const Post = require('../models/postModel')
 const timeAgo = require("../functions/timeAgo")
 const User = require("./../models/registerModel")
+const Community = require("./../models/communityModel")
 
 exports.getSinglePost = async (req, res) => {
 	try {
@@ -47,23 +48,37 @@ exports.getSinglePost = async (req, res) => {
 };
 
 exports.getCreatePost = async (req, res) => {
-	res.render('post-create')
+	const userID = req.session.user
+	const user = await User.findByUserID(userID)
+	let communities = user.communities
+	const com = []
+
+	for (const c of communities) {
+        const r = await Community.findCommunityById(c);
+        com.push(r);
+    }
+
+	res.render('post-create', {
+		user, 
+		communities: com
+	})
 }
 
 exports.createPost = async (req, res) => {
-	const { title, tag, snippet } = req.body;
+	const { title, community, snippet } = req.body;
 
 	if (!title || !snippet) {
 		return res.render('post-create', { error: 'Title and description are required' });
 	}
 
+	console.log(community)
 	const image = req.file ? { data: req.file.buffer, contentType: req.file.mimetype } : { data: null, contentType: null };
 	const currentUser = await User.findByUserID(req.session.user) 
 
-	await Post.createPost({
+	const r = await Post.createPost({
 		title,
 		image,
-		tag: tag || null,
+		community: community == "None_Selected" ? null : community,
 		snippet,
 		author: currentUser ? currentUser.name : "Guest",
 		votes: 0,
@@ -71,6 +86,15 @@ exports.createPost = async (req, res) => {
 		commentCount: 0,
 		createdAt: new Date()
 	});
-	res.redirect('/home');
 
+	if (community !== "None_Selected") {
+		await Community.addPostToCommunity(community, req.session.user, r._id)
+	}
+
+	console.log(r)
+	if (!r) {
+		res.send("An error has occured, please try again later");
+	} else {
+		res.redirect('/home');
+	}
 };

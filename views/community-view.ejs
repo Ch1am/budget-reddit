@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title><%= community.name %></title>
+        <%- include('partials/nav') %>
+    </head>
+
+    <body>
+        <h1>Welcome to <%= community.name %>!</h1>
+        <p><%= community.description %></p>
+
+        <h2><u>Posts</u></h2>
+        <% if (posts.length == 0) { %>
+            This community currently has no posts, feel free to create a post for this community <a href="/post/create">here</a>!
+        <% } %>
+        <%- include('partials/post') %>
+    </body>
+</html>

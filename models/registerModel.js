@@ -17,6 +17,10 @@ const accountSchema = new mongoose.Schema({
     type: {
         type: String,
         default: "user"
+    },
+    communities: {
+        type: Array,
+        default: []
     }
 })
 
@@ -26,6 +30,24 @@ exports.findByEmail = function(email) {
     return User.findOne({
         email: email
     })
+}
+
+exports.addUserToCommunityUserSide = function(communityID, userID) {
+    return User.findByIdAndUpdate(
+        userID,
+        // pushes the user to the community but only if the user doesn't already exist
+        { $addToSet: { communities: communityID }},
+        { returnDocument: 'after' }
+    )
+}
+
+exports.removeUserFromCommunityUserSide = function(communityID, userID) {
+    return User.findByIdAndUpdate(
+        userID,
+        // pulls the user from the users array of a specific community
+        { $pull: { community: communityID }},
+        { returnDocument: 'after' }
+    )
 }
 
 exports.findByUserID = function(id) {

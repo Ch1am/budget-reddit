@@ -12,7 +12,7 @@ const postSchema = new mongoose.Schema({
   title:        { type: String, required: true },
   snippet:      { type: String, required: true },
   image: {       data: { type: Buffer, default: null }, contentType:{type:String,default:null}},
-  tag:          { type: String },
+  community:          { type: String, default: null },
   votes:        { type: Number, default: 0 },
   voters:       [voterSchema],
   commentCount: { type: Number, default: 0 },

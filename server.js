@@ -12,7 +12,8 @@ const session = require("express-session");
 const authentication = require("./routes/authentication");
 const homeRoute = require("./routes/home");
 const settingsRoute = require("./routes/settings.js")
-const postRoutes = require('./routes/posts');
+const postRoutes = require("./routes/posts");
+const communityRoutes = require("./routes/community.js")
 
 // session config
 server.use(session({
@@ -34,7 +35,8 @@ server.set("view engine", "ejs");
 server.use("/", authentication);
 server.use("/home", homeRoute);
 server.use("/settings", settingsRoute);
-server.use('/post', postRoutes);
+server.use("/post", postRoutes);
+server.use("/community", communityRoutes)
 
 
 // async function to connect to DB

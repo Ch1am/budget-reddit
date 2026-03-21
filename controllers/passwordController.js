@@ -105,7 +105,8 @@ exports.register = async (req, res) => {
                 name: newName,
                 email: newEmail,
                 password: await bcrypt.hash(newPassword, 10),
-                type: "user"
+                type: "user",
+                communities: []
             })
 
             if (!result) {

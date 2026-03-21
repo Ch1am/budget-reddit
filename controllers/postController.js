@@ -50,6 +50,8 @@ exports.getCreatePost = async (req, res) => {
 
 exports.createPost = async (req, res) => {
   const { title, tag, snippet } = req.body;
+  const userInfo = await User.findByUserID(req.session.user);
+  const username = userInfo.username;
 
   if (!title || !snippet) {
     return res.render('post-create', { error: 'Title and description are required' });
@@ -62,7 +64,7 @@ exports.createPost = async (req, res) => {
     image,
     tag: tag || null,
     snippet,
-    author: 'guest', //replace with session ID
+    author: username, 
     votes: 0,
     voters: [],
     commentCount: 0,

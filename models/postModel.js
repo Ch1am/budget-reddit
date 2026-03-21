@@ -1,5 +1,3 @@
-const fs = require("node:fs/promises");
-const path = require("path");
 const mongoose = require("mongoose");
 
 const voterSchema = new mongoose.Schema({
@@ -36,7 +34,23 @@ const getPostById = async (id) => {
 //Function createPost to create a new post and insert into mongo
 const createPost = async (postData) => {
   const post = new Post(postData);
-  return await post.save();;
+  return await post.save();
 };
 
-module.exports = {getAllPost, getPostById, createPost};
+// update vote count and voters list
+const updateVote = async (id, username, voteType, voteChange) => {
+  const post = await Post.findById(id);
+  // remove existing vote if any
+  post.voters = post.voters.filter(v => v.username !== username);
+  // add new vote if not removing
+  if (voteType !== null) {
+    post.voters.push({ username, voteType });
+  }
+  // update vote count
+  post.votes += voteChange;
+
+  // save back to MongoDB
+  await post.save();
+};
+
+module.exports = {getAllPost, getPostById, createPost, updateVote};

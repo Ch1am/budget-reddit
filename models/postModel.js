@@ -31,6 +31,11 @@ const getPostById = async (id) => {
 	return await Post.findById(id).lean();
 };
 
+//function getPostsByAuthor retrieves all posts made by user who is logged in.
+const getPostsByAuthor = async (author) => {
+  return await Post.find({ author }).lean();
+};
+
 //Function createPost to create a new post and insert into mongo
 const createPost = async (postData) => {
   const post = new Post(postData);
@@ -53,12 +58,14 @@ const updateVote = async (id, username, voteType, voteChange) => {
   await post.save();
 };
 
+//editing logged in user post
 const updatePost = async (id, updatedData) => {
   return await Post.findByIdAndUpdate(id, updatedData);
 };
 
+//deleting logged in user post
 const deletePost = async (id) => {
   return await Post.findByIdAndDelete(id);
 };
 
-module.exports = {getAllPost, getPostById, createPost, updateVote, updatePost, deletePost};
+module.exports = {getAllPost, getPostById, getPostsByAuthor, createPost, updateVote, updatePost, deletePost};

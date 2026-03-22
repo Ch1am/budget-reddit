@@ -55,6 +55,22 @@ exports.getSinglePost = async (req, res) => {
   }
 };
 
+exports.getUserPost = async (req,res)=>{
+  try {
+    if (!req.session || !req.session.user) return res.redirect('/login');
+
+    const userInfo = await User.findByUserID(req.session.user);
+    const posts = await Post.getPostsByAuthor(userInfo.name);
+
+    res.render('myPost', { posts, timeAgo });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error loading your posts');
+  }  
+}
+
+
 exports.getCreatePost = async (req, res) => {
   if (!req.session || !req.session.user) return res.redirect("/login");
   res.render("post-create");

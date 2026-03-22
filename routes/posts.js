@@ -10,8 +10,9 @@ router.get('/create', postController.getCreatePost);
 // POST create form
 router.post('/create', upload.single('image'),postController.createPost);
 
-//GET to see single post
-router.get('/:id', postController.getSinglePost);
+
+//GET to see all user post
+router.get('/myposts', postController.getUserPost);
 
 //GET to retrieve edit post ejs
 router.get('/:id/edit', postController.getEditPost)
@@ -21,5 +22,8 @@ router.post('/:id/edit', postController.editPost)
 
 //POST to handle delete
 router.post('/:id/delete', postController.deletePost)
+
+//GET to see single post
+router.get('/:id', postController.getSinglePost);
 
 module.exports = router;

@@ -53,4 +53,12 @@ const updateVote = async (id, username, voteType, voteChange) => {
   await post.save();
 };
 
+const updatePost = async (id, updatedData) => {
+  return await Post.findByIdAndUpdate(id, updatedData);
+};
+
+const deletePost = async (id) => {
+  return await Post.findByIdAndDelete(id);
+};
+
 module.exports = {getAllPost, getPostById, createPost, updateVote};

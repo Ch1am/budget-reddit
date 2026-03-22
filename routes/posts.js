@@ -13,5 +13,13 @@ router.post('/create', upload.single('image'),postController.createPost);
 //GET to see single post
 router.get('/:id', postController.getSinglePost);
 
+//GET to retrieve edit post ejs
+router.get('/:id/edit', postController.getEditPost)
+
+//POST to send edited post
+router.post('/:id/edit', postController.editPost)
+
+//POST to handle delete
+router.post('/:id/delete', postController.deletePost)
 
 module.exports = router;

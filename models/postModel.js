@@ -61,4 +61,4 @@ const deletePost = async (id) => {
   return await Post.findByIdAndDelete(id);
 };
 
-module.exports = {getAllPost, getPostById, createPost, updateVote};
+module.exports = {getAllPost, getPostById, createPost, updateVote, updatePost, deletePost};

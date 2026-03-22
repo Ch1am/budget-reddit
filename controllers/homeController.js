@@ -18,11 +18,11 @@ exports.displayAllPost = async (req, res) => {
 		const userInfo = await User.findByUserID(session.user)
 		let posts = await postModel.getAllPost()
 		const reversedPosts = posts.slice().reverse() //this reverse line just flips the array so the newst post is at the top
-		const username = userInfo.username;
+		const name = userInfo.name;
 
     const postsWithVotes = reversedPosts.map((post) => {
       //existingVote checks if user has voted on any post before, then renders the vote button color
-    const existingVote = post.voters.find((voter) => voter.username === username)
+    const existingVote = post.voters.find((voter) => voter.name === name)
 
       //converting the img buffer to base64 string for ejs
 let imageBase64 = null

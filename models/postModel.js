@@ -1,42 +1,80 @@
-const fs = require("node:fs/promises");
-const path = require("path");
 const mongoose = require("mongoose");
 
 const voterSchema = new mongoose.Schema({
   username: String,
-  voteType: String
+  voteType: String,
 });
 
 const postSchema = new mongoose.Schema({
-  author:       { type: String, required: true ,default: "guest"},
-  title:        { type: String, required: true },
-  snippet:      { type: String, required: true },
-  image: {       data: { type: Buffer, default: null }, contentType:{type:String,default:null}},
-  tag:          { type: String },
-  votes:        { type: Number, default: 0 },
-  voters:       [voterSchema],
+  author: { type: String, required: true, default: "guest" },
+  title: { type: String, required: true },
+  snippet: { type: String, required: true },
+  image: {
+    data: { type: Buffer, default: null },
+    contentType: { type: String, default: null },
+  },
+  tag: { type: String },
+  votes: { type: Number, default: 0 },
+  voters: [voterSchema],
   commentCount: { type: Number, default: 0 },
-  createdAt:    { type: Date }
+  createdAt: { type: Date },
 });
 
-
-const Post = mongoose.model('Post', postSchema, 'posts');
-
+const Post = mongoose.model("Post", postSchema, "posts");
 
 //Function getAllPost retrieves all data
 const getAllPost = async () => {
-    return await Post.find().lean();
+  return await Post.find().lean();
 };
 
 //Function to get sigle post by id
 const getPostById = async (id) => {
-	return await Post.findById(id).lean();
+  return await Post.findById(id).lean();
+};
+
+//function getPostsByAuthor retrieves all posts made by user who is logged in.
+const getPostsByAuthor = async (author) => {
+  return await Post.find({ author }).lean();
 };
 
 //Function createPost to create a new post and insert into mongo
 const createPost = async (postData) => {
   const post = new Post(postData);
-  return await post.save();;
+  return await post.save();
 };
 
-module.exports = {getAllPost, getPostById, createPost};
+// update vote count and voters list
+const updateVote = async (id, username, voteType, voteChange) => {
+  const post = await Post.findById(id);
+  // remove existing vote if any
+  post.voters = post.voters.filter((v) => v.username !== username);
+  // add new vote if not removing
+  if (voteType !== null) {
+    post.voters.push({ username, voteType });
+  }
+  // update vote count
+  post.votes += voteChange;
+
+  // save back to MongoDB
+  await post.save();
+};
+
+//editing logged in user post
+const updatePost = async (id, updatedData) => {
+  return await Post.findByIdAndUpdate(id, updatedData);
+};
+
+//deleting logged in user post
+const deletePost = async (id) => {
+  return await Post.findByIdAndDelete(id);
+};
+
+module.exports = {
+  getAllPost,
+  getPostById,
+  getPostsByAuthor,
+  createPost,
+  updateVote,
+  updatePost,
+  deletePost,
+};

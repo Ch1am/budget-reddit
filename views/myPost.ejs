@@ -14,20 +14,20 @@
 
   <h1>My Posts</h1>
   <% if (posts.length === 0) { %>
-    <p>You have no posts yet.</p>
+  <p>You have no posts yet.</p>
   <% } else { %>
-    <% posts.forEach((post) => { %>
-      <div>
-        <a href="/post/<%= post._id %>"><%= post.title %></a>
-        <p>by u/<%= post.author %> | <%= timeAgo(post.createdAt) %></p>
-        <p><%= post.snippet %></p>
-        <a href="/post/<%= post._id %>/edit">Edit</a>
-        <form action="/post/<%= post._id %>/delete" method="POST" style="display:inline">
-          <button type="submit">Delete</button>
-        </form>
-      </div>
-      <hr>
-    <% }) %>
+  <% posts.forEach((post) => { %>
+  <div>
+    <a href="/post/<%= post._id %>"><%= post.title %></a>
+    <p>by u/<%= post.author %> | <%= timeAgo(post.createdAt) %></p>
+    <p><%= post.snippet %></p>
+    <a href="/post/<%= post._id %>/edit">Edit</a>
+    <form action="/post/<%= post._id %>/delete" method="POST" style="display:inline">
+      <button type="submit">Delete</button>
+    </form>
+  </div>
+  <hr>
+  <% }) %>
   <% } %>
 
   <a href="/home">Back to Home</a>

@@ -55,21 +55,19 @@ exports.getSinglePost = async (req, res) => {
   }
 };
 
-exports.getUserPost = async (req,res)=>{
+exports.getUserPost = async (req, res) => {
   try {
-    if (!req.session || !req.session.user) return res.redirect('/login');
+    if (!req.session || !req.session.user) return res.redirect("/login");
 
     const userInfo = await User.findByUserID(req.session.user);
     const posts = await Post.getPostsByAuthor(userInfo.name);
 
-    res.render('myPost', { posts, timeAgo });
-
+    res.render("myPost", { posts, timeAgo });
   } catch (error) {
     console.error(error);
-    res.status(500).send('Error loading your posts');
-  }  
-}
-
+    res.status(500).send("Error loading your posts");
+  }
+};
 
 exports.getCreatePost = async (req, res) => {
   if (!req.session || !req.session.user) return res.redirect("/login");
@@ -123,20 +121,22 @@ exports.editPost = async (req, res) => {
   const post = await Post.getPostById(req.params.id);
   const userInfo = await User.findByUserID(req.session.user);
 
-  if (post.author !== userInfo.name) return res.redirect(`/post/${req.params.id}`);
+  if (post.author !== userInfo.name)
+    return res.redirect(`/post/${req.params.id}`);
 
   const { title, snippet, tag } = req.body;
   await Post.updatePost(req.params.id, { title, snippet, tag });
   res.redirect(`/post/${req.params.id}`);
 };
 
-exports.deletePost = async(req,res)=>{
-    if (!req.session || !req.session.user) return res.redirect("/login");
+exports.deletePost = async (req, res) => {
+  if (!req.session || !req.session.user) return res.redirect("/login");
   const post = await Post.getPostById(req.params.id);
   const userInfo = await User.findByUserID(req.session.user);
 
-  if (post.author !== userInfo.name) return res.redirect(`/post/${req.params.id}`);
+  if (post.author !== userInfo.name)
+    return res.redirect(`/post/${req.params.id}`);
 
-  await Post.deletePost(req.params.id)
+  await Post.deletePost(req.params.id);
   res.redirect("/home");
-}
+};

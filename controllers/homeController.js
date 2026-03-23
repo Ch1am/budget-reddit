@@ -11,7 +11,6 @@ exports.displayAllPost = async (req, res) => {
 		const session = req.session
 		// user information
 		const userInfo = await User.findByUserID(session.user)
-
 		let posts = await postModel.getAllPost();
 		posts = await Promise.all(posts.map(async (p) => {
 			if (p.community) {

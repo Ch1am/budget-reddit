@@ -12,7 +12,7 @@ const postSchema = new mongoose.Schema({
   title:        { type: String, required: true },
   snippet:      { type: String, required: true },
   image: {       data: { type: Buffer, default: null }, contentType:{type:String,default:null}},
-  community:          { type: String, default: null },
+  community:    { type: mongoose.Schema.Types.ObjectId, ref: "Community", default: null },
   votes:        { type: Number, default: 0 },
   voters:       [voterSchema],
   commentCount: { type: Number, default: 0 },
@@ -39,4 +39,9 @@ const createPost = async (postData) => {
   return await post.save();;
 };
 
-module.exports = {getAllPost, getPostById, createPost};
+//deleting logged in user post
+const deletePost = async (id) => {
+  return await Post.findByIdAndDelete(id);
+};
+
+module.exports = {getAllPost, getPostById, createPost, deletePost};

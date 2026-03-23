@@ -1,15 +1,16 @@
 const express = require("express");
 const router = express.Router();
 const homeController = require('../controllers/homeController')
+const middleware = require("../middleware/auth");
 
 //GET route to display the list of posts
-router.get("/", homeController.displayAllPost);
+router.get("/", middleware.isLoggedIn, homeController.displayAllPost);
 
 // POST upvote
-router.post('/:id/upvote', homeController .upvote);
+router.post('/:id/upvote', middleware.isLoggedIn, homeController .upvote);
 
 // POST downvote
-router.post('/:id/downvote', homeController.downvote);
+router.post('/:id/downvote', middleware.isLoggedIn, homeController.downvote);
 
 // POST share (stub)
 router.post('/:id/share', (req, res) => {

@@ -6,10 +6,25 @@
     </head>
 
     <body>
-        <h1>Welcome to <%= community.name %>!</h1>
+        <h1>Welcome to <%= community.name %>! (<%= community.users.length %> <%= community.users.length == 1 ? "member" : "members" %>)</h1>
         <p><%= community.description %></p>
-
-        <h2><u>Posts</u></h2>
+        <% if (!userJoinedCommunity) { %>
+            <form action="/community/<%= community._id %>/join" method="post">
+                <input type="submit" value="Join this community!">
+            </form>
+        <% } else if (userJoinedCommunity && userIsAdmin) { %>
+            <form action="/community/<%= community._id %>/manage" method="post">
+                <input type="submit" value="Manage this community!">
+            </form>
+            <form action="/community/<%= community._id %>/leave" method="post">
+                <input type="submit" value="Leave this community :(">
+            </form>
+        <% } else { %>
+            <form action="/community/<%= community._id %>/leave" method="post">
+                <input type="submit" value="Leave this community :(">
+            </form>
+        <% } %>
+        <h2><u>Posts</u> (<%= posts.length %> <%= posts.length == 1 ? "post" : "posts"  %>)</h2>
         <% if (posts.length == 0) { %>
             This community currently has no posts, feel free to create a post for this community <a href="/post/create">here</a>!
         <% } %>

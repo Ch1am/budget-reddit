@@ -138,3 +138,12 @@ exports.editCommunityDescription = function(communityID, userID, desc) {
         { returnDocument: 'after' }
     )
 }
+
+// community name
+exports.editCommunityName = function(communityID, userID, name) {
+    return Community.findOneAndUpdate(
+        { _id: communityID, users: userID, admins: userID},
+        { $set: { name: name } },
+        { returnDocument: 'after' }
+    )
+}

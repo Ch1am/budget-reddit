@@ -45,7 +45,7 @@ exports.removeUserFromCommunityUserSide = function(communityID, userID) {
     return User.findByIdAndUpdate(
         userID,
         // pulls the user from the users array of a specific community
-        { $pull: { community: communityID }},
+        { $pull: { communities: communityID }},
         { returnDocument: 'after' }
     )
 }

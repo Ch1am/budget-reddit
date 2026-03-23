@@ -49,6 +49,7 @@ exports.getSinglePost = async (req, res) => {
 
 exports.getCreatePost = async (req, res) => {
 	const userID = req.session.user
+
 	const user = await User.findByUserID(userID)
 	let communities = user.communities
 	const com = []

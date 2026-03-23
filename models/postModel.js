@@ -6,16 +6,13 @@ const voterSchema = new mongoose.Schema({
 });
 
 const postSchema = new mongoose.Schema({
-  author: { type: String, required: true, default: "guest" },
-  title: { type: String, required: true },
-  snippet: { type: String, required: true },
-  image: {
-    data: { type: Buffer, default: null },
-    contentType: { type: String, default: null },
-  },
-  tag: { type: String },
-  votes: { type: Number, default: 0 },
-  voters: [voterSchema],
+  author:       { type: String, required: true ,default: "guest"},
+  title:        { type: String, required: true },
+  snippet:      { type: String, required: true },
+  image: {       data: { type: Buffer, default: null }, contentType:{type:String,default:null}},
+  community:    { type: mongoose.Schema.Types.ObjectId, ref: "Community", default: null },
+  votes:        { type: Number, default: 0 },
+  voters:       [voterSchema],
   commentCount: { type: Number, default: 0 },
   createdAt: { type: Date },
 });

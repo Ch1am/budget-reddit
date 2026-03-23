@@ -1,51 +1,88 @@
-<h2>Newest Posts</h2>
-<% posts.forEach(post=> { %>
-<article class="post-card" id="post-<%= post._id %>" onclick="window.location.href='/post/<%= post._id %>'">
-  <!--- User and time created -->
-  <div class="post-meta">
-    <span>u/<%= post.author %></span>
-    &nbsp;&bull;&nbsp;
-    <time datetime="<%= post.createdAt %>">
-      <%= timeAgo( post.createdAt ) %>
-    </time>
-  </div>
-  <!-- Post title -->
-  <a href="/post/<%= post._id %>" class="post-title">
-    <%= post.title %>
-  </a>
-  <% if (post.imageBase64) { %>
-  <img src="data:<%= post.imageType %>;base64,<%= post.imageBase64 %>" alt="<%= post.title %>" class="post-image">
-  <% } %>
-  <!-- Desc Snippet-->
-  <p class="post-snippet">
-    <%= post.snippet %> <a href="/post/<%= post._id %>" class="read-more">read more</a>
-  </p>
+<table border="1">
+	<% let i = 0 %>
+	<% posts.forEach(post => { %>
+		<article id="post-<%= post._id %>" onclick="window.location.href='/post/<%= post._id %>'">
+			<% if (i != 0) { %>
+				<tr>
+					<td colspan="2" style="text-align: center;">
+						<div style="width: 100%; overflow: hidden; white-space: nowrap; color: #888;">
+							############################################################################
+						</div>
+					</td>
+				</tr>
+			<% } %>
+			<tr>
+				<td rowspan="4" style="text-align: center;">
+					<!--Voting div-->
+					<form action="/home/<%= post._id %>/upvote" method="POST">
+					<% if (post.userVote==='upvote') { %>
+						<button type="submit" class="vote-up selected">
+						<% } else { %>
+							<button type="submit" class="vote-up">
+							<% } %>
+								<img src="/icons/vote_up_arrow.svg" alt="upvote" width="20" height="20" />
+							</button>
+					</form>
 
-  <!--all not working at all bruh-->
-  <div class="post-actions">
-    <!--Voting div-->
-    <div class="vote-pill">
-<form action="/home/<%= post._id %>/upvote" method="POST" onsubmit="this.querySelector('button').disabled=true">
-  <button type="submit" class="vote-up <%= post.userVote === 'upvote' ? 'selected' : '' %>">
-    <img src="/icons/vote_up_arrow.svg" alt="upvote" width="20" height="20" />
-  </button>
-</form>
+					<span class="vote-count">
+					<%= post.votes %>
+					</span>
 
-      <span class="vote-count"><%= post.votes %></span>
+					<form action="/home/<%= post._id %>/downvote" method="POST">
+					<% if (post.userVote==='downvote') { %>
+						<button onclick=window.location.reload() type="submit" class="vote-down selected">
+						<% } else { %>
+							<button type="submit" class="vote-down">
+							<% } %>
+								<img src="/icons/vote_down_arrow.svg" alt="downvote" width="20" height="20" />
+							</button>
+					</form>
+				</td>
+				<td>
+					<span>
+						u/<%= post.author %>
+					</span>
 
-<form action="/home/<%= post._id %>/downvote" method="POST" onsubmit="this.querySelector('button').disabled=true">
-  <button type="submit" class="vote-down <%= post.userVote === 'downvote' ? 'selected' : '' %>">
-    <img src="/icons/vote_down_arrow.svg" alt="downvote" width="20" height="20" />
-  </button>
-</form>
-    </div>
-    <!--Comment div-->
-    <a href="/home/<%= post._id %>#comments" class="pill-btn">
-      <img src="icons/comment.svg" alt="comment" width="20" height="20" />
-      <%= post.commentCount %>
-    </a>
-  </div>
+					&nbsp;&bull;&nbsp;
 
+					<time datetime="<%= post.createdAt %>">
+						<%= timeAgo( post.createdAt ) %>
+					</time>
+					<% if (post.community && !inCommunity) { %>
+						&nbsp;&bull;&nbsp;
+						<span>
+							Found at <a href="/community/<%= post.community._id %>">r/<%= post.community.name %></a>
+						</span>
+					<% } %>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<!-- Post title -->
+					<a href="/post/<%= post._id %>" class="post-title"><%= post.title %></a>
+					<br><br>
 
-</article>
-<% }) %>
+					<% if (post.imageBase64) { %>
+						<img src="data:<%= post.imageType %>;base64,<%= post.imageBase64 %>" alt="<%= post.title %>" class="post-image">
+						<br>
+					<% } %>
+
+					<!-- Desc Snippet-->
+					<p><%= post.snippet %> <a href="/post/<%= post._id %>" class="read-more">read more</a></p>
+						
+				</td>
+			<tr>
+			<tr>
+				<td colspan="2">
+					<a href="/home/<%= post._id %>#comments" class="pill-btn">
+						<img src="/icons/comment.svg" alt="comment" width="20" height="20" />
+						<%= post.commentCount %>
+					</a>
+				</td>
+			</tr>
+			
+			<% i++ %>
+		</article>
+
+	<% }) %>
+</table>

@@ -2,7 +2,6 @@ const postModel = require('../models/postModel');
 const timeAgo = require("../functions/timeAgo")
 const User = require("../models/registerModel")
 const mongoose = require('mongoose');
-const Post = require("../models/postModel");
 const Community = require('../models/communityModel');
 
 //displayAllPost diplays everything from newest order in the array (added last in the array)
@@ -10,7 +9,6 @@ exports.displayAllPost = async (req, res) => {
 	try {
 		const session = req.session
 		// user information
-		const userInfo = await User.findByUserID(session.user)
 		let posts = await postModel.getAllPost();
 		posts = await Promise.all(posts.map(async (p) => {
 			if (p.community) {
@@ -21,7 +19,8 @@ exports.displayAllPost = async (req, res) => {
 		}));
 
 		const reversedPosts = posts.slice().reverse() //this reverse line just flips the array so the newst post is at the top
-		const username = 'russell_dev'; // replace with sessionID later
+		const currentUser = await User.findByUserID(req.session.user) 
+		const username = currentUser.name
 
 
 		const postsWithVotes = reversedPosts.map((post) => {
@@ -56,56 +55,50 @@ exports.displayAllPost = async (req, res) => {
 	}
 }
 
-// russell old upvote code
 exports.upvote = async (req, res) => {
-	const id = req.params.id
-	const posts = await postModel.getAll();
-	const post = posts.find((p) => String(p.id) === String(req.params.id));
-	const username = 'russell_dev';
+  const id = req.params.id;
+  const currentUser = await User.findByUserID(req.session.user);
+  const username = currentUser.name;
 
-	if (post) {
-		const existingVote = post.voters.find((v) => v.username === username);
-		if (existingVote) {
-		if (existingVote.voteType === 'upvote') {
-			post.votes--;
-			post.voters = post.voters.filter((v) => v.username !== username);
-		} else {
-			post.votes += 2;
-			existingVote.voteType = 'upvote';
-		}
-		} else {
-		post.voters.push({ username, voteType: 'upvote' });
-		post.votes++;
-		}
-		await postModel.insertAll(posts);
-	}
-	res.redirect(`/home#post-${id}`);
+  try {
+    const post = await postModel.getPostById(id);
+    const existingVote = post.voters.find((v) => v.username === username);
+
+    if (!existingVote) {
+      await postModel.updateVote(id, username, 'upvote', 1);
+    } else if (existingVote.voteType === 'upvote') {
+      await postModel.updateVote(id, username, null, -1);
+    } else {
+      await postModel.updateVote(id, username, 'upvote', 2);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+  res.redirect(`/home#post-${id}`);
 };
 
 exports.downvote = async (req, res) => {
-	const id = req.params.id
-	const posts = await postModel.getAll();
-	const post = posts.find((p) => String(p.id) === String(req.params.id));
-	const username = 'russell_dev';
+  const id = req.params.id;
+  const currentUser = await User.findByUserID(req.session.user);
+  const username = currentUser.name;
 
-	if (post) {
-		const existingVote = post.voters.find((v) => v.username === username);
-		if (existingVote) {
-		if (existingVote.voteType === 'downvote') {
-			post.votes++;
-			post.voters = post.voters.filter((v) => v.username !== username);
-		} else {
-			post.votes -= 2;
-			existingVote.voteType = 'downvote';
-		}
-		} else {
-		post.voters.push({ username, voteType: 'downvote' });
-		post.votes--;
-		}
-		await postModel.insertAll(posts);
-	}
-	res.redirect(`/home#post-${id}`);
+  try {
+    const post = await postModel.getPostById(id);
+    const existingVote = post.voters.find((v) => v.username === username);
+
+    if (!existingVote) {
+      await postModel.updateVote(id, username, 'downvote', -1);
+    } else if (existingVote.voteType === 'downvote') {
+      await postModel.updateVote(id, username, null, 1);
+    } else {
+      await postModel.updateVote(id, username, 'downvote', -2);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+  res.redirect(`/home#post-${id}`);
 };
+
 exports.showAddCollection = (req,res) => {
   let msg = null
   res.render ('create-collection',{msg,result:null})

@@ -17,12 +17,8 @@ exports.getSinglePost = async (req, res) => {
 				timeAgo
 			});
 		}
-
-		let sessionUser = null;
-		if (req.session && req.session.user) {
-			const userInfo = await User.findByUserID(req.session.user);
-			sessionUser = userInfo.name;
-		}
+		
+      const currentUser = await User.findByUserID(req.session.user) 
 
 		//converting the image
 		let imageBase64 = null; //set the imgb64 to null first then
@@ -53,7 +49,7 @@ exports.getSinglePost = async (req, res) => {
 			},
 			timeAgo,
 			collectionList,
-			sessionUser,
+			currentUser,
 		});
 	} catch (error) {
 		console.error(error);

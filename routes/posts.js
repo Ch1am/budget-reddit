@@ -11,9 +11,6 @@ router.get('/create', middleware.isLoggedIn, postController.getCreatePost);
 // POST create form
 router.post('/create', middleware.isLoggedIn, upload.single('image'), postController.createPost);
 
-//GET to see single post
-router.get('/:id', middleware.isLoggedIn, postController.getSinglePost);
-
 // add to collection
 router.get('/:id/add-to-collection',postController.showCollectionDetails)
 router.post('/:id/add-to-collection',postController.addInCollection)
@@ -31,6 +28,6 @@ router.post("/:id/edit", postController.editPost);
 router.post("/:id/delete", postController.deletePost);
 
 //GET to see single post
-router.get("/:id", postController.getSinglePost);
+router.get('/:id', middleware.isLoggedIn, postController.getSinglePost);
 
 module.exports = router;

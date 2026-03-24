@@ -7,7 +7,7 @@ const middleware = require("../middleware/auth");
 router.get("/", middleware.isLoggedIn, homeController.displayAllPost);
 
 // POST upvote
-router.post('/:id/upvote', middleware.isLoggedIn, homeController .upvote);
+router.post('/:id/upvote', middleware.isLoggedIn, homeController.upvote);
 
 // POST downvote
 router.post('/:id/downvote', middleware.isLoggedIn, homeController.downvote);

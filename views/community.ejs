@@ -6,7 +6,7 @@
     </head>
 
     <body>
-        <h1>memeit communities</h1>
+        <h1>memeit communities (<a href="/community/create">create</a>)</h1>
         <% if (!communities || communities.length == 0) { %>
             There are currently no communities! Feel free to create one for yourself <a href="/community/create">here!</a>
         <% } else { %>
@@ -14,7 +14,11 @@
                 <% communities.forEach(c => { %>
                     <tr>
                         <td>
-                            <h3><a href="/community/<%= c._id %>"><%= c.name %></a> &bull; <%= c.users.length %> members</h3>
+                            <h3><a href="/community/<%= c._id %>"><%= c.name %></a> &bull; <%= c.users.length %> members
+                            <% if (c.users.includes(userID)) { %>
+                                 (Joined)
+                            <% } %>
+                            </h3>
                             <p><%= c.description %></p>
                         </td>
                     </tr>

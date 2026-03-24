@@ -1,5 +1,4 @@
-const fs = require("node:fs/promises")
-const User = require('./../models/registerModel')
+const User = require('./../models/registerModel');
 const bcrypt = require("bcrypt");
 
 exports.showLogin = async (req, res) => {

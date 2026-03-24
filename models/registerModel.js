@@ -54,6 +54,10 @@ exports.findByUserID = function(id) {
     return User.findById(id);
 }
 
+exports.findByUsername = function(name) {
+    return User.findOne({ name: name })
+}
+
 exports.addUser = function(newUser) {
     return User.create(newUser)
 }
@@ -66,4 +70,22 @@ exports.editUser = function(email, name, password, type) {
         password: password,
         type: type
     })
+}
+
+exports.editUserName = function(id, name) {
+    return User.findByIdAndUpdate(id, 
+        { name: name },
+        { new: true, runValidators: true}
+    );
+}
+
+exports.editPassword = function(id, hashedPassword) {
+    return User.findByIdAndUpdate(id, 
+        { password: hashedPassword},
+        { new: true, runValidators: true}
+    )
+}
+
+exports.deleteAccount = function(id) {
+    return User.findByIdAndDelete(id);
 }

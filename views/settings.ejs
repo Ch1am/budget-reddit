@@ -14,98 +14,86 @@
             <a href="/home" class="logo">Budget Reddit</a>
         </h1>
 
-        <div class="nav-right">
-            <span class="nav-username">u/<%= user.username %></span>
+        <div>
+            <span>u/<%= user.name %></span>
         </div>
 
+        <h1>Account Settings</h1>
 
-        <h1 class="settings-title">Account Settings</h1>
-        <article class="settings-card">
-            <h2>Profile Picture</h2>
-            <p class="card-desc">Upload a new profile picture. Accepted formats: JPG, PNG.</p>
+
+        <h2>Change Username</h2>
+        <p class>Your current username is <strong>u/<%= user.name %></strong>.</p>
+        <% if (usernameErrors.length > 0) { %>
+            The following errors have occured:
+            <ul>
+                <% usernameErrors.forEach(e => { %>
+                    <li><%= e %></li>
+                <% }) %>
+            </ul>
+        <% } %>
+
+        <form action="/settings/username" method="POST">
+            <label for="newUsername">New Username:</label>
+            <input type="text" name="newUsername" placeholder="Enter new username" value="<%= tempUsername ? tempUsername : "" %>" required>
+            <br>
+            <button type="submit">Save</button>
+        </form>
+
+
+        <h2>Change Password</h2>
+        <p>Choose a strong password you have not used before.</p>
+        <% if (passwordErrors.length > 0) { %>
+            The following errors have occured:
+            <ul>
+                <% passwordErrors.forEach(e => { %>
+                    <li><%= e %></li>
+                <% }) %>
+            </ul>
+        <% } %>
+
+        <form action="/settings/password" method="POST">
+            <table>
+                <tr>
+                    <td>Current Password:</td>
+                    <td><input type="password" name="currentPassword" placeholder="Enter current password" required></td>
+                </tr>
+                <tr>
+                    <td>New Password:</td>
+                    <td><input type="password" name="newPassword" placeholder="Enter new password" required></td>
+                </tr>
+                <tr>
+                    <td>Confirm New Password:</td>
+                    <td><input type="password" name="confirmPassword" placeholder="Confirm new password" required></td>
+                </tr>
+            </table>
+
+            <button type="submit">Save</button>
+        </form>
+
+
+        <h2>Danger Zone</h2>
+        <p>Actions taken within this section are permanent and cannot be undone. Proceed with caution.</p>
+        <% if (!accountDelete) { %>
+            <form action="/settings/delete" method="post">
+                <input type="submit" value="Delete My Account">
+            </form>
+            <form action="/settings/logout" method="POST">
+                <button type="submit">Log Out</button>
+            </form>
+        <% } %>
+
+        <% if (accountDelete) { %>
+            <h2 class="modal-title">Are you sure?</h2>
+            <p class="modal-warning">This will permanently delete your account, all your posts, comments and votes. This cannot be reversed.</p>
             
-            <div class="avatar-preview">
-                <% if (user.avatar) { %>
-                    <img src="<%= user.avatar %>" alt="Current avatar" class="avatar-img">
-                <% } else { %>
-                    <div class="avatar-placeholder">No image</div>
-                <% } %>
-            </div>
-            
-            <form action="/settings/avatar" method="POST" class="settings-form">
-                <input type="file" name="avatar" accept="image/jpeg, image/png">
-                <button type="submit" class="save-btn">Upload</button>
-            </form>
-
-        </article>
-
-        <article class="settings-card">
-            <h2>Change Username</h2>
-
-            <p class="card-desc">Your current username is <strong>u/<%= user.username %></strong>.</p>
-            <form action="/settings/username" method="POST" class="settings-form">
-                <% if (username_change && username_change.changed) { %>
-                    <p>✅ Your username has been successfully changed!</p>
-                <% } %>
-                <label for="new-username">New Username</label>
-                <input type="text" id="new-username" name="username" placeholder="Enter new username" required>
+            <form action="/settings/confirmDelete" method="POST" class="settings-form">
+                <label for="delete-confirm">Type your username to confirm</label>
+                <input type="text" name="confirmUsername" placeholder="Enter your username">
                 <br>
-                <button type="submit" class="save-btn">Save</button>
-            </form>
-        </article>
-
-        <article class="settings-card">
-            <h2>Change Password</h2>
-            <p class="card-desc">Choose a strong password you have not used before.</p>
-            <form action="/settings" method="POST" class="settings-form">
-                <% if (response && response.r != "Success!") { %>
-                    <p>⚠️ <%= response.r %></p>
-                <% } else if (response && response.r == "Success!") { %>
-                    <p>✅ Your password has been successfully changed!</p>
-                <% } %>
-
-                <label for="current-password">Current Password: </label>
-                <input type="password" id="current-password" name="currentPassword" placeholder="Enter current password" required>
-                <br>
-                <label for="new-password">New Password</label>
-                <input type="password" id="new-password" name="newPassword" placeholder="Enter new password" required>
-                <br>
-                <label for="confirm-password">Confirm New Password</label>
-                <input type="password" id="confirm-password" name="confirmPassword" placeholder="Confirm new password" required>
-                <br>
-                <button type="submit" class="save-btn">Save</button>
-            </form>
-        </article>
-
-        <article class="settings-card danger-card">
-            <h2>Danger Zone</h2>
-            <p class="danger-warning">Actions taken within this section are permanent and cannot be undone. Proceed with caution.</p>
-            <% if (!acc_delete) { %>
-                <form action="/settings/delete" method="post">
-                    <input type="submit" value="Delete My Account">
-                </form>
-                <form action="/logout" method="POST">
-                    <button type="submit" class="logout-danger-btn">Log Out</button>
-                </form>
-            <% } %>
-
-            <% if (acc_delete) { %>
-                <h2 class="modal-title">Are you sure?</h2>
-                <p class="modal-warning">This will permanently delete your account, all your posts, comments and votes. This cannot be reversed.</p>
-                
-                <% if (!acc_delete.status) { %>
-                    <p>⚠️ <%= acc_delete.msg %></p>
-                <% } %>
-                
-                <form action="/settings/delete" method="POST" class="settings-form">
-                    <label for="delete-confirm">Type your username to confirm</label>
-                    <input type="text" name="confirmUsername" placeholder="Enter your username">
-                    <br>
-                    <button type="submit" formaction="/settings" formmethod="post">Cancel</button>
-                    <button type="submit" name="confirm_delete" value="pressed">Delete My Account</button>
-                </form>                 
-            <% } %>
-        </article>
+                <button type="submit" formaction="/settings" formmethod="post">Cancel</button>
+                <button type="submit" name="confirm_delete" value="pressed">Delete My Account</button>
+            </form>                 
+        <% } %>
 
         <footer>
             <small>&copy; <%= new Date().getFullYear() %> Budget Reddit. All rights reserved.</small>

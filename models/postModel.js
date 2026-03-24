@@ -84,6 +84,10 @@ const findByTitle = async (title, userId) =>{
     return await Collection.findOne({title: title, user: userId}).lean();
 }
 
+const deleteUserCollection = (userID) => {
+	return Collection.deleteMany({ user: userID });
+}
+
 // Get all posts in a collection
 const renameCollection = async (collectionId, newTitle) =>{
 	return Collection.findByIdAndUpdate(collectionId, {title: newTitle})
@@ -92,6 +96,7 @@ const renameCollection = async (collectionId, newTitle) =>{
 const deleteCollection = async(collectionId)=>{
 	return Collection.findByIdAndDelete(collectionId)
 }
+
 const removePostFromCollection = async (collectionId, postId)=>{
 	return Collection.findByIdAndUpdate(collectionId, 
 		{$pull: {posts: { _id: new mongoose.Types.ObjectId(postId) }}
@@ -142,5 +147,6 @@ module.exports = {
 	removePostFromCollection, 
 	deleteCollection, 
 	renameCollection, 
-	getCollectionById
+	getCollectionById,
+	deleteUserCollection
 };

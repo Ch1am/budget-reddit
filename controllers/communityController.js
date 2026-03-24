@@ -3,12 +3,15 @@ const mongoose = require("mongoose");
 const Post = require("../models/postModel");
 const User = require("../models/registerModel");
 const timeAgo = require("../functions/timeAgo");
+const session = require("express-session");
 
 exports.communityLanding = async (req, res) => {
     const communities = await Community.getAllCommunities()
+    const userID = req.session.user
 
     res.render("community", {
-        communities
+        communities,
+        userID
     })
 }
 
@@ -164,6 +167,7 @@ exports.renderCommunity = async(req, res) => {
 
 exports.joinCommunity = async(req, res) => {
     try {
+        const session = req.session
         const communityID = req.params.communityID;
         const addCommunity = await Community.addUserToCommunity(communityID, session.user);
         const addUser = await User.addUserToCommunityUserSide(communityID, session.user);

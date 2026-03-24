@@ -4,6 +4,10 @@ const User = require("./../models/registerModel")
 
 exports.getSinglePost = async (req, res) => {
 	try {
+		const collectionList = await Post.retrieveAll()
+		if (!collectionList) {
+			collectionList = null
+		}
 		const post = await Post.getPostById(req.params.id);
 
 		if (!post) {
@@ -37,7 +41,8 @@ exports.getSinglePost = async (req, res) => {
 				imageBase64,
 				imageType: post.image ? post.image.contentType : null //if contentType exists else its null
 			},
-			timeAgo
+			timeAgo,
+			collectionList
 		});
 
 	} catch (error) {
@@ -74,3 +79,51 @@ exports.createPost = async (req, res) => {
 	res.redirect('/home');
 
 };
+
+exports.showCollectionDetails = async (req,res) => {
+	try {
+		const post = await Post.getPostById(req.params.id)
+		console.log("THE ID RECEIVED IS:", req.params.id)
+		let collectionList = await Post.retrieveAll(req.session.user)
+		res.render('collection-selection',{collectionList,post})
+	  } catch (error) {
+		console.log (error)
+		console.log("THE ID RECEIVED IS:", req.params.id)
+		res.send('Error reading collection')
+	  }
+}
+
+exports.addInCollection = async (req,res)=> {
+	try {
+		let postID = req.params.id
+		console.log("THE ID RECEIVED IS:", req.params.id);
+		let selectedCollection = req.body.title
+		// let msg = null
+		let collectionID = await Post.findByTitle(selectedCollection, req.session.user)
+		await Post.addIntoCollection(collectionID._id,postID)
+		// let collectionList = await Post.retrieveAll()
+		// if (!result) {
+		// 	msg = 'Post is already in collection.'
+		// } else {
+		// 	msg = 'Post has been successfully added to collection'
+		// }
+		// res.render('show-collection', {collectionList,msg})
+		res.redirect('/home/my-collection')
+	} catch (error) {
+		console.log(error)
+	}
+}
+
+// exports.newCollection = async (req,res) => {
+	
+//   const title = req.body.title
+//   try {
+// 	const savedCollection = Post.createCollection(title,[])
+// 	let msg = 'Collection created successfully'
+//   } catch (error) {
+// 	console.log(error)
+// 	let msg = 'Error creating collection'
+//   }
+//   res.alert(msg)
+
+// }

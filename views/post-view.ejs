@@ -23,7 +23,33 @@
 				<p>Post ID: <%= post._id %>
 				</p> <!-- "123" -->
 
-				<% } %>
+				<%if(!collectionList) {%>
+					<form action="/post/<%= post._id %>/add-to-collection" method="get">
+						<button type="submit">Add to Collection</button>
+					</form>
+				<%} else {%>
+					<%let isSaved = false%>
+					<%let collectionSavedTo = null%>
+					<%collectionList.forEach (collection=>{%>
+						<%collection.posts.forEach (savedPost => {%>
+							<%if (savedPost._id.toString()===post._id.toString()) {%>
+								<%isSaved = true%>
+								<%collectionSavedTo = collection.title%>
+							<%}%>
+						<%})%>
+					<%})%>
+					<%if (isSaved == false) {%>
+						<form action="/post/<%= post._id %>/add-to-collection" method="get">
+							<button type="submit">Add to Collection</button>
+						</form>
+					<%} else {%>
+						Post saved to collection: <%=collectionSavedTo%>
+					<%}%>
+				<%}%>
+				
+			<% } %>
+
+
 
 
 	</body>

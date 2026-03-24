@@ -19,6 +19,13 @@ const postSchema = new mongoose.Schema({
   createdAt:    { type: Date }
 });
 
+const collectionSchema = new mongoose.Schema({
+  title: {type: String, required: true},
+  user: {type: mongoose.Schema.Types.ObjectId, ref: "User", required: true},
+  posts: [postSchema]
+})
+
+const Collection = mongoose.model('Collection', collectionSchema,'collections')
 
 const Post = mongoose.model('Post', postSchema, 'posts');
 
@@ -39,4 +46,56 @@ const createPost = async (postData) => {
   return await post.save();;
 };
 
-module.exports = {getAllPost, getPostById, createPost};
+//Function creates a new collection
+const createCollection = async (collectionData) => {
+  const collection = new Collection (collectionData)
+  return await collection.save()
+}
+
+// Retrives all collection
+const retrieveAll = async (userId) =>{
+  return Collection.find({user: userId})
+}
+
+// Adds a post into collection
+const addIntoCollection = async (collectionID, postID) => {
+  let selectedCollection = await Collection.findById(collectionID)
+  let selectedPost = await Post.findById(postID).lean()
+  // let isAlreadyAdded = false
+  // for (let i = 0; i < selectedCollection.posts.length; i++) {
+  //   if (selectedCollection.posts[i]._id.toString()===postID.toString()) {
+  //     isAlreadyAdded = true
+  //   }
+  // } 
+  // if (!isAlreadyAdded) {
+  // GREEN PARTS not needed coz validated in the post-view itself
+  selectedCollection.posts.push(selectedPost)
+  return await selectedCollection.save()
+  // }
+  // console.log("Post already in collection!")
+  // return null
+}
+
+// Find a specific collection by its title
+const findByTitle = async (title, userId) =>{
+    
+    return await Collection.findOne({title: title, user: userId}).lean();
+}
+
+// Get all posts in a collection
+const renameCollection = async (collectionId, newTitle) =>{
+  return Collection.findByIdAndUpdate(collectionId, {title: newTitle})
+}
+
+const deleteCollection = async(collectionId)=>{
+  return Collection.findByIdAndDelete(collectionId)
+}
+const removePostFromCollection = async (collectionId, postId)=>{
+  return Collection.findByIdAndUpdate(collectionId, {$pull: {posts: { _id: new mongoose.Types.ObjectId(postId) }}
+  })
+}
+const getCollectionById = async (id)=>{
+  return Collection.findById(id).lean()
+}
+
+module.exports = {getAllPost, getPostById, createPost, retrieveAll, createCollection,addIntoCollection,findByTitle, removePostFromCollection, deleteCollection, renameCollection, getCollectionById};

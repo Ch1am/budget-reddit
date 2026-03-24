@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Show Collection</title>
+  
+</head>
+<body>
+
+    
+
+  <% if (collectionList && collectionList.length === 0) { %>
+    <p>No collection yet.</p> 
+    
+  <% } else { %>
+    <h2>Collection List</h2>
+    
+    
+    <% collectionList.forEach(collection => { %>
+        <form action="/post/<%= post._id %>/add-to-collection" method="post">
+            <input type="hidden" name="title" value="<%=collection.title%>">
+                <p><strong>Title: <%= collection.title %></strong></p>  
+                <%if (collection.posts.length == 0 ) {%>
+                    No posts added.
+                    <br><br>
+                <%} else {%>
+                    <%collection.posts.slice(0, 4).forEach(post => {%>
+                            Author: <%=post.author%> <br>
+                            Title: <%=post.title%> <br>
+                            Snippet: <%=post.snippet%> <br><br>
+
+                        
+                       
+                    <%})%>
+                
+                <%}%>
+            <button type="submit">Add here</button>
+        </form>
+        <hr>
+    <%})%>
+    
+    
+  <% } %>
+    
+
+    <br><br>
+    <form action="/home/new-collection" method="post">
+        <button type="submit">Create Collection</button>
+    </form>
+    <br><br>
+    <form action="/" method="get">
+        <button type="submit">Home</button>
+    </form>
+    
+    
+    
+
+</body>
+</html>

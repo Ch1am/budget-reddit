@@ -103,4 +103,95 @@ exports.downvote = async (req, res) => {
   }
   res.redirect(`/home#post-${id}`);
 };
+exports.showAddCollection = (req,res) => {
+  let msg = null
+  res.render ('create-collection',{msg,result:null})
+}
 
+exports.addCollection = async (req,res) => {
+  const title = req.body.title 
+  
+  
+  let result = null
+  let msg = null
+  
+  if (title) {
+    let newCollection = {
+      title: title,
+      user: req.session.user,
+      posts: []
+    }
+    try {
+      const result = await postModel.createCollection(newCollection)
+      console.log('mylog:' +result)
+      // msg = 'Collection created successfully'
+      // res.render('create-collection',{result:result, msg})
+      res.redirect('/home/my-collection')
+    } catch (error) {
+      console.log(error)
+      msg = 'Error creating collection'
+      res.render('create-collection',{result:result,msg})
+    }  
+  }
+}
+
+exports.showCollections = async (req,res) => {
+  let msg = null
+  try {
+    let collectionList = await postModel.retrieveAll(req.session.user)
+    res.render('show-collection',{collectionList,msg})
+  } catch (error) {
+    console.log (error)
+    res.send('Error reading collection')
+  }
+}
+
+exports.displayPostInCollection = async(req,res) => {
+  const collectionTitle = req.params.title
+  try {
+    const collection = await postModel.findByTitle(collectionTitle, req.session.user)
+    res.render('indivCollection',{collection})
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+exports.renameCollection = async (req, res)=>{
+  const collectionId = req.body.collectionId
+  const newTitle = req.body.newTitle
+  try {
+    await postModel.renameCollection(collectionId, newTitle)
+    res.redirect("/home/my-collection")
+  } catch (error){
+    console.log(error)
+  }
+}
+exports.deleteCollection = async (req, res)=>{
+  const collectionId = req.body.collectionId
+  try {
+    await postModel.deleteCollection(collectionId)
+    res.redirect("/home/my-collection")
+  } catch (error){
+    console.log(error)
+  }
+}
+
+exports.removePostsFromCollection = async (req, res)=>{
+  const collectionTitle = req.params.title
+  const postId = req.body.postId
+  try {
+    const collection = await postModel.findByTitle(collectionTitle, req.session.user)
+    await postModel.removePostFromCollection(collection._id, postId)
+    res.redirect("/home/collection/" + collectionTitle)
+  } catch (error){
+    console.log(error)
+  }
+}
+exports.showRenameCollection = async (req, res)=>{
+  try {
+    const collection = await postModel.getCollectionById(req.params.id)
+    res.render("rename-collection", {collection})
+  } catch (error){
+    console.log(error)
+  }
+}

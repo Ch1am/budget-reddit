@@ -13,5 +13,9 @@ router.post('/create', upload.single('image'),postController.createPost);
 //GET to see single post
 router.get('/:id', postController.getSinglePost);
 
+// add to collection
+router.get('/:id/add-to-collection',postController.showCollectionDetails)
+router.post('/:id/add-to-collection',postController.addInCollection)
+
 
 module.exports = router;

@@ -164,6 +164,7 @@ exports.renderCommunity = async(req, res) => {
 
 exports.joinCommunity = async(req, res) => {
     try {
+        const session = req.session
         const communityID = req.params.communityID;
         const addCommunity = await Community.addUserToCommunity(communityID, session.user);
         const addUser = await User.addUserToCommunityUserSide(communityID, session.user);

@@ -284,7 +284,7 @@ nav {
     border-radius: 50%;
     border: none;
     background: transparent;
-    color: inherit;
+    color: #96adae;
     cursor: pointer;
     transition: background-color 0.2s, color 0.2s;
     padding: 0;
@@ -371,9 +371,18 @@ footer small {
   background-color: #1b71e9;
 }
 
-.vote-pill .vote-up.selected {
-  color: #ff0000 !important;
+.vote-up.selected {
+  background-color: rgba(255, 69, 0, 0.1) !important;
 }
-.vote-pill .vote-down.selected {
-    color: #8800ff !important;
+
+.vote-up.selected img {
+  filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(346deg) brightness(118%) contrast(119%);
+}
+
+.vote-down.selected {
+  background-color: rgba(113, 147, 255, 0.1) !important;
+}
+
+.vote-down.selected img {
+  filter: invert(44%) sepia(93%) saturate(400%) hue-rotate(199deg) brightness(101%) contrast(101%);
 }

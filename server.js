@@ -1,3 +1,5 @@
+const dns = require('dns');
+dns.setServers(['1.1.1.1']);
 const dotenv = require('dotenv');
 // Specify the path to the environment variablef file 'config.env'
 dotenv.config({ path: './config.env' });

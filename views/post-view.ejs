@@ -1,57 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
-
 	<head>
 		<meta charset="UTF-8">
-		<title>
-			<%= post.title %>
-		</title>
+		<title><%= post.title %></title>
 		<%- include('partials/nav') %>
 	</head>
 
 	<body>
 		<% if (!post || post.length===0) { %>
 			<h1>POST does not exist</h1>
-			<% } else { %>
-			<h1>
-				<%= post.title %>
-			</h1>
+		<% } else { %>
+			<h1><%= post.title %></h1>
 			<% if (post.imageBase64) { %>
 				<img src="data:<%= post.imageType %>;base64,<%= post.imageBase64 %>" alt="<%= post.title %>" class="post-image">
-				<% } %>
-				<!-- Use the ID -->
-				<p>Post ID: <%= post._id %>
-				</p> <!-- "123" -->
+			<% } %>
 
-				<%if(!collectionList) {%>
+			<!-- Use the ID -->
+			<p>Post ID: <%= post._id %></p>
+
+			<% if (!collectionList) {%>
+				<form action="/post/<%= post._id %>/add-to-collection" method="get">
+					<button type="submit">Add to Collection</button>
+				</form>
+			<% } else { %>
+				<% let isSaved = false %>
+				<% let collectionSavedTo = null %>
+				<% collectionList.forEach(collection => { %>
+					<% collection.posts.forEach (savedPost => {%>
+						<%if (savedPost._id.toString()===post._id.toString()) {%>
+							<%isSaved = true%>
+							<%collectionSavedTo = collection.title%>
+						<%}%>
+					<%})%>
+				<%})%>
+
+				<% if (isSaved == false) { %>
 					<form action="/post/<%= post._id %>/add-to-collection" method="get">
 						<button type="submit">Add to Collection</button>
 					</form>
 				<%} else {%>
-					<%let isSaved = false%>
-					<%let collectionSavedTo = null%>
-					<%collectionList.forEach (collection=>{%>
-						<%collection.posts.forEach (savedPost => {%>
-							<%if (savedPost._id.toString()===post._id.toString()) {%>
-								<%isSaved = true%>
-								<%collectionSavedTo = collection.title%>
-							<%}%>
-						<%})%>
-					<%})%>
-					<%if (isSaved == false) {%>
-						<form action="/post/<%= post._id %>/add-to-collection" method="get">
-							<button type="submit">Add to Collection</button>
-						</form>
-					<%} else {%>
-						Post saved to collection: <%=collectionSavedTo%>
-					<%}%>
+					Post saved to collection: <%=collectionSavedTo%>
 				<%}%>
-				
-			<% } %>
+			<%}%>
+		<% } %>
 
-
-
-
+		<% if (locals.sessionUser && sessionUser === post.author) { %>
+			<a href="/post/<%= post._id %>/edit">Edit</a>
+			<form action="/post/<%= post._id %>/delete" method="POST" style="display:inline">
+				<button type="submit">Delete</button>
+			</form>
+		<% } %>
 	</body>
-
 </html>

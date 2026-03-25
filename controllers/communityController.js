@@ -132,9 +132,14 @@ exports.renderCommunity = async(req, res) => {
             }
         })
 
-        const reversedPosts = posts.slice().reverse()
+        // Sort by net score (votes) descending; tie-break by newest first.
+        const sortedPosts = posts.slice().sort((a, b) => {
+            const voteDiff = (b.votes ?? 0) - (a.votes ?? 0);
+            if (voteDiff !== 0) return voteDiff;
+            return new Date(b.createdAt ?? 0) - new Date(a.createdAt ?? 0);
+        });
 
-        const postsWithVotes = reversedPosts.map((post) => {
+        const postsWithVotes = sortedPosts.map((post) => {
             //just to test if i up/downvote, whether the button will remain highlighted
             const existingVote = post.voters.find((voter) => voter._id === req.session.user);
 

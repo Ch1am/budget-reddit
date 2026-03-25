@@ -5,6 +5,7 @@
         <title>Rename Collection</title>
     </head>
     <body>
+       <%- include('../partials/nav') %>
        <h2>Rename "<%= collection.title %>"</h2>
        <form action = "/home/rename-collection" method = "post">
             <input type="hidden" name="collectionId" value="<%= collection._id %>">

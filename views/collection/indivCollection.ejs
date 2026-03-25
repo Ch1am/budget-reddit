@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <title><%=collection.title%></title>
-  
 </head>
 <a href="/home">Home</a>
 <a href="/home/my-collection">Collections</a>
 <body>
+  <%- include('../partials/nav') %>
     <h1><%= collection.title %></h1>
     <hr>
     <%if (collection.posts.length == 0) {%>

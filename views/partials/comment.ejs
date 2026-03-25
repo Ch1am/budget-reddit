@@ -1,6 +1,6 @@
 <% comments.forEach((comment, index) => { %>
     <article class="comment-card" id="comment-<%= comment._id %>">
-        <!--- User and time created -->
+        <!--- Username and time created -->
         <div class="comment-meta">
             <span>u/<%= comment.author %></span>
             &nbsp;&bull;&nbsp;
@@ -8,7 +8,7 @@
                 <%= timeAgo( comment.createdAt ) %>
             </time>
         </div>
-        <!-- Comment image (optional) -->
+        <!-- comment image -->
         <% if (comment.imageBase64) { %>
             <img
               src="data:<%= comment.imageType %>;base64,<%= comment.imageBase64 %>"
@@ -17,15 +17,15 @@
             />
         <% } %>
 
-        <!-- Comment text -->
+        <!-- comment text -->
         <p class="post-snippet">
             <%= comment.content %>
         </p>
 
-        <!-- Actions: vote buttons -->
+        <!--vote buttons area -->
         <div class="post-actions">
             <div class="vote-pill">
-                <!-- Upvote -->
+                <!-- upvote -->
                 <form
                   action="/comment/<%= comment._id %>/upvote"
                   method="POST"
@@ -41,7 +41,7 @@
 
                 <span class="vote-count"><%= comment.votes %></span>
 
-                <!-- Downvote -->
+                <!-- downvote -->
                 <form
                   action="/comment/<%= comment._id %>/downvote"
                   method="POST"
@@ -59,7 +59,7 @@
 
     </article>
 
-    <!-- Divider between comments (but not after the last comment) -->
+    <!-- add a line horizental line between each comment but also prevent it from being added to the last comment -->
     <% if (index < comments.length - 1) { %>
       <hr class="comment-divider" />
     <% } %>

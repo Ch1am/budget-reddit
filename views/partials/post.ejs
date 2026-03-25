@@ -12,16 +12,12 @@
 
     <tr>
       <td colspan="2">
-        <!--
-          Entire card navigation:
-          - Clicking votes or comment count should NOT trigger this redirect.
-        -->
         <article
           id="post-<%= post._id %>"
           onclick="window.location.href='/post/<%= post._id %>'"
           class="post-card"
         >
-          <!-- User + time created -->
+          <!-- username + time created -->
           <div class="post-meta">
             <span>u/<%= post.author %></span>
             &nbsp;&bull;&nbsp;
@@ -57,13 +53,13 @@
             </p>
           </div>
 
-          <!-- Actions row: votes left, comment count right -->
+          <!-- action row -->
           <div
             class="post-actions"
             style="display: flex; align-items: center; justify-content: flex-start; gap: 12px;"
           >
             <div class="vote-pill" style="display: flex; align-items: center; gap: 10px;">
-              <!-- Upvote -->
+              <!-- upvote -->
               <form
                 action="/home/<%= post._id %>/upvote"
                 method="POST"
@@ -78,10 +74,10 @@
                 </button>
               </form>
 
-              <!-- Vote count -->
+              <!-- vote count -->
               <span class="vote-count"><%= post.votes %></span>
 
-              <!-- Downvote -->
+              <!-- downvote -->
               <form
                 action="/home/<%= post._id %>/downvote"
                 method="POST"
@@ -96,7 +92,7 @@
                 </button>
               </form>
 
-              <!-- Comments count (next to downvote) -->
+              <!-- comments count -->
               <a
                 href="/post/<%= post._id %>#comments"
                 class="pill-btn"

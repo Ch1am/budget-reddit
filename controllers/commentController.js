@@ -1,44 +1,40 @@
 const Comment = require("../models/commentModel");
 const User = require("../models/registerModel");
 
-/**
- * Create a comment under a specific post.
- * Route shape (see `routes/comment.js`): POST `/post/:postId/comment`
- */
+// POST `/post/:postId/comment`
 exports.createComment = async (req, res) => {
-  // Basic guard: only logged-in users can create comments.
+  // Only logged-in users can comment.
   if (!req.session || !req.session.user) return res.redirect("/login");
 
   try {
-    // Load the logged-in user's details (name/author) from the DB.
+    // get the current user info
     const userInfo = await User.findByUserID(req.session.user);
 
     // Comment text comes from the form body.
     const { content } = req.body;
 
-    // The post id comes from the URL params.
+    // get the postID from url
     const postId = req.params.postId;
 
-    // Server-side validation:
-    // Allow the user to submit either:
-    // - text content, OR
-    // - an uploaded image
-    // Reject only when BOTH are missing (no empty comments).
+    // trim to check if it just blanks
     const trimmedText = typeof content === "string" ? content.trim() : "";
+    // check if there's text content
     const hasText = trimmedText.length > 0;
+    // check if user uploaded an image
     const hasImage = !!req.file;
 
-    // Optional image upload: multer stores the uploaded file in `req.file`.
+    // check if user did upload an image and if so store it other null
     const image = hasImage
       ? { data: req.file.buffer, contentType: req.file.mimetype }
       : { data: null, contentType: null };
 
-    // Reject empty request (no text AND no image).
+    // stop comment that has no text and image
     if (!hasText && !hasImage) return res.redirect(`/post/${postId}`);
-    // Persist the comment + return to the post page.
+
+    // create the comment in mongo
     await Comment.createComment(postId, {
       author: userInfo.name,
-      // Store empty string for image-only comments.
+      // Store empty string if image-only
       content: hasText ? trimmedText : "",
       image,
       votes: 0,
@@ -46,7 +42,7 @@ exports.createComment = async (req, res) => {
       createdAt: new Date(),
     });
 
-    // After creating, redirect back to the post so the user sees the new comment.
+    // redirect back to the post so the user can sees the new comment.
     res.redirect(`/post/${postId}`);
   } catch (error) {
     console.error(error);
@@ -54,26 +50,22 @@ exports.createComment = async (req, res) => {
   }
 };
 
-/**
- * Edit an existing comment.
- * Route shape: POST `/comment/:id/edit`
- */
+// POST `/comment/:id/edit`
 exports.editComment = async (req, res) => {
   // Only logged-in users can edit.
   if (!req.session || !req.session.user) return res.redirect("/login");
 
   try {
-    // Load user so we can enforce "only the author can edit".
     const userInfo = await User.findByUserID(req.session.user);
 
-    // Load the comment by its id.
+    // get comment by its id.
     const comment = await Comment.getCommentById(req.params.id);
 
-    // Ownership check: if missing or not authored by the current user, deny.
+    // check if the comment belong to current user
     if (!comment || comment.author !== userInfo.name)
       return res.redirect(`/post/${comment.postId}`);
 
-    // Only allow updating `content` (image editing can be added later).
+    // update the comment text content
     const { content } = req.body;
     await Comment.editComment(req.params.id, { content });
 
@@ -85,26 +77,20 @@ exports.editComment = async (req, res) => {
   }
 };
 
-/**
- * Delete an existing comment.
- * Route shape: POST `/comment/:id/delete`
- */
+// POST `/comment/:id/delete`
 exports.deleteComment = async (req, res) => {
   // Only logged-in users can delete.
   if (!req.session || !req.session.user) return res.redirect("/login");
 
   try {
-    // Load user for ownership check.
     const userInfo = await User.findByUserID(req.session.user);
-
-    // Fetch comment to find its postId for redirect.
     const comment = await Comment.getCommentById(req.params.id);
 
-    // Ownership check.
+    // check if the comment belong to current user
     if (!comment || comment.author !== userInfo.name)
       return res.redirect(`/post/${comment.postId}`);
 
-    // Delete comment and update post commentCount in the model layer.
+    // delete comment and update post commentCount
     await Comment.deleteComment(req.params.id, comment.postId);
 
     // Redirect back to the post after deletion.
@@ -115,25 +101,16 @@ exports.deleteComment = async (req, res) => {
   }
 };
 
-/**
- * Upvote a comment.
- * Route shape: POST `/comment/:id/upvote`
- *
- * Vote logic:
- * - If the user hasn't voted yet => add upvote (+1)
- * - If the user already upvoted => toggle off (remove upvote, -1)
- * - If the user downvoted => flip to upvote (+2: -1 down +2 up effect)
- */
+//POST `/comment/:id/upvote`
 exports.upvoteComment = async (req, res) => {
   // Only logged-in users can vote.
   if (!req.session || !req.session.user) return res.redirect("/login");
 
   try {
-    // Get current user's identity (stored in voters as `username`).
     const userInfo = await User.findByUserID(req.session.user);
     const username = userInfo.name;
 
-    // Load comment so we can inspect existing votes.
+    // Load comment to check existing votes.
     const comment = await Comment.getCommentById(req.params.id);
 
     if (!comment) return res.status(404).send("Comment not found");
@@ -142,20 +119,20 @@ exports.upvoteComment = async (req, res) => {
     let voteType = "upvote";
     let voteChange;
 
-    // Decide what to do based on existing vote state.
+    // check current vote state.
     if (!existingVoter) {
-      // First time voting.
+      // if no existing vote then just normal upvote
       voteChange = 1;
     } else if (existingVoter.voteType === "upvote") {
-      // Toggle off: remove the upvote.
+      // remove the upvote.
       voteType = null;
       voteChange = -1;
     } else {
-      // Flip from downvote to upvote.
+      // if they got an downvote then remove that and then add the upvote
       voteChange = 2;
     }
 
-    // Model updates both `votes` and the `voters` array.
+    // updates both votes and voters array.
     await Comment.updateCommentVote(req.params.id, username, voteType, voteChange);
     res.redirect(`/post/${comment.postId}`);
   } catch (error) {
@@ -164,25 +141,19 @@ exports.upvoteComment = async (req, res) => {
   }
 };
 
-/**
- * Downvote a comment.
- * Route shape: POST `/comment/:id/downvote`
- *
- * Vote logic mirrors upvote:
- * - none => add downvote (-1)
- * - already downvoted => toggle off (+1)
- * - upvoted => flip to downvote (-2)
- */
+
+// POST `/comment/:id/downvote`
+// Function to downvote a comment
 exports.downvoteComment = async (req, res) => {
   // Only logged-in users can vote.
   if (!req.session || !req.session.user) return res.redirect("/login");
 
   try {
-    // Current user identity.
+
     const userInfo = await User.findByUserID(req.session.user);
     const username = userInfo.name;
 
-    // Load comment for existing vote inspection.
+    // Load comment to check existing votes.
     const comment = await Comment.getCommentById(req.params.id);
 
     if (!comment) return res.status(404).send("Comment not found");
@@ -191,20 +162,19 @@ exports.downvoteComment = async (req, res) => {
     let voteType = "downvote";
     let voteChange;
 
-    // Decide what to do based on existing vote state.
     if (!existingVoter) {
-      // First time voting.
+      // if no existing vote then just normal downvote
       voteChange = -1;
     } else if (existingVoter.voteType === "downvote") {
-      // Toggle off: remove the downvote.
+      // if it does then remove their downvote
       voteType = null;
       voteChange = 1;
     } else {
-      // Flip from upvote to downvote.
+      // if they got an upvote then remove that and then remove again to add the downvote
       voteChange = -2;
     }
 
-    // Update comment votes in the model layer.
+    // update comment votes 
     await Comment.updateCommentVote(req.params.id, username, voteType, voteChange);
     res.redirect(`/post/${comment.postId}`);
   } catch (error) {

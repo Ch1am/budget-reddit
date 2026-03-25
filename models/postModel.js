@@ -28,17 +28,17 @@ const Post = mongoose.model("Post", postSchema, "posts");
 
 // Function getAllPost retrieves all posts
 exports.getAllPost = async () => {
-  return await Post.find();
+  return await Post.find().populate("authorId", "name type");
 };
 
 // Function to get a single post by id
 exports.getPostById = async (id) => {
-  return await Post.findById(id);
+  return await Post.findById(id).populate("authorId", "name type");
 };
 
 // Function getPostsByAuthorId retrieves posts made by user id (preferred).
 exports.getPostsByAuthorId = async (authorId) => {
-  return await Post.find({ authorId });
+  return await Post.find({ authorId }).populate("authorId", "name type");
 };
 
 // Function createPost creates and saves a new post

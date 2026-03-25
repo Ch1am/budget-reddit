@@ -134,17 +134,6 @@ exports.renderCommunity = async(req, res) => {
             }
         })
 
-        // Bulk lookup author display names (Deleted-User fallback).
-        const authorIds = posts
-            .map((p) => p.authorId)
-            .filter(Boolean)
-            .map((id) => id.toString());
-        const uniqueAuthorIds = [...new Set(authorIds)];
-        const authors = uniqueAuthorIds.length
-            ? await User.findUsersByIds(uniqueAuthorIds)
-            : [];
-        const authorById = new Map(authors.map((u) => [u._id.toString(), u.name]));
-
         // Sort by net score (votes) descending; tie-break by newest first.
         const sortedPosts = posts.slice().sort((a, b) => {
             const voteDiff = (b.votes ?? 0) - (a.votes ?? 0);
@@ -167,7 +156,7 @@ exports.renderCommunity = async(req, res) => {
             return {
                 ...post,
                 displayAuthor:
-                    (post.authorId && authorById.get(post.authorId.toString())) ||
+                    (post.authorId && post.authorId.name) ||
                     "Deleted-User",
                 userVote: existingVote ? existingVote.voteType : null,
                 imageBase64,

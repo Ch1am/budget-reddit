@@ -37,51 +37,18 @@ exports.getSinglePost = async (req, res) => {
 			});
 		}
 		const post = postDoc.toObject();
+		// Keep a stable author id string for comparisons in controllers/views.
+		const postAuthorIdStr = post.authorId
+			? (post.authorId._id ? post.authorId._id.toString() : post.authorId.toString())
+			: null;
 
 		// Load comments for this post
 		const rawComments = await Comment.getCommentsByPost(req.params.id);
 
-		// store the authorIDs for post and comment and store them 
-		const authorIds = [];
-
-		// Add the post's authorID.
-		if (post && post.authorId) {
-			authorIds.push(post.authorId.toString());
-		}
-
-		// Add each comment's authorID.
-		for (let i = 0; i < rawComments.length; i++) {
-			const c = rawComments[i];
-			if (c && c.authorId) {
-				authorIds.push(c.authorId.toString());
-			}
-		}
-
-		// find unique authorIds
-		const seen = {};
-		const uniqueAuthorIds = [];
-		for (let i = 0; i < authorIds.length; i++) {
-			const id = authorIds[i];
-			if (!seen[id]) {
-				seen[id] = true;
-				uniqueAuthorIds.push(id);
-			}
-		}
-
-		// get all the authors of the post and comments
-		const authors = uniqueAuthorIds.length > 0
-			? await User.findUsersByIds(uniqueAuthorIds)
-			: [];
-
-		// make a lookup object to get author name by id, this is to optimize and
-		// avoid calling .find() or .filter() repeatedly when rendering the post and comments
-		const authorNameById = {};
-		for (let i = 0; i < authors.length; i++) {
-			const u = authors[i];
-			if (u && u._id) {
-				authorNameById[u._id.toString()] = u.name;
-			}
-		}
+		// Author name resolution:
+		// We rely on `.populate("authorId", "name")` in the model layer.
+		// - If the user exists: `authorId` is an object like { _id, name, ... }
+		// - If the user was deleted: `authorId` is null
 
 		// convert each comment into a plain JS object
 		const comments = [];
@@ -119,7 +86,7 @@ exports.getSinglePost = async (req, res) => {
 
 			// Resolve display author name
 			const displayAuthor =
-				(commentObj.authorId && authorNameById[commentObj.authorId.toString()]) ||
+				(commentObj.authorId && commentObj.authorId.name) ||
 				"Deleted-User";
 
 			comments.push({
@@ -151,7 +118,7 @@ exports.getSinglePost = async (req, res) => {
 			post: {
 				...post,
 				displayAuthor:
-					(post.authorId && authorNameById[post.authorId.toString()]) ||
+					(post.authorId && post.authorId.name) ||
 					"Deleted-User",
 				imageBase64,
 				imageType: post.image ? post.image.contentType : null,
@@ -237,7 +204,9 @@ exports.getEditPost = async (req, res) => {
 	const isAdmin = userInfo?.type === "admin";
 
 	const isOwner =
-		post.authorId && post.authorId.toString() === userInfo._id.toString();
+		post.authorId &&
+		(post.authorId._id ? post.authorId._id.toString() : post.authorId.toString()) ===
+			userInfo._id.toString();
 	if (!isOwner && !isAdmin)
 		return res.redirect(`/post/${req.params.id}`);
 
@@ -250,7 +219,9 @@ exports.editPost = async (req, res) => {
 	const isAdmin = userInfo?.type === "admin";
 
 	const isOwner =
-		post.authorId && post.authorId.toString() === userInfo._id.toString();
+		post.authorId &&
+		(post.authorId._id ? post.authorId._id.toString() : post.authorId.toString()) ===
+			userInfo._id.toString();
 	if (!isOwner && !isAdmin)
 		return res.redirect(`/post/${req.params.id}`);
 
@@ -265,7 +236,9 @@ exports.deletePost = async (req, res) => {
 	const isAdmin = userInfo?.type === "admin";
 
 	const isOwner =
-		post.authorId && post.authorId.toString() === userInfo._id.toString();
+		post.authorId &&
+		(post.authorId._id ? post.authorId._id.toString() : post.authorId.toString()) ===
+			userInfo._id.toString();
 	if (!isOwner && !isAdmin)
 		return res.redirect(`/post/${req.params.id}`);
 

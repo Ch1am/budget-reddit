@@ -24,17 +24,17 @@ const Comment = mongoose.model("Comment", commentSchema, "comment");
 
 //Function getAllcomment retrieves comments data based on the postId of the post
 exports.getCommentsByPost = async (postId) => {
-    return await Comment.find({ postId });
+    return await Comment.find({ postId }).populate("authorId", "name type");
 };
 
 // function getCommentById retrieves comment id for editing and deleting
 exports.getCommentById = async (id) => {
-  return await Comment.findById(id);
+  return await Comment.findById(id).populate("authorId", "name type");
 };
 
 //function getCommentByAuthor retrieves all comments made by a specific user
 exports.getCommentByAuthorId = async (authorId) => {
-    return await Comment.find({ authorId });
+    return await Comment.find({ authorId }).populate("authorId", "name type");
 };
 
 //Function createComment to create a new comment and insert into mongo

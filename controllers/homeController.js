@@ -29,20 +29,6 @@ exports.displayAllPost = async (req, res) => {
 		const sessionUserId = req.session?.user || null;
 		const currentUser = sessionUserId ? await User.findByUserID(sessionUserId) : null;
 
-		// Resolve display names for post authors (Deleted-User fallback).
-		const authorIds = posts
-			.map((p) => p.authorId)
-			.filter(Boolean)
-			.map((id) => id.toString());
-		const uniqueAuthorIds = [...new Set(authorIds)];
-		const authors = uniqueAuthorIds.length
-			? await User.findUsersByIds(uniqueAuthorIds)
-			: [];
-		const authorById = new Map(
-			authors.map((u) => [u._id.toString(), u.name]),
-		);
-
-
 		const postsWithVotes = sortedPosts.map((post) => {
 			//just to test if i up/downvote, whether the button will remain highlighted
 			const existingVote = sessionUserId
@@ -63,9 +49,8 @@ exports.displayAllPost = async (req, res) => {
 			}
 			return {
 				...post,
-				// Prefer live user lookup; fallback to old `author` field; then Deleted-User.
 				displayAuthor:
-					(post.authorId && authorById.get(post.authorId.toString())) ||
+					(post.authorId && post.authorId.name) ||
 					"Deleted-User",
 				userVote: existingVote ? existingVote.voteType : null,
 				imageBase64,

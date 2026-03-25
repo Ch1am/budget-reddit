@@ -2,38 +2,81 @@ const Post = require('../models/postModel')
 const timeAgo = require("../functions/timeAgo")
 const User = require("./../models/registerModel")
 const Community = require("./../models/communityModel")
+const Comment = require("../models/commentModel");
 
 exports.getSinglePost = async (req, res) => {
 	try {
-		const collectionList = await Post.retrieveAll()
-		if (!collectionList) {
-			collectionList = null
-		}
+		const rawCollectionList = await Post.retrieveAll();
+		const collectionList = rawCollectionList || null;
 		const post = await Post.getPostById(req.params.id);
 
+		// Session user (used for edit/delete + comment vote highlighting)
+		let currentUser = null;
+		let sessionUser = null;
+		if (req.session && req.session.user) {
+			currentUser = await User.findByUserID(req.session.user);
+			sessionUser = currentUser ? currentUser.name : null;
+		}
+
+		// If post doesn't exist, still provide fields used by the template.
 		if (!post) {
 			return res.status(404).render("post-view", {
 				post: null,
-				timeAgo
+				comments: [],
+				timeAgo,
+				collectionList,
+				currentUser,
+				sessionUser,
 			});
 		}
-		
-      const currentUser = await User.findByUserID(req.session.user) 
 
-		//converting the image
-		let imageBase64 = null; //set the imgb64 to null first then
+		// Load comments for this post
+		const rawComments = await Comment.getCommentsByPost(req.params.id);
+		const comments = rawComments.map((comment) => {
+			// Convert comment image (Buffer) -> base64 string for EJS
+			let imageBase64 = null;
+			const imageData =
+				comment.image && comment.image.data ? comment.image.data : null;
+
+			if (imageData) {
+				try {
+					if (Buffer.isBuffer(imageData)) {
+						imageBase64 = imageData.toString("base64");
+					} else if (typeof imageData === "string") {
+						imageBase64 = Buffer.from(imageData, "binary").toString("base64");
+					} else if (imageData.buffer) {
+						imageBase64 = Buffer.from(imageData.buffer).toString("base64");
+					}
+				} catch (e) {
+					console.error("Comment image conversion error:", e.message);
+				}
+			}
+
+			// Highlight comment vote button for the current user (if logged in)
+			let userVote = null;
+			if (sessionUser) {
+				const existingVoter = comment.voters?.find(
+					(v) => v.username === sessionUser,
+				);
+				userVote = existingVoter ? existingVoter.voteType : null;
+			}
+
+			return {
+				...comment,
+				imageBase64,
+				imageType: comment.image ? comment.image.contentType : null,
+				userVote,
+			};
+		});
+
+		// Convert post image to base64 for EJS
+		let imageBase64 = null; // set the imgb64 to null first
 		if (post.image && post.image.data) {
-			//check whether the post created has an img and whether that img has data
 			try {
-				//if mongoose returns any data that hasnt been .lean()
 				if (Buffer.isBuffer(post.image.data)) {
 					imageBase64 = post.image.data.toString("base64");
-				//data stored as raw binary string, binary encoding treats each char as a byte
 				} else if (typeof post.image.data === "string") {
-					imageBase64 = Buffer.from(post.image.data, "binary").toString(
-						"base64",
-					);
-				//if data is a plain object cuz of lean, using bufferFrom() just converts it back into smth we can encode
+					imageBase64 = Buffer.from(post.image.data, "binary").toString("base64");
 				} else if (post.image.data.buffer) {
 					imageBase64 = Buffer.from(post.image.data.buffer).toString("base64");
 				}
@@ -41,15 +84,18 @@ exports.getSinglePost = async (req, res) => {
 				console.error("Image conversion error:", e.message);
 			}
 		}
+
 		res.render("post-view", {
 			post: {
 				...post,
 				imageBase64,
-				imageType: post.image ? post.image.contentType : null, //if contentType exists else its null
+				imageType: post.image ? post.image.contentType : null,
 			},
+			comments,
 			timeAgo,
 			collectionList,
 			currentUser,
+			sessionUser,
 		});
 	} catch (error) {
 		console.error(error);

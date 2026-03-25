@@ -1,0 +1,24 @@
+<form
+  action="/post/<%= postId %>/comment"
+  method="POST"
+  enctype="multipart/form-data"
+  class="comment-form"
+>
+  <textarea
+    name="content"
+    placeholder="Join the conversation"
+    required
+  ></textarea>
+
+  <div class="comment-form-actions">
+    <label for="comment-image" class="btn-icon" title="Attach image">
+      <img src="/icons/image.svg" alt="Add image" width="20" height="20" />
+      <input type="file" id="comment-image" name="image" accept="image/*" hidden />
+    </label>
+
+    <div class="comment-form-right">
+      <a href="/post/<%= postId %>" class="btn-secondary">Cancel</a>
+      <button type="submit" class="btn-primary">Comment</button>
+    </div>
+  </div>
+</form>

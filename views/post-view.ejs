@@ -50,5 +50,12 @@
 				<button type="submit">Delete</button>
 			</form>
 		<% } %>
+
+		<!-- Comments + comment form -->
+		<div id="comments">
+			<%- include('partials/comment-create', { postId: post._id }) %>
+			<hr>
+			<%- include('partials/comment', { comments }) %>
+		</div>
 	</body>
 </html>

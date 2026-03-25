@@ -16,6 +16,7 @@ const homeRoute = require("./routes/home");
 const settingsRoute = require("./routes/settings.js")
 const postRoutes = require("./routes/posts");
 const communityRoutes = require("./routes/community.js")
+const commentRouter = require("./routes/comment");
 
 // session config
 server.use(session({
@@ -39,6 +40,10 @@ server.use("/home", homeRoute);
 server.use("/settings", settingsRoute);
 server.use("/post", postRoutes);
 server.use("/community", communityRoutes)
+// Mount comment routes at `/` so routes like:
+//   POST /post/:postId/comment
+// work with the form actions in `views/partials/comment-create.ejs`.
+server.use("/", commentRouter);
 
 
 // async function to connect to DB

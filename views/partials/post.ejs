@@ -5,8 +5,8 @@
 			<% if (i != 0) { %>
 				<tr>
 					<td colspan="2" style="text-align: center;">
-						<div style="width: 100%; overflow: hidden; white-space: nowrap; color: #888;">
-							############################################################################
+						<div style="width: 100%;">
+							<hr class="post-divider" />
 						</div>
 					</td>
 				</tr>
@@ -74,7 +74,7 @@
 			<tr>
 			<tr>
 				<td colspan="2">
-					<a href="/home/<%= post._id %>#comments" class="pill-btn">
+					<a href="/post/<%= post._id %>#comments" class="pill-btn" onclick="event.stopPropagation()">
 						<img src="/icons/comment.svg" alt="comment" width="20" height="20" />
 						<%= post.commentCount %>
 					</a>

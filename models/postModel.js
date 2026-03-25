@@ -132,6 +132,13 @@ const deletePost = async (id) => {
 	return await Post.findByIdAndDelete(id);
 };
 
+// Increment (or decrement) a post's `commentCount`.
+// Kept here so commentModel can call it via this module instead of
+// relying on direct access to the raw Mongoose model methods.
+exports.incrementCommentCount = async (postId, delta) => {
+	return await Post.findByIdAndUpdate(postId, { $inc: { commentCount: delta } });
+};
+
 module.exports = {
 	getAllPost,
 	getPostById,
@@ -148,5 +155,6 @@ module.exports = {
 	deleteCollection, 
 	renameCollection, 
 	getCollectionById,
-	deleteUserCollection
+	deleteUserCollection,
+	incrementCommentCount: exports.incrementCommentCount
 };

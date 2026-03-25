@@ -1,18 +1,10 @@
-<form
-  action="/post/<%= postId %>/comment"
-  method="POST"
-  enctype="multipart/form-data"
-  class="comment-form"
->
-  <textarea
-    name="content"
-    placeholder="Join the conversation"
-  ></textarea>
+<form action="/post/<%= postId %>/comment" method="POST" enctype="multipart/form-data" class="comment-form">
+  <textarea name="content" placeholder="Join the conversation" rows="4" cols="60"></textarea>
 
   <div class="comment-form-actions">
     <label for="comment-image" class="btn-icon" title="Attach image">
       <img src="/icons/image.svg" alt="Add image" width="20" height="20" />
-      <input type="file" id="comment-image" name="image" accept="image/*" hidden />
+      <input type="file" id="comment-image" name="image" accept="image/*" />
     </label>
 
     <div class="comment-form-right">

@@ -8,6 +8,13 @@ const collectionController = require("./collectionController");
 
 exports.getSinglePost = async (req, res) => {
 	try {
+		// Used for inline comment editing UI (see `views/partials/comment.ejs`).
+		// We toggle edit mode via `GET /post/:id?editCommentId=<commentId>#comment-<commentId>`.
+		const editCommentId =
+			typeof req.query.editCommentId === "string" && req.query.editCommentId.trim()
+				? req.query.editCommentId.trim()
+				: null;
+
 		// Collections are now managed by `collectionModel`, not `postModel`.
 		// This list is used by `views/post/post-view.ejs` to render the
 		// "Add to Collection" UI.
@@ -33,6 +40,7 @@ exports.getSinglePost = async (req, res) => {
 				collectionList,
 				currentUser,
 				sessionUser,
+				editCommentId,
 			});
 		}
 
@@ -102,6 +110,7 @@ exports.getSinglePost = async (req, res) => {
 			collectionList,
 			currentUser,
 			sessionUser,
+			editCommentId,
 		});
 	} catch (error) {
 		console.error(error);

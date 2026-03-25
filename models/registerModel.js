@@ -54,6 +54,12 @@ exports.findByUserID = function(id) {
     return User.findById(id);
 }
 
+// Bulk lookup for rendering authors/voters efficiently.
+exports.findUsersByIds = function(ids) {
+    if (!Array.isArray(ids) || ids.length === 0) return Promise.resolve([]);
+    return User.find({ _id: { $in: ids } }).lean();
+}
+
 exports.findByUsername = function(name) {
     return User.findOne({ name: name })
 }

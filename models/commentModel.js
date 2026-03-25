@@ -2,13 +2,15 @@ const mongoose = require("mongoose");
 const Post = require("./postModel");
 
 const voterSchema = new mongoose.Schema({
-    username: { type: String, required: true },
+    // Store voter as userId so votes survive username changes/deletion.
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     voteType: { type: String, enum: ["upvote", "downvote"], required: true },
 }, { _id: false });
 
 const commentSchema = new mongoose.Schema({
     postId: { type: mongoose.Schema.Types.ObjectId, ref: "Post", required: true },
-    author: { type: String, required: true },
+    // New: store author as userId so comments can still render after account deletion.
+    authorId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     createdAt: { type: Date, default: Date.now },
     image: {
         data: { type: Buffer, default: null },
@@ -32,8 +34,8 @@ exports.getCommentById = async (id) => {
 };
 
 //function getCommentByAuthor retrieves all comments made by a specific user
-exports.getCommentByAuthor = async (author) => {
-    return await Comment.find({ author }).lean();
+exports.getCommentByAuthorId = async (authorId) => {
+    return await Comment.find({ authorId }).lean();
 };
 
 //Function createComment to create a new comment and insert into mongo
@@ -48,7 +50,7 @@ exports.createComment = async (postId, commentData) => {
 };
 
 // update vote counts and voters list
-exports.updateCommentVote = async (id, username, voteType, voteChange) => {
+exports.updateCommentVote = async (id, userId, voteType, voteChange) => {
     const comment = await Comment.findById(id);
     if (!comment) return;
 
@@ -57,10 +59,10 @@ exports.updateCommentVote = async (id, username, voteType, voteChange) => {
     const currentVoters = comment.voters || [];
 
     // remove existing vote if any
-    comment.voters = currentVoters.filter((v) => v.username !== username);
+    comment.voters = currentVoters.filter((v) => v.userId?.toString() !== userId.toString());
     // add new vote if not there
     if (voteType !== null) {
-        comment.voters.push({ username, voteType });
+        comment.voters.push({ userId, voteType });
     }
     // update vote count
     comment.votes = (comment.votes || 0) + voteChange;
@@ -79,5 +81,10 @@ exports.deleteComment = async (id, postId) => {
     await Comment.findByIdAndDelete(id);
     // Keep commentCount in sync when deleting comments.
     await Post.incrementCommentCount(postId, -1);
+};
+
+// Delete all comments under a post (used for cascade delete when a post is deleted).
+exports.deleteCommentsByPostId = async (postId) => {
+    return await Comment.deleteMany({ postId });
 };
 

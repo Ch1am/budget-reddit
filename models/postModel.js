@@ -2,13 +2,15 @@ const mongoose = require("mongoose");
 
 // Voter embedded schema for post upvotes/downvotes
 const voterSchema = new mongoose.Schema({
-  username: String,
-  voteType: String,
+  // Store voter as userId so votes survive username changes/deletion.
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  voteType: { type: String, enum: ["upvote", "downvote"], required: true },
 });
 
 // Main Post schema
 const postSchema = new mongoose.Schema({
-  author: { type: String, required: true, default: "guest" },
+  // New: store author as userId so posts can still render after account deletion.
+  authorId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   title: { type: String, required: true },
   snippet: { type: String, required: true },
   image: {
@@ -34,9 +36,9 @@ exports.getPostById = async (id) => {
   return await Post.findById(id).lean();
 };
 
-// Function getPostsByAuthor retrieves posts made by author
-exports.getPostsByAuthor = async (author) => {
-  return await Post.find({ author }).lean();
+// Function getPostsByAuthorId retrieves posts made by user id (preferred).
+exports.getPostsByAuthorId = async (authorId) => {
+  return await Post.find({ authorId }).lean();
 };
 
 // Function createPost creates and saves a new post
@@ -46,15 +48,15 @@ exports.createPost = async (postData) => {
 };
 
 // updateVote updates vote count and voters array
-exports.updateVote = async (id, username, voteType, voteChange) => {
+exports.updateVote = async (id, userId, voteType, voteChange) => {
   const post = await Post.findById(id);
 
   // Remove existing vote if any
-  post.voters = post.voters.filter((v) => v.username !== username);
+  post.voters = (post.voters || []).filter((v) => v.userId?.toString() !== userId.toString());
 
   // Add new vote if not removing (toggle off sets voteType to null)
   if (voteType !== null) {
-    post.voters.push({ username, voteType });
+    post.voters.push({ userId, voteType });
   }
 
   // Update vote total

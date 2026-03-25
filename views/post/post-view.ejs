@@ -11,6 +11,7 @@
 			<h1>POST does not exist</h1>
 		<% } else { %>
 			<h1><%= post.title %></h1>
+			<p>by u/<%= post.displayAuthor || "Deleted-User" %></p>
 			<% if (post.imageBase64) { %>
 				<img src="data:<%= post.imageType %>;base64,<%= post.imageBase64 %>" alt="<%= post.title %>" class="post-image">
 			<% } %>
@@ -44,7 +45,7 @@
 			<%}%>
 		<% } %>
 
-		<% if (locals.sessionUser && sessionUser === post.author) { %>
+		<% if (locals.sessionUserId && post.authorId && sessionUserId.toString() === post.authorId.toString()) { %>
 			<a href="/post/<%= post._id %>/edit">Edit</a>
 			<form action="/post/<%= post._id %>/delete" method="POST" style="display:inline">
 				<button type="submit">Delete</button>
@@ -55,7 +56,7 @@
 		<div id="comments">
 			<%- include('../partials/comment-create', { postId: post._id }) %>
 			<hr>
-			<%- include('../partials/comment', { comments, postId: post._id, sessionUser, editCommentId }) %>
+			<%- include('../partials/comment', { comments, postId: post._id, sessionUserId, editCommentId }) %>
 		</div>
 	</body>
 </html>

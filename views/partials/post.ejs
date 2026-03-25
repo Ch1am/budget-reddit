@@ -19,7 +19,7 @@
         >
           <!-- username + time created -->
           <div class="post-meta">
-            <span>u/<%= post.author %></span>
+            <span>u/<%= post.displayAuthor || "Deleted-User" %></span>
             &nbsp;&bull;&nbsp;
             <time datetime="<%= post.createdAt %>">
               <%= timeAgo(post.createdAt) %>

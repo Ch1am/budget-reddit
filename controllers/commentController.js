@@ -33,7 +33,7 @@ exports.createComment = async (req, res) => {
 
     // create the comment in mongo
     await Comment.createComment(postId, {
-      author: userInfo.name,
+      authorId: userInfo._id,
       // Store empty string if image-only
       content: hasText ? trimmedText : "",
       image,
@@ -62,7 +62,10 @@ exports.editComment = async (req, res) => {
     const comment = await Comment.getCommentById(req.params.id);
 
     // check if the comment belong to current user
-    if (!comment || comment.author !== userInfo.name)
+    const isOwner =
+      comment?.authorId &&
+      comment.authorId.toString() === userInfo._id.toString();
+    if (!comment || !isOwner)
       return res.redirect(`/post/${comment.postId}`);
 
     // update the comment text content
@@ -87,7 +90,10 @@ exports.deleteComment = async (req, res) => {
     const comment = await Comment.getCommentById(req.params.id);
 
     // check if the comment belong to current user
-    if (!comment || comment.author !== userInfo.name)
+    const isOwner =
+      comment?.authorId &&
+      comment.authorId.toString() === userInfo._id.toString();
+    if (!comment || !isOwner)
       return res.redirect(`/post/${comment.postId}`);
 
     // delete comment and update post commentCount
@@ -107,15 +113,16 @@ exports.upvoteComment = async (req, res) => {
   if (!req.session || !req.session.user) return res.redirect("/login");
 
   try {
-    const userInfo = await User.findByUserID(req.session.user);
-    const username = userInfo.name;
+    const sessionUserId = req.session.user;
 
     // Load comment to check existing votes.
     const comment = await Comment.getCommentById(req.params.id);
 
     if (!comment) return res.status(404).send("Comment not found");
 
-    const existingVoter = comment.voters?.find((v) => v.username === username);
+    const existingVoter = comment.voters?.find(
+      (v) => v.userId?.toString() === sessionUserId.toString(),
+    );
     let voteType = "upvote";
     let voteChange;
 
@@ -133,7 +140,7 @@ exports.upvoteComment = async (req, res) => {
     }
 
     // updates both votes and voters array.
-    await Comment.updateCommentVote(req.params.id, username, voteType, voteChange);
+    await Comment.updateCommentVote(req.params.id, sessionUserId, voteType, voteChange);
     res.redirect(`/post/${comment.postId}`);
   } catch (error) {
     console.error(error);
@@ -150,15 +157,16 @@ exports.downvoteComment = async (req, res) => {
 
   try {
 
-    const userInfo = await User.findByUserID(req.session.user);
-    const username = userInfo.name;
+    const sessionUserId = req.session.user;
 
     // Load comment to check existing votes.
     const comment = await Comment.getCommentById(req.params.id);
 
     if (!comment) return res.status(404).send("Comment not found");
 
-    const existingVoter = comment.voters?.find((v) => v.username === username);
+    const existingVoter = comment.voters?.find(
+      (v) => v.userId?.toString() === sessionUserId.toString(),
+    );
     let voteType = "downvote";
     let voteChange;
 
@@ -175,7 +183,7 @@ exports.downvoteComment = async (req, res) => {
     }
 
     // update comment votes 
-    await Comment.updateCommentVote(req.params.id, username, voteType, voteChange);
+    await Comment.updateCommentVote(req.params.id, sessionUserId, voteType, voteChange);
     res.redirect(`/post/${comment.postId}`);
   } catch (error) {
     console.error(error);

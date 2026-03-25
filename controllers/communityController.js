@@ -4,6 +4,7 @@ const Post = require("../models/postModel");
 const User = require("../models/registerModel");
 const timeAgo = require("../functions/timeAgo");
 const session = require("express-session");
+const Comment = require("../models/commentModel");
 
 exports.communityLanding = async (req, res) => {
     const communities = await Community.getAllCommunities()
@@ -132,6 +133,17 @@ exports.renderCommunity = async(req, res) => {
             }
         })
 
+        // Bulk lookup author display names (Deleted-User fallback).
+        const authorIds = posts
+            .map((p) => p.authorId)
+            .filter(Boolean)
+            .map((id) => id.toString());
+        const uniqueAuthorIds = [...new Set(authorIds)];
+        const authors = uniqueAuthorIds.length
+            ? await User.findUsersByIds(uniqueAuthorIds)
+            : [];
+        const authorById = new Map(authors.map((u) => [u._id.toString(), u.name]));
+
         // Sort by net score (votes) descending; tie-break by newest first.
         const sortedPosts = posts.slice().sort((a, b) => {
             const voteDiff = (b.votes ?? 0) - (a.votes ?? 0);
@@ -141,7 +153,9 @@ exports.renderCommunity = async(req, res) => {
 
         const postsWithVotes = sortedPosts.map((post) => {
             //just to test if i up/downvote, whether the button will remain highlighted
-            const existingVote = post.voters.find((voter) => voter._id === req.session.user);
+            const existingVote = req.session?.user
+                ? (post.voters || []).find((voter) => voter.userId?.toString() === req.session.user.toString())
+                : null;
 
             //converting the img buffer to base64 string for ejs
             let imageBase64 = null;
@@ -151,6 +165,9 @@ exports.renderCommunity = async(req, res) => {
 
             return {
                 ...post,
+                displayAuthor:
+                    (post.authorId && authorById.get(post.authorId.toString())) ||
+                    "Deleted-User",
                 userVote: existingVote ? existingVote.voteType : null,
                 imageBase64,
                 imageType: post.image ? post.image.contentType : null
@@ -598,6 +615,8 @@ exports.deletePost = async(req, res) => {
     }
 
     const resultCommunitySide = await Community.deletePostFromCommunity(communityID, post._id);
+    // Cascade delete all comments under this post.
+    await Comment.deleteCommentsByPostId(post._id);
     const resultServerSide = await Post.deletePost(post._id);
 
     if (resultCommunitySide && resultServerSide) {

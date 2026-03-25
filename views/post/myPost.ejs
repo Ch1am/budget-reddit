@@ -18,7 +18,7 @@
   <% posts.forEach((post) => { %>
   <div>
     <a href="/post/<%= post._id %>"><%= post.title %></a>
-    <p>by u/<%= post.author %> | <%= timeAgo(post.createdAt) %></p>
+    <p>by u/<%= post.displayAuthor || post.author || "Deleted-User" %> | <%= timeAgo(post.createdAt) %></p>
     <p><%= post.snippet %></p>
     <a href="/post/<%= post._id %>/edit">Edit</a>
     <form action="/post/<%= post._id %>/delete" method="POST" style="display:inline">

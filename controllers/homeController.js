@@ -25,13 +25,30 @@ exports.displayAllPost = async (req, res) => {
 			if (voteDiff !== 0) return voteDiff;
 			return new Date(b.createdAt ?? 0) - new Date(a.createdAt ?? 0);
 		});
-		const currentUser = await User.findByUserID(req.session.user) 
-		const username = currentUser.name
+		const sessionUserId = req.session?.user || null;
+		const currentUser = sessionUserId ? await User.findByUserID(sessionUserId) : null;
+
+		// Resolve display names for post authors (Deleted-User fallback).
+		const authorIds = posts
+			.map((p) => p.authorId)
+			.filter(Boolean)
+			.map((id) => id.toString());
+		const uniqueAuthorIds = [...new Set(authorIds)];
+		const authors = uniqueAuthorIds.length
+			? await User.findUsersByIds(uniqueAuthorIds)
+			: [];
+		const authorById = new Map(
+			authors.map((u) => [u._id.toString(), u.name]),
+		);
 
 
 		const postsWithVotes = sortedPosts.map((post) => {
 			//just to test if i up/downvote, whether the button will remain highlighted
-			const existingVote = post.voters.find((voter) => voter.username === username);
+			const existingVote = sessionUserId
+				? (post.voters || []).find(
+						(voter) => voter.userId?.toString() === sessionUserId.toString(),
+					)
+				: null;
 
 			//converting the img buffer to base64 string for ejs
 			let imageBase64 = null;
@@ -40,6 +57,10 @@ exports.displayAllPost = async (req, res) => {
 			}
 			return {
 				...post,
+				// Prefer live user lookup; fallback to old `author` field; then Deleted-User.
+				displayAuthor:
+					(post.authorId && authorById.get(post.authorId.toString())) ||
+					"Deleted-User",
 				userVote: existingVote ? existingVote.voteType : null,
 				imageBase64,
 				imageType: post.image ? post.image.contentType : null
@@ -63,19 +84,20 @@ exports.displayAllPost = async (req, res) => {
 
 exports.upvote = async (req, res) => {
   const id = req.params.id;
-  const currentUser = await User.findByUserID(req.session.user);
-  const username = currentUser.name;
+  const sessionUserId = req.session?.user;
 
   try {
     const post = await postModel.getPostById(id);
-    const existingVote = post.voters.find((v) => v.username === username);
+    const existingVote = (post.voters || []).find(
+      (v) => v.userId?.toString() === sessionUserId.toString(),
+    );
 
     if (!existingVote) {
-      await postModel.updateVote(id, username, 'upvote', 1);
+      await postModel.updateVote(id, sessionUserId, 'upvote', 1);
     } else if (existingVote.voteType === 'upvote') {
-      await postModel.updateVote(id, username, null, -1);
+      await postModel.updateVote(id, sessionUserId, null, -1);
     } else {
-      await postModel.updateVote(id, username, 'upvote', 2);
+      await postModel.updateVote(id, sessionUserId, 'upvote', 2);
     }
   } catch (error) {
     console.error(error);
@@ -85,19 +107,20 @@ exports.upvote = async (req, res) => {
 
 exports.downvote = async (req, res) => {
   const id = req.params.id;
-  const currentUser = await User.findByUserID(req.session.user);
-  const username = currentUser.name;
+  const sessionUserId = req.session?.user;
 
   try {
     const post = await postModel.getPostById(id);
-    const existingVote = post.voters.find((v) => v.username === username);
+    const existingVote = (post.voters || []).find(
+      (v) => v.userId?.toString() === sessionUserId.toString(),
+    );
 
     if (!existingVote) {
-      await postModel.updateVote(id, username, 'downvote', -1);
+      await postModel.updateVote(id, sessionUserId, 'downvote', -1);
     } else if (existingVote.voteType === 'downvote') {
-      await postModel.updateVote(id, username, null, 1);
+      await postModel.updateVote(id, sessionUserId, null, 1);
     } else {
-      await postModel.updateVote(id, username, 'downvote', -2);
+      await postModel.updateVote(id, sessionUserId, 'downvote', -2);
     }
   } catch (error) {
     console.error(error);

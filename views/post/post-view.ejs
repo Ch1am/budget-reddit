@@ -3,10 +3,10 @@
 	<head>
 		<meta charset="UTF-8">
 		<title><%= post.title %></title>
-		<%- include('../partials/nav') %>
 	</head>
 
 	<body>
+			<%- include('../partials/nav') %>
 		<% if (!post || post.length===0) { %>
 			<h1>POST does not exist</h1>
 		<% } else { %>

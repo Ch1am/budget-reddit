@@ -2,10 +2,10 @@
 <html>
     <head>
         <title><%= community.name %></title>
-        <%- include('../partials/nav') %>
     </head>
 
     <body>
+        <%- include('../partials/nav') %>
         <h1>Welcome to <%= community.name %>! (<%= community.users.length %> <%= community.users.length == 1 ? "member" : "members" %>)</h1>
         <p><%= community.description %></p>
         <% if (!userJoinedCommunity) { %>

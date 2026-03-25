@@ -1,6 +1,5 @@
 const Comment = require("../models/commentModel");
 const User = require("../models/registerModel");
-const timeAgo = require("../functions/timeAgo");
 
 exports.createComment = async (req, res) => {
   if (!req.session || !req.session.user) return res.redirect("/login");
@@ -10,15 +9,28 @@ exports.createComment = async (req, res) => {
     const { content } = req.body;
     const postId = req.params.postId;
 
-    if (!content) return res.redirect(`/post/${postId}`);
+    // Server-side validation:
+    // Allow the user to submit either:
+    // - text content, OR
+    // - an uploaded image
+    // Reject only when BOTH are missing (no empty comments).
+    const trimmedText = typeof content === "string" ? content.trim() : "";
+    const hasText = trimmedText.length > 0;
+    const hasImage = !!req.file;
 
-    const image = req.file
+    // Optional image upload: multer stores the uploaded file in `req.file`.
+    const image = hasImage
       ? { data: req.file.buffer, contentType: req.file.mimetype }
       : { data: null, contentType: null };
 
+    // Reject empty request (no text AND no image).
+    if (!hasText && !hasImage) return res.redirect(`/post/${postId}`);
+
+    // Persist the comment + return to the post page.
     await Comment.createComment(postId, {
       author: userInfo.name,
-      content,
+      // Store empty string for image-only comments.
+      content: hasText ? trimmedText : "",
       image,
       votes: 0,
       voters: [],
@@ -79,7 +91,9 @@ exports.upvoteComment = async (req, res) => {
     const username = userInfo.name;
     const comment = await Comment.getCommentById(req.params.id);
 
-    const existingVoter = comment.voters.find(v => v.username === username);
+    if (!comment) return res.status(404).send("Comment not found");
+
+    const existingVoter = comment.voters?.find((v) => v.username === username);
     let voteType = "upvote";
     let voteChange;
 
@@ -108,7 +122,9 @@ exports.downvoteComment = async (req, res) => {
     const username = userInfo.name;
     const comment = await Comment.getCommentById(req.params.id);
 
-    const existingVoter = comment.voters.find(v => v.username === username);
+    if (!comment) return res.status(404).send("Comment not found");
+
+    const existingVoter = comment.voters?.find((v) => v.username === username);
     let voteType = "downvote";
     let voteChange;
 

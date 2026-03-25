@@ -14,7 +14,7 @@ const commentSchema = new mongoose.Schema({
         data: { type: Buffer, default: null },
         contentType: { type: String, default: null },
     },
-    content: { type: String, required: true },
+    content: { type: String, required: false, default: "" },
     votes: { type: Number, default: 0 },
     voters: [voterSchema],
 });
@@ -52,14 +52,19 @@ exports.createComment = async (postId, commentData) => {
 // update vote count and voters list
 exports.updateCommentVote = async (id, username, voteType, voteChange) => {
     const comment = await Comment.findById(id);
+    if (!comment) return;
+
+    // Older documents may not have `voters` populated; normalize to an array.
+    const currentVoters = comment.voters || [];
+
     // remove existing vote if any
-    comment.voters = comment.voters.filter((v) => v.username !== username);
+    comment.voters = currentVoters.filter((v) => v.username !== username);
     // add new vote if not removing
     if (voteType !== null) {
         comment.voters.push({ username, voteType });
     }
     // update vote count
-    comment.votes += voteChange;
+    comment.votes = (comment.votes || 0) + voteChange;
 
     // save back to MongoDB
     await comment.save();

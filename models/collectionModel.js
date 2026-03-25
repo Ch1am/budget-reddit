@@ -61,7 +61,7 @@ exports.createCollection = async (collectionData) => {
  * Get all collections belonging to the given user.
  */
 exports.retrieveAll = async (userId) => {
-  return await Collection.find({ user: userId }).lean();
+  return await Collection.find({ user: userId });
 };
 
 /**
@@ -88,7 +88,7 @@ exports.addIntoCollection = async (collectionID, postID) => {
  * Find a single collection by title + user.
  */
 exports.findByTitle = async (title, userId) => {
-  return await Collection.findOne({ title, user: userId }).lean();
+  return await Collection.findOne({ title, user: userId });
 };
 
 /**
@@ -131,6 +131,6 @@ exports.removePostFromCollection = async (collectionId, postId) => {
  * Get a specific collection by its document id.
  */
 exports.getCollectionById = async (id) => {
-  return await Collection.findById(id).lean();
+  return await Collection.findById(id);
 };
 

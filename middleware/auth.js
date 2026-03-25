@@ -10,3 +10,12 @@ exports.isLoggedIn = (req, res, next) => {
     }
     next();
 }
+
+// If a user is already logged in, redirect them away from auth pages.
+exports.redirectIfLoggedIn = (req, res, next) => {
+    const session = req.session;
+    if (session && session.user) {
+        return res.redirect("/home");
+    }
+    next();
+}

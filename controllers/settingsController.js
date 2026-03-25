@@ -4,8 +4,7 @@ const Community = require("../models/communityModel");
 const { deleteUserCollection } = require("../models/collectionModel");
 
 exports.renderSettingsPage = async(req, res) => {
-    const session = req.session.user
-    const user = await User.findByUserID(session);
+    const user = await User.findByUserID(req.session.user);
 
     res.render("settings/settings", {
         user, 
@@ -66,7 +65,6 @@ exports.changePassword = async (req, res) => {
     const confirmPassword = req.body.confirmPassword
 
     const session = req.session.user
-
     const user = await User.findByUserID(session);
     const passwordCompare = await bcrypt.compare(currentPassword, user.password);
     const errors = []
@@ -119,8 +117,7 @@ exports.changePassword = async (req, res) => {
 }
 
 exports.renderDeleteAccount = async (req, res) => {
-    const session = req.session.user
-    const user = await User.findByUserID(session);
+    const user = await User.findByUserID(req.session.user);
 
     res.render("settings/settings", {
         user, 

@@ -21,7 +21,6 @@ exports.addCollection = async (req, res) => {
   let result = null;
   let msg = null;
 
-  if (!req.session || !req.session.user) return res.redirect("/login");
   if (!title) return res.redirect("/home/new-collection");
 
   const newCollection = {
@@ -44,8 +43,6 @@ exports.addCollection = async (req, res) => {
 exports.showCollections = async (req, res) => {
   let msg = null;
 
-  if (!req.session || !req.session.user) return res.redirect("/login");
-
   try {
     const collectionList = await collectionModel.retrieveAll(req.session.user);
     return res.render("collection/show-collection", { collectionList, msg });
@@ -58,8 +55,6 @@ exports.showCollections = async (req, res) => {
 // GET /home/collection/:title
 exports.displayPostInCollection = async (req, res) => {
   const collectionTitle = req.params.title;
-
-  if (!req.session || !req.session.user) return res.redirect("/login");
 
   try {
     const collection = await collectionModel.findByTitle(
@@ -78,8 +73,6 @@ exports.renameCollection = async (req, res) => {
   const collectionId = req.body.collectionId;
   const newTitle = req.body.newTitle;
 
-  if (!req.session || !req.session.user) return res.redirect("/login");
-
   try {
     await collectionModel.renameCollection(collectionId, newTitle);
     return res.redirect("/home/my-collection");
@@ -92,8 +85,6 @@ exports.renameCollection = async (req, res) => {
 // POST /home/delete-collection
 exports.deleteCollection = async (req, res) => {
   const collectionId = req.body.collectionId;
-
-  if (!req.session || !req.session.user) return res.redirect("/login");
 
   try {
     await collectionModel.deleteCollection(collectionId);
@@ -108,8 +99,6 @@ exports.deleteCollection = async (req, res) => {
 exports.removePostsFromCollection = async (req, res) => {
   const collectionTitle = req.params.title;
   const postId = req.body.postId;
-
-  if (!req.session || !req.session.user) return res.redirect("/login");
 
   try {
     const collection = await collectionModel.findByTitle(
@@ -126,8 +115,6 @@ exports.removePostsFromCollection = async (req, res) => {
 
 // GET /home/collection/:id/rename
 exports.showRenameCollection = async (req, res) => {
-  if (!req.session || !req.session.user) return res.redirect("/login");
-
   try {
     const collection = await collectionModel.getCollectionById(req.params.id);
     return res.render("collection/rename-collection", { collection });
@@ -140,8 +127,6 @@ exports.showRenameCollection = async (req, res) => {
 // GET /post/:id/add-to-collection
 exports.showCollectionDetails = async (req, res) => {
   const postId = req.params.id;
-
-  if (!req.session || !req.session.user) return res.redirect("/login");
 
   try {
     const post = await postModel.getPostById(postId);
@@ -157,8 +142,6 @@ exports.showCollectionDetails = async (req, res) => {
 exports.addInCollection = async (req, res) => {
   const postID = req.params.id;
   const selectedCollectionTitle = req.body.title;
-
-  if (!req.session || !req.session.user) return res.redirect("/login");
 
   try {
     const collection = await collectionModel.findByTitle(

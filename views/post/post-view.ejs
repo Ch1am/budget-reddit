@@ -45,7 +45,7 @@
 			<%}%>
 		<% } %>
 
-		<% if (locals.sessionUserId && post.authorId && sessionUserId.toString() === post.authorId.toString()) { %>
+		<% if (locals.currentUser && (currentUser.type === 'admin' || (post.authorId && sessionUserId.toString() === post.authorId.toString()))) { %>
 			<a href="/post/<%= post._id %>/edit">Edit</a>
 			<form action="/post/<%= post._id %>/delete" method="POST" style="display:inline">
 				<button type="submit">Delete</button>
@@ -56,7 +56,8 @@
 		<div id="comments">
 			<%- include('../partials/comment-create', { postId: post._id }) %>
 			<hr>
-			<%- include('../partials/comment', { comments, postId: post._id, sessionUserId, editCommentId }) %>
+			<%- include('../partials/comment', { comments, postId: post._id, sessionUserId, isAdmin, editCommentId }) %>
 		</div>
+		<%- include('../partials/footer') %>
 	</body>
 </html>

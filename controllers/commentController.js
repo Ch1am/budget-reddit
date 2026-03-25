@@ -3,9 +3,6 @@ const User = require("../models/registerModel");
 
 // POST `/post/:postId/comment`
 exports.createComment = async (req, res) => {
-  // Only logged-in users can comment.
-  if (!req.session || !req.session.user) return res.redirect("/login");
-
   try {
     // get the current user info
     const userInfo = await User.findByUserID(req.session.user);
@@ -52,11 +49,9 @@ exports.createComment = async (req, res) => {
 
 // POST `/comment/:id/edit`
 exports.editComment = async (req, res) => {
-  // Only logged-in users can edit.
-  if (!req.session || !req.session.user) return res.redirect("/login");
-
   try {
     const userInfo = await User.findByUserID(req.session.user);
+    const isAdmin = userInfo?.type === "admin";
 
     // get comment by its id.
     const comment = await Comment.getCommentById(req.params.id);
@@ -65,7 +60,7 @@ exports.editComment = async (req, res) => {
     const isOwner =
       comment?.authorId &&
       comment.authorId.toString() === userInfo._id.toString();
-    if (!comment || !isOwner)
+    if (!comment || (!isOwner && !isAdmin))
       return res.redirect(`/post/${comment.postId}`);
 
     // update the comment text content
@@ -82,18 +77,16 @@ exports.editComment = async (req, res) => {
 
 // POST `/comment/:id/delete`
 exports.deleteComment = async (req, res) => {
-  // Only logged-in users can delete.
-  if (!req.session || !req.session.user) return res.redirect("/login");
-
   try {
     const userInfo = await User.findByUserID(req.session.user);
+    const isAdmin = userInfo?.type === "admin";
     const comment = await Comment.getCommentById(req.params.id);
 
     // check if the comment belong to current user
     const isOwner =
       comment?.authorId &&
       comment.authorId.toString() === userInfo._id.toString();
-    if (!comment || !isOwner)
+    if (!comment || (!isOwner && !isAdmin))
       return res.redirect(`/post/${comment.postId}`);
 
     // delete comment and update post commentCount
@@ -109,9 +102,6 @@ exports.deleteComment = async (req, res) => {
 
 //POST `/comment/:id/upvote`
 exports.upvoteComment = async (req, res) => {
-  // Only logged-in users can vote.
-  if (!req.session || !req.session.user) return res.redirect("/login");
-
   try {
     const sessionUserId = req.session.user;
 
@@ -152,9 +142,6 @@ exports.upvoteComment = async (req, res) => {
 // POST `/comment/:id/downvote`
 // Function to downvote a comment
 exports.downvoteComment = async (req, res) => {
-  // Only logged-in users can vote.
-  if (!req.session || !req.session.user) return res.redirect("/login");
-
   try {
 
     const sessionUserId = req.session.user;

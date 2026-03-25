@@ -18,28 +18,28 @@ exports.getSinglePost = async (req, res) => {
 		// Collections are now managed by `collectionModel`, not `postModel`.
 		// This list is used by `views/post/post-view.ejs` to render the
 		// "Add to Collection" UI.
-		const collectionList = req.session?.user
-			? await collectionModel.retrieveAll(req.session.user)
-			: null;
-		const post = await Post.getPostById(req.params.id);
+		const sessionUserId = req.session.user;
+		const collectionList = await collectionModel.retrieveAll(sessionUserId);
+		const postDoc = await Post.getPostById(req.params.id);
 
 		// Session user (used for edit/delete + comment vote highlighting)
-		const sessionUserId = req.session?.user || null;
-		const currentUser = sessionUserId ? await User.findByUserID(sessionUserId) : null;
-		const sessionUser = currentUser ? currentUser.name : null; // kept for templates that still expect name
+		const currentUser = await User.findByUserID(sessionUserId);
+		const isAdmin = currentUser?.type === "admin";
 
 		// If post doesn't exist, still provide fields used by the template.
-		if (!post) {
+		if (!postDoc) {
 			return res.status(404).render("post/post-view", {
 				post: null,
 				comments: [],
 				timeAgo,
 				collectionList,
 				currentUser,
-				sessionUser,
+				sessionUserId,
+				isAdmin,
 				editCommentId,
 			});
 		}
+		const post = postDoc.toObject();
 
 		// Load comments for this post
 		const rawComments = await Comment.getCommentsByPost(req.params.id);
@@ -56,10 +56,11 @@ exports.getSinglePost = async (req, res) => {
 		const authorById = new Map(authors.map((u) => [u._id.toString(), u.name]));
 
 		const comments = rawComments.map((comment) => {
+			const commentObj = comment.toObject();
 			// Convert comment image (Buffer) -> base64 string for EJS
 			let imageBase64 = null;
 			const imageData =
-				comment.image && comment.image.data ? comment.image.data : null;
+				commentObj.image && commentObj.image.data ? commentObj.image.data : null;
 
 			if (imageData) {
 				try {
@@ -78,19 +79,19 @@ exports.getSinglePost = async (req, res) => {
 			// Highlight comment vote button for the current user (if logged in)
 			let userVote = null;
 			if (sessionUserId) {
-				const existingVoter = comment.voters?.find(
+				const existingVoter = commentObj.voters?.find(
 					(v) => v.userId?.toString() === sessionUserId.toString(),
 				);
 				userVote = existingVoter ? existingVoter.voteType : null;
 			}
 
 			return {
-				...comment,
+				...commentObj,
 				displayAuthor:
-					(comment.authorId && authorById.get(comment.authorId.toString())) ||
+					(commentObj.authorId && authorById.get(commentObj.authorId.toString())) ||
 					"Deleted-User",
 				imageBase64,
-				imageType: comment.image ? comment.image.contentType : null,
+				imageType: commentObj.image ? commentObj.image.contentType : null,
 				userVote,
 			};
 		});
@@ -124,8 +125,8 @@ exports.getSinglePost = async (req, res) => {
 			timeAgo,
 			collectionList,
 			currentUser,
-			sessionUser,
 			sessionUserId,
+			isAdmin,
 			editCommentId,
 		});
 	} catch (error) {
@@ -136,8 +137,6 @@ exports.getSinglePost = async (req, res) => {
 
 exports.getUserPost = async (req, res) => {
 	try {
-		if (!req.session || !req.session.user) return res.redirect("/login");
-
 		const userInfo = await User.findByUserID(req.session.user);
 		const posts = await Post.getPostsByAuthorId(userInfo._id);
 
@@ -149,9 +148,7 @@ exports.getUserPost = async (req, res) => {
 };
 
 exports.getCreatePost = async (req, res) => {
-	const userID = req.session.user
-
-	const user = await User.findByUserID(userID)
+	const user = await User.findByUserID(req.session.user)
 	let communities = user.communities
 	const com = []
 
@@ -222,27 +219,26 @@ exports.addInCollection = async (req, res) =>
 // }
 
 exports.getEditPost = async (req, res) => {
-	if (!req.session || !req.session.user) return res.redirect("/login");
-
 	const post = await Post.getPostById(req.params.id);
 	const userInfo = await User.findByUserID(req.session.user);
+	const isAdmin = userInfo?.type === "admin";
 
 	const isOwner =
 		post.authorId && post.authorId.toString() === userInfo._id.toString();
-	if (!isOwner)
+	if (!isOwner && !isAdmin)
 		return res.redirect(`/post/${req.params.id}`);
 
 	res.render("post/post-edit", { post });
 };
 
 exports.editPost = async (req, res) => {
-	if (!req.session || !req.session.user) return res.redirect("/login");
 	const post = await Post.getPostById(req.params.id);
 	const userInfo = await User.findByUserID(req.session.user);
+	const isAdmin = userInfo?.type === "admin";
 
 	const isOwner =
 		post.authorId && post.authorId.toString() === userInfo._id.toString();
-	if (!isOwner)
+	if (!isOwner && !isAdmin)
 		return res.redirect(`/post/${req.params.id}`);
 
 	const { title, snippet, tag } = req.body;
@@ -251,13 +247,13 @@ exports.editPost = async (req, res) => {
 };
 
 exports.deletePost = async (req, res) => {
-	if (!req.session || !req.session.user) return res.redirect("/login");
 	const post = await Post.getPostById(req.params.id);
 	const userInfo = await User.findByUserID(req.session.user);
+	const isAdmin = userInfo?.type === "admin";
 
 	const isOwner =
 		post.authorId && post.authorId.toString() === userInfo._id.toString();
-	if (!isOwner)
+	if (!isOwner && !isAdmin)
 		return res.redirect(`/post/${req.params.id}`);
 
 	// Cascade delete all comments under this post.

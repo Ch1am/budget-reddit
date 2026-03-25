@@ -3,12 +3,6 @@ const bcrypt = require("bcrypt");
 
 exports.showLogin = async (req, res) => {
     try {
-        // session check -> redirect to /home page
-        const session = req.session
-		if (session && session.user) {
-			return res.redirect("/home")
-		}
-
         res.render("auth/login", {
             error: [],
             filledEmail: null,
@@ -136,12 +130,12 @@ exports.password = async (req, res) => {
         passworderrormessage = null
         confirmpasserrormessage = null
         html = null
-        res.render("forgot", {email, newpassword, confirmpassword, emailerrormessage, passworderrormessage, confirmpasserrormessage, html})
+        res.render("forgot", { email, newpassword, confirmpassword, emailerrormessage, passworderrormessage, confirmpasserrormessage, html })
     } catch (error) {
         console.log(error)
     }
 }
-exports.changePassword = async (req, res) =>{
+exports.changePassword = async (req, res) => {
     email = req.body.email
     newpassword = req.body.newpassword
     confirmpassword = req.body.confirmnewpass
@@ -150,34 +144,34 @@ exports.changePassword = async (req, res) =>{
     confirmpasserrormessage = null
     html = null
 
-    if (!email){
+    if (!email) {
         emailerrormessage = "Email is required"
     }
-    if (!newpassword){
+    if (!newpassword) {
         passworderrormessage = "New Password is required"
     }
-    if (newpassword && !confirmpassword){
+    if (newpassword && !confirmpassword) {
         confirmpasserrormessage = "Please confirm your new password"
     }
 
-    if (!emailerrormessage){
+    if (!emailerrormessage) {
         userInfo = await findByemail(email)
         if (!userInfo)
             emailerrormessage = "Couldn't find your account"
     }
-    if (!passworderrormessage && !confirmpasserrormessage && newpassword !== confirmpassword){
+    if (!passworderrormessage && !confirmpasserrormessage && newpassword !== confirmpassword) {
         confirmpasserrormessage = "Passwords do not match"
     }
-    if (!emailerrormessage && !passworderrormessage && !confirmpasserrormessage){
+    if (!emailerrormessage && !passworderrormessage && !confirmpasserrormessage) {
         await editUser(email, newpassword);
         html = `Password has been changed`
     }
-    return res.render("forgot", {email, newpassword, confirmpassword, emailerrormessage, passworderrormessage, confirmpasserrormessage, html})
+    return res.render("forgot", { email, newpassword, confirmpassword, emailerrormessage, passworderrormessage, confirmpasserrormessage, html })
 
-    }
+}
 // const filePath = "password-data.json";
 // exports.getUser = async (req, res)=>{
-//     let email = read.query.email 
+//     let email = read.query.email
 //     console.log(email)
 //     try {
 //         let userInfo = await UserActivation.findByemail(email)
@@ -210,7 +204,7 @@ exports.changePassword = async (req, res) =>{
 //             ogcontent = JSON.parse(raw) // add the raw in to safe it before you overwrite
 //         }
 //          ogcontent.push(users)
-//          const jsonData = JSON.stringify (ogcontent,null,2) //convert js array into json 
+//          const jsonData = JSON.stringify (ogcontent,null,2) //convert js array into json
 //          await fs.writeFile(filePath,jsonData) //adding info inside
 //     } catch (error) {
 //         console.error ('Error saving password:',error)
@@ -218,7 +212,7 @@ exports.changePassword = async (req, res) =>{
 // }
 
 // exports.register = async(req, res)=>{
-// try {   
+// try {
 //         let newemail = req.body.regisemail
 //         let newpassword = req.body.regispassword
 //         let confirmpassword = req.body.regisconfirmpassword
@@ -241,7 +235,7 @@ exports.changePassword = async (req, res) =>{
 //         }
 //         if (!newpassword) {
 //             newpassworderrormsg = 'Password is required.'
-//         } 
+//         }
 //         if (!confirmpassword && newpassword) {
 //             confirmpasswordmsg = 'Please confirm your password.'
 //         }
@@ -259,7 +253,7 @@ exports.changePassword = async (req, res) =>{
 
 //         // if (userInfo) {
 //         //     emailusedmsg = 'This email address has been used to register an account before.'
-//         // } 
+//         // }
 
 
 //         // if (!nameerrormsg && !newemailerrormsg && !newpassworderrormsg && !confirmpasswordmsg && !passwordmatchmsg && !emailusedmsg) {

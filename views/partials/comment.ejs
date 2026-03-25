@@ -1,5 +1,7 @@
 <% comments.forEach((comment, index)=> { %>
   <% const isOwner = !!sessionUserId && !!comment.authorId && sessionUserId.toString() === comment.authorId.toString(); %>
+  <% const canDelete = !!isAdmin || isOwner; %>
+  <% const canEdit = isOwner; %>
     <% const isEditing=!!editCommentId && isOwner && editCommentId.toString()===comment._id.toString(); %>
 
       <% if (isEditing) { %>
@@ -15,13 +17,15 @@
                   <%= timeAgo(comment.createdAt) %>
                 </time>
 
-                <% if (isOwner) { %>
+                <% if (canEdit) { %>
                   &nbsp;&bull;&nbsp;
                   <a href="/post/<%= postId %>?editCommentId=<%= comment._id %>">Edit</a>
+                <% } %>
+                <% if (canDelete) { %>
                   <form action="/comment/<%= comment._id %>/delete" method="POST" style="display:inline">
                     <button type="submit">Delete</button>
                   </form>
-                  <% } %>
+                <% } %>
               </div>
 
               <!-- comment image -->

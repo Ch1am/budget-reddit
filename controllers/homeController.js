@@ -12,11 +12,12 @@ exports.displayAllPost = async (req, res) => {
 		// user information
 		let posts = await postModel.getAllPost();
 		posts = await Promise.all(posts.map(async (p) => {
+			const pObj = typeof p.toObject === "function" ? p.toObject() : p;
 			if (p.community) {
-				p.community = await Community.findCommunityById(p.community);
+				pObj.community = await Community.findCommunityById(p.community);
 			}
 			
-			return p; 
+			return pObj; 
 		}));
 
 		// Sort by net score (votes) descending; tie-break by newest first.
@@ -53,7 +54,12 @@ exports.displayAllPost = async (req, res) => {
 			//converting the img buffer to base64 string for ejs
 			let imageBase64 = null;
 			if (post.image && post.image.data) {
-				imageBase64 = Buffer.from(post.image.data.buffer).toString('base64');
+				const buf = Buffer.isBuffer(post.image.data)
+					? post.image.data
+					: post.image.data.buffer
+						? Buffer.from(post.image.data.buffer)
+						: Buffer.from(post.image.data);
+				imageBase64 = buf.toString('base64');
 			}
 			return {
 				...post,

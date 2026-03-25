@@ -3,20 +3,31 @@ const router = express.Router();
 const commentController = require("../controllers/commentController");
 const multer = require("multer");
 const upload = multer({ storage: multer.memoryStorage() });
+const middleware = require("../middleware/auth");
 
 // POST create new comment
-router.post("/post/:postId/comment", upload.single("image"), commentController.createComment);
+router.post(
+  "/post/:postId/comment",
+  middleware.isLoggedIn,
+  upload.single("image"),
+  commentController.createComment,
+);
 
 // POST to update comment
-router.post("/comment/:id/edit", upload.single("image"), commentController.editComment);
+router.post(
+  "/comment/:id/edit",
+  middleware.isLoggedIn,
+  upload.single("image"),
+  commentController.editComment,
+);
 
 // POST to handle delete
-router.post("/comment/:id/delete", commentController.deleteComment);
+router.post("/comment/:id/delete", middleware.isLoggedIn, commentController.deleteComment);
 
 // for upvoting comment
-router.post("/comment/:id/upvote", commentController.upvoteComment);
+router.post("/comment/:id/upvote", middleware.isLoggedIn, commentController.upvoteComment);
 
 // for downvoting a comment
-router.post("/comment/:id/downvote", commentController.downvoteComment);
+router.post("/comment/:id/downvote", middleware.isLoggedIn, commentController.downvoteComment);
 
 module.exports = router;

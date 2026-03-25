@@ -126,7 +126,8 @@ exports.renderCommunity = async(req, res) => {
         const rawPosts = await Post.getAllPost();
         const posts = []
 
-        rawPosts.forEach(p => {
+        rawPosts.forEach(pDoc => {
+            const p = typeof pDoc.toObject === "function" ? pDoc.toObject() : pDoc;
             if (p.community && p.community.toString() === communityID) {
                 p.community = community
                 posts.push(p);

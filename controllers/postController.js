@@ -3,11 +3,17 @@ const timeAgo = require("../functions/timeAgo")
 const User = require("./../models/registerModel")
 const Community = require("./../models/communityModel")
 const Comment = require("../models/commentModel");
+const collectionModel = require("../models/collectionModel");
+const collectionController = require("./collectionController");
 
 exports.getSinglePost = async (req, res) => {
 	try {
-		const rawCollectionList = await Post.retrieveAll();
-		const collectionList = rawCollectionList || null;
+		// Collections are now managed by `collectionModel`, not `postModel`.
+		// This list is used by `views/post/post-view.ejs` to render the
+		// "Add to Collection" UI.
+		const collectionList = req.session?.user
+			? await collectionModel.retrieveAll(req.session.user)
+			: null;
 		const post = await Post.getPostById(req.params.id);
 
 		// Session user (used for edit/delete + comment vote highlighting)
@@ -20,7 +26,7 @@ exports.getSinglePost = async (req, res) => {
 
 		// If post doesn't exist, still provide fields used by the template.
 		if (!post) {
-			return res.status(404).render("post-view", {
+			return res.status(404).render("post/post-view", {
 				post: null,
 				comments: [],
 				timeAgo,
@@ -85,7 +91,7 @@ exports.getSinglePost = async (req, res) => {
 			}
 		}
 
-		res.render("post-view", {
+		res.render("post/post-view", {
 			post: {
 				...post,
 				imageBase64,
@@ -110,7 +116,7 @@ exports.getUserPost = async (req, res) => {
 		const userInfo = await User.findByUserID(req.session.user);
 		const posts = await Post.getPostsByAuthor(userInfo.name);
 
-		res.render("myPost", { posts, timeAgo });
+		res.render("post/myPost", { posts, timeAgo });
 	} catch (error) {
 		console.error(error);
 		res.status(500).send("Error loading your posts");
@@ -129,7 +135,7 @@ exports.getCreatePost = async (req, res) => {
         com.push(r);
     }
 
-	res.render('post-create', {
+	res.render('post/post-create', {
 		user, 
 		communities: com
 	})
@@ -139,7 +145,7 @@ exports.createPost = async (req, res) => {
 	const { title, community, snippet } = req.body;
 
 	if (!title || !snippet) {
-		return res.render('post-create', { error: 'Title and description are required' });
+		return res.render('post/post-create', { error: 'Title and description are required' });
 	}
 
 	const image = req.file ? { data: req.file.buffer, contentType: req.file.mimetype } : { data: null, contentType: null };
@@ -168,39 +174,13 @@ exports.createPost = async (req, res) => {
 	}
 };
 
-exports.showCollectionDetails = async (req,res) => {
-	try {
-			const post = await Post.getPostById(req.params.id)
-			console.log("THE ID RECEIVED IS:", req.params.id)
-			let collectionList = await Post.retrieveAll(req.session.user)
-			res.render('collection-selection',{collectionList,post})
-		} catch (error) {
-			console.log (error)
-			console.log("THE ID RECEIVED IS:", req.params.id)
-			res.send('Error reading collection')
-		}
-}
+// These endpoints are handled by `collectionController`.
+// We keep these exports only for backward compatibility.
+exports.showCollectionDetails = async (req, res) =>
+	collectionController.showCollectionDetails(req, res);
 
-exports.addInCollection = async (req,res)=> {
-	try {
-		let postID = req.params.id
-		console.log("THE ID RECEIVED IS:", req.params.id);
-		let selectedCollection = req.body.title
-		// let msg = null
-		let collectionID = await Post.findByTitle(selectedCollection, req.session.user)
-		await Post.addIntoCollection(collectionID._id,postID)
-		// let collectionList = await Post.retrieveAll()
-		// if (!result) {
-		// 	msg = 'Post is already in collection.'
-		// } else {
-		// 	msg = 'Post has been successfully added to collection'
-		// }
-		// res.render('show-collection', {collectionList,msg})
-		res.redirect('/home/my-collection')
-	} catch (error) {
-		console.log(error)
-	}
-}
+exports.addInCollection = async (req, res) =>
+	collectionController.addInCollection(req, res);
 
 // exports.newCollection = async (req,res) => {
 	
@@ -225,7 +205,7 @@ exports.getEditPost = async (req, res) => {
 	if (post.author !== userInfo.name)
 		return res.redirect(`/post/${req.params.id}`);
 
-	res.render("post-edit", { post });
+	res.render("post/post-edit", { post });
 };
 
 exports.editPost = async (req, res) => {

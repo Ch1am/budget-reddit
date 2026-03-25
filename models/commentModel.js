@@ -2,14 +2,13 @@ const mongoose = require("mongoose");
 const Post = require("./postModel");
 
 const voterSchema = new mongoose.Schema({
-    // Store voter as userId so votes survive username changes/deletion.
+    // userId so votes survive username changes/deletion.
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     voteType: { type: String, enum: ["upvote", "downvote"], required: true },
 }, { _id: false });
 
 const commentSchema = new mongoose.Schema({
     postId: { type: mongoose.Schema.Types.ObjectId, ref: "Post", required: true },
-    // New: store author as userId so comments can still render after account deletion.
     authorId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     createdAt: { type: Date, default: Date.now },
     image: {
@@ -54,12 +53,8 @@ exports.updateCommentVote = async (id, userId, voteType, voteChange) => {
     const comment = await Comment.findById(id);
     if (!comment) return;
 
-    // Older data may not have `voters` populated; normalize to an array.
-    // basically a guard for old data
-    const currentVoters = comment.voters || [];
-
     // remove existing vote if any
-    comment.voters = currentVoters.filter((v) => v.userId?.toString() !== userId.toString());
+    comment.voters = comment.voters.filter((v) => v.userId?.toString() !== userId.toString());
     // add new vote if not there
     if (voteType !== null) {
         comment.voters.push({ userId, voteType });
@@ -79,11 +74,11 @@ exports.editComment = async (id, updatedData) => {
 //deleting logged in user post
 exports.deleteComment = async (id, postId) => {
     await Comment.findByIdAndDelete(id);
-    // Keep commentCount in sync when deleting comments.
+    // Keep commentCount in sync when deleting comments
     await Post.incrementCommentCount(postId, -1);
 };
 
-// Delete all comments under a post (used for cascade delete when a post is deleted).
+// Delete all comments under a post when a post is deleted
 exports.deleteCommentsByPostId = async (postId) => {
     return await Comment.deleteMany({ postId });
 };

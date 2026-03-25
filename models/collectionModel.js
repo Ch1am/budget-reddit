@@ -1,14 +1,6 @@
 const mongoose = require("mongoose");
 const postModel = require("./postModel");
 
-/**
- * Collection model stores a user's saved group of posts.
- *
- * Important:
- * - The `posts` array is embedded (snapshot of post fields at the time it was added).
- * - Voting for posts lives on the Post model; this embedded copy is just for display.
- */
-
 const voterSchema = new mongoose.Schema(
   {
     username: String,
@@ -22,7 +14,7 @@ const postSchema = new mongoose.Schema(
   {
     author: { type: String, required: true, default: "guest" },
     title: { type: String, required: true },
-    snippet: { type: String, required: true },
+    desc: { type: String, required: true },
     image: {
       data: { type: Buffer, default: null },
       contentType: { type: String, default: null },

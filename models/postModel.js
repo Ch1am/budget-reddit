@@ -1,18 +1,18 @@
 const mongoose = require("mongoose");
 
-// Voter embedded schema for post upvotes/downvotes
+// Voter schema for post upvotes/downvotes
 const voterSchema = new mongoose.Schema({
-  // Store voter as userId so votes survive username changes/deletion.
+  // userId so votes survive username changes/deletion.
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   voteType: { type: String, enum: ["upvote", "downvote"], required: true },
 });
 
 // Main Post schema
 const postSchema = new mongoose.Schema({
-  // New: store author as userId so posts can still render after account deletion.
+  //store userId so posts can still render after account deletion.
   authorId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   title: { type: String, required: true },
-  snippet: { type: String, required: true },
+  desc: { type: String, required: true },
   image: {
     data: { type: Buffer, default: null },
     contentType: { type: String, default: null },
@@ -54,7 +54,7 @@ exports.updateVote = async (id, userId, voteType, voteChange) => {
   // Remove existing vote if any
   post.voters = (post.voters || []).filter((v) => v.userId?.toString() !== userId.toString());
 
-  // Add new vote if not removing (toggle off sets voteType to null)
+  // Add new vote if not removing
   if (voteType !== null) {
     post.voters.push({ userId, voteType });
   }
@@ -62,7 +62,7 @@ exports.updateVote = async (id, userId, voteType, voteChange) => {
   // Update vote total
   post.votes += voteChange;
 
-  // Save back to MongoDB
+  // Save to MongoDB
   await post.save();
 };
 
@@ -76,8 +76,7 @@ exports.deletePost = async (id) => {
   return await Post.findByIdAndDelete(id);
 };
 
-// Increment (or decrement) a post's `commentCount`.
-// This is called by `commentModel` when comments are created/deleted.
+// increase or decrease a post commentCount
 exports.incrementCommentCount = async (postId, delta) => {
   return await Post.findByIdAndUpdate(postId, { $inc: { commentCount: delta } });
 };

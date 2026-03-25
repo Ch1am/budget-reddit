@@ -8,25 +8,22 @@ const collectionController = require("./collectionController");
 
 exports.getSinglePost = async (req, res) => {
 	try {
-		// Used for inline comment editing UI (see `views/partials/comment.ejs`).
-		// We toggle edit mode via `GET /post/:id?editCommentId=<commentId>#comment-<commentId>`.
+		// Used for comment editing UI views/partials/comment.ejs
 		const editCommentId =
 			typeof req.query.editCommentId === "string" && req.query.editCommentId.trim()
 				? req.query.editCommentId.trim()
 				: null;
 
-		// Collections are now managed by `collectionModel`, not `postModel`.
-		// This list is used by `views/post/post-view.ejs` to render the
-		// "Add to Collection" UI.
+		// list used by post-view.ejs to render the "Add to Collection" UI.
 		const sessionUserId = req.session.user;
 		const collectionList = await collectionModel.retrieveAll(sessionUserId);
 		const postDoc = await Post.getPostById(req.params.id);
 
-		// Session user (used for edit/delete + comment vote highlighting)
+		// get the current logged in user and check if they are an admin
 		const currentUser = await User.findByUserID(sessionUserId);
 		const isAdmin = currentUser?.type === "admin";
 
-		// If post doesn't exist, still provide fields used by the template.
+		// if post dont exist still provide fields that can be used
 		if (!postDoc) {
 			return res.status(404).render("post/post-view", {
 				post: null,
@@ -44,20 +41,55 @@ exports.getSinglePost = async (req, res) => {
 		// Load comments for this post
 		const rawComments = await Comment.getCommentsByPost(req.params.id);
 
-		// Bulk lookup author display names (Deleted-User fallback).
-		const authorIds = [
-			post?.authorId ? post.authorId.toString() : null,
-			...rawComments.map((c) => (c.authorId ? c.authorId.toString() : null)),
-		].filter(Boolean);
-		const uniqueAuthorIds = [...new Set(authorIds)];
-		const authors = uniqueAuthorIds.length
+		// store the authorIDs for post and comment and store them 
+		const authorIds = [];
+
+		// Add the post's authorID.
+		if (post && post.authorId) {
+			authorIds.push(post.authorId.toString());
+		}
+
+		// Add each comment's authorID.
+		for (let i = 0; i < rawComments.length; i++) {
+			const c = rawComments[i];
+			if (c && c.authorId) {
+				authorIds.push(c.authorId.toString());
+			}
+		}
+
+		// find unique authorIds
+		const seen = {};
+		const uniqueAuthorIds = [];
+		for (let i = 0; i < authorIds.length; i++) {
+			const id = authorIds[i];
+			if (!seen[id]) {
+				seen[id] = true;
+				uniqueAuthorIds.push(id);
+			}
+		}
+
+		// get all the authors of the post and comments
+		const authors = uniqueAuthorIds.length > 0
 			? await User.findUsersByIds(uniqueAuthorIds)
 			: [];
-		const authorById = new Map(authors.map((u) => [u._id.toString(), u.name]));
 
-		const comments = rawComments.map((comment) => {
+		// make a lookup object to get author name by id, this is to optimize and
+		// avoid calling .find() or .filter() repeatedly when rendering the post and comments
+		const authorNameById = {};
+		for (let i = 0; i < authors.length; i++) {
+			const u = authors[i];
+			if (u && u._id) {
+				authorNameById[u._id.toString()] = u.name;
+			}
+		}
+
+		// convert each comment into a plain JS object
+		const comments = [];
+		for (let i = 0; i < rawComments.length; i++) {
+			const comment = rawComments[i];
 			const commentObj = comment.toObject();
-			// Convert comment image (Buffer) -> base64 string for EJS
+
+			// Convert comment image (Buffer) to base64 string for EJS
 			let imageBase64 = null;
 			const imageData =
 				commentObj.image && commentObj.image.data ? commentObj.image.data : null;
@@ -85,16 +117,19 @@ exports.getSinglePost = async (req, res) => {
 				userVote = existingVoter ? existingVoter.voteType : null;
 			}
 
-			return {
+			// Resolve display author name
+			const displayAuthor =
+				(commentObj.authorId && authorNameById[commentObj.authorId.toString()]) ||
+				"Deleted-User";
+
+			comments.push({
 				...commentObj,
-				displayAuthor:
-					(commentObj.authorId && authorById.get(commentObj.authorId.toString())) ||
-					"Deleted-User",
+				displayAuthor,
 				imageBase64,
 				imageType: commentObj.image ? commentObj.image.contentType : null,
 				userVote,
-			};
-		});
+			});
+		}
 
 		// Convert post image to base64 for EJS
 		let imageBase64 = null; // set the imgb64 to null first
@@ -116,7 +151,7 @@ exports.getSinglePost = async (req, res) => {
 			post: {
 				...post,
 				displayAuthor:
-					(post.authorId && authorById.get(post.authorId.toString())) ||
+					(post.authorId && authorNameById[post.authorId.toString()]) ||
 					"Deleted-User",
 				imageBase64,
 				imageType: post.image ? post.image.contentType : null,
@@ -164,9 +199,9 @@ exports.getCreatePost = async (req, res) => {
 }
 
 exports.createPost = async (req, res) => {
-	const { title, community, snippet } = req.body;
+	const { title, community, desc } = req.body;
 
-	if (!title || !snippet) {
+	if (!title || !desc) {
 		return res.render('post/post-create', { error: 'Title and description are required' });
 	}
 
@@ -177,7 +212,7 @@ exports.createPost = async (req, res) => {
 		title,
 		image,
 		community: community == "None_Selected" ? null : community,
-		snippet,
+		desc,
 		authorId: currentUser._id,
 		votes: 0,
 		voters: [],
@@ -195,28 +230,6 @@ exports.createPost = async (req, res) => {
 		res.redirect('/home');
 	}
 };
-
-// These endpoints are handled by `collectionController`.
-// We keep these exports only for backward compatibility.
-exports.showCollectionDetails = async (req, res) =>
-	collectionController.showCollectionDetails(req, res);
-
-exports.addInCollection = async (req, res) =>
-	collectionController.addInCollection(req, res);
-
-// exports.newCollection = async (req,res) => {
-	
-//   const title = req.body.title
-//   try {
-// 	const savedCollection = Post.createCollection(title,[])
-// 	let msg = 'Collection created successfully'
-//   } catch (error) {
-// 	console.log(error)
-// 	let msg = 'Error creating collection'
-//   }
-//   res.alert(msg)
-
-// }
 
 exports.getEditPost = async (req, res) => {
 	const post = await Post.getPostById(req.params.id);
@@ -241,8 +254,8 @@ exports.editPost = async (req, res) => {
 	if (!isOwner && !isAdmin)
 		return res.redirect(`/post/${req.params.id}`);
 
-	const { title, snippet, tag } = req.body;
-	await Post.updatePost(req.params.id, { title, snippet, tag });
+	const { title, tag, desc } = req.body;
+	await Post.updatePost(req.params.id, { title, desc, tag });
 	res.redirect(`/post/${req.params.id}`);
 };
 
@@ -256,7 +269,7 @@ exports.deletePost = async (req, res) => {
 	if (!isOwner && !isAdmin)
 		return res.redirect(`/post/${req.params.id}`);
 
-	// Cascade delete all comments under this post.
+	//delete all comments under this post.
 	await Comment.deleteCommentsByPostId(req.params.id);
 	await Post.deletePost(req.params.id);
 	res.redirect("/home");

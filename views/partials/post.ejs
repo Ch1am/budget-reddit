@@ -48,8 +48,11 @@
 
             <!-- Snippet -->
             <p class="post-snippet">
-              <%= post.snippet %>
-              <a href="/post/<%= post._id %>" class="read-more">read more</a>
+              <% const desc = (post.desc || "").toString(); %>
+              <%= desc.length > 150 ? desc.slice(0, 150) + "..." : desc %>
+              <% if (desc.length > 150) { %>
+                <a href="/post/<%= post._id %>" class="read-more">read more</a>
+              <% } %>
             </p>
           </div>
 

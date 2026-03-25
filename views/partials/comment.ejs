@@ -10,7 +10,6 @@
             <article class="comment-card" id="comment-<%= comment._id %>">
               <!--- Username and time created -->
               <div class="comment-meta">
-                <!-- comment.author is there for older comments that don't have the displayAuthor field -->
                 <span>u/<%= comment.displayAuthor || "Deleted-User" %></span>
                 &nbsp;&bull;&nbsp;
                 <time datetime="<%= comment.createdAt %>">

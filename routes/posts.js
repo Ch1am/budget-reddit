@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const multer = require('multer');
 const postController = require('../controllers/postController');
+const collectionController = require("../controllers/collectionController");
 const upload = multer({storage:multer.memoryStorage()})
 const middleware = require("../middleware/auth");
 
@@ -12,8 +13,8 @@ router.get('/create', middleware.isLoggedIn, postController.getCreatePost);
 router.post('/create', middleware.isLoggedIn, upload.single('image'), postController.createPost);
 
 // add to collection
-router.get('/:id/add-to-collection',postController.showCollectionDetails)
-router.post('/:id/add-to-collection',postController.addInCollection)
+router.get('/:id/add-to-collection', collectionController.showCollectionDetails);
+router.post('/:id/add-to-collection', collectionController.addInCollection);
 
 //GET to see all user post
 router.get("/myposts", postController.getUserPost);

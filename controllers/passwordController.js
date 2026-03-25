@@ -9,7 +9,7 @@ exports.showLogin = async (req, res) => {
 			return res.redirect("/home")
 		}
 
-        res.render("login", { 
+        res.render("auth/login", {
             error: [],
             filledEmail: null,
             filledPassword: null
@@ -46,14 +46,14 @@ exports.loginAction = async (req, res) => {
                 req.session.user = userInfo._id.toString()
                 res.redirect("/home")
             } else {
-                res.render("login", {
+                res.render("auth/login", {
                     error,
                     filledEmail,
                     filledPassword
                 })
             }
         } else {
-            res.render("login", {
+            res.render("auth/login", {
                 error,
                 filledEmail,
                 filledPassword: null
@@ -65,7 +65,7 @@ exports.loginAction = async (req, res) => {
 }
 
 exports.showRegister = async (req, res) => {
-    return res.render('register', { 
+    return res.render('auth/register', {
         error: [],
         newName: undefined,
         newEmail: undefined,
@@ -92,7 +92,7 @@ exports.register = async (req, res) => {
         if (newEmail && newPassword && confirmPassword && existing && newPassword == confirmPassword) error.push("This email address has already been used to register an account before.");
 
         if (error.length >= 1) {
-            res.render("register", {
+            res.render("auth/register", {
                 error,
                 newEmail,
                 newPassword,

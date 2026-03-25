@@ -9,14 +9,14 @@ exports.communityLanding = async (req, res) => {
     const communities = await Community.getAllCommunities()
     const userID = req.session.user
 
-    res.render("community", {
+    res.render("community/community", {
         communities,
         userID
     })
 }
 
 exports.renderCreateCommunity = (req, res) => {
-    res.render("community-create", {
+    res.render("community/community-create", {
         errors: [],
         communityName: null,
         communityDescription: null
@@ -47,7 +47,7 @@ exports.createCommunity = async (req, res) => {
         }
 
         if (errors.length > 0) {
-            res.render("community-create", {
+            res.render("community/community-create", {
                 errors,
                 communityName: comName,
                 communityDescription: comDesc
@@ -79,7 +79,7 @@ exports.createCommunity = async (req, res) => {
                 )
             } else {
                 errors.push("An error has occured when creating your community. Please try again later.")
-                res.render("community-create", {
+                res.render("community/community-create", {
                     errors,
                     communityName: comName,
                     communityDescription: comDesc
@@ -152,7 +152,7 @@ exports.renderCommunity = async(req, res) => {
             };
         });
 
-        res.render("community-view", {
+        res.render("community/community-view", {
             community, 
             posts: postsWithVotes, 
             timeAgo, 
@@ -270,7 +270,7 @@ exports.renderManageCommunity = async(req, res) => {
             </script>
         `)
     } else {
-        res.render("community-manage", {
+        res.render("community/community-manage", {
             community,
             user
         })
@@ -470,7 +470,7 @@ exports.deleteCommunityRenderConfirmation = async (req, res) => {
         `)
     }
 
-    res.render("community-deleteConfirmation", {
+    res.render("community/community-deleteConfirmation", {
         community, 
         user
     })

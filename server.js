@@ -13,6 +13,7 @@ const session = require("express-session");
 // utilize routes here
 const authentication = require("./routes/authentication");
 const homeRoute = require("./routes/home");
+const collectionRoute = require("./routes/collection");
 const settingsRoute = require("./routes/settings.js")
 const postRoutes = require("./routes/posts");
 const communityRoutes = require("./routes/community.js")
@@ -37,6 +38,7 @@ server.set("view engine", "ejs");
 // use the routes you initialize above here
 server.use("/", authentication);
 server.use("/home", homeRoute);
+server.use("/home", collectionRoute);
 server.use("/settings", settingsRoute);
 server.use("/post", postRoutes);
 server.use("/community", communityRoutes)

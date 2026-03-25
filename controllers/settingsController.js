@@ -1,13 +1,13 @@
 const User = require("../models/registerModel");
 const bcrypt = require("bcrypt");
 const Community = require("../models/communityModel");
-const { deleteUserCollection } = require("../models/postModel");
+const { deleteUserCollection } = require("../models/collectionModel");
 
 exports.renderSettingsPage = async(req, res) => {
     const session = req.session.user
     const user = await User.findByUserID(session);
 
-    res.render("settings", {
+    res.render("settings/settings", {
         user, 
         accountDelete: false,
         usernameErrors: [],
@@ -35,7 +35,7 @@ exports.changeUsername = async(req, res) => {
 
 
     if (errors.length > 0) {
-        res.render("settings", {
+        res.render("settings/settings", {
             user, 
             accountDelete: false,
             usernameErrors: errors,
@@ -81,7 +81,7 @@ exports.changePassword = async (req, res) => {
         }
 
         if (errors.length > 0) {
-            res.render("settings", {
+            res.render("settings/settings", {
                 user, 
                 accountDelete: false,
                 usernameErrors: [],
@@ -108,7 +108,7 @@ exports.changePassword = async (req, res) => {
     } else {
         errors.push("The current password provided is incorrect. Please try again.")
 
-        res.render("settings", {
+        res.render("settings/settings", {
             user, 
             accountDelete: false,
             usernameErrors: [],
@@ -122,7 +122,7 @@ exports.renderDeleteAccount = async (req, res) => {
     const session = req.session.user
     const user = await User.findByUserID(session);
 
-    res.render("settings", {
+    res.render("settings/settings", {
         user, 
         accountDelete: true,
         usernameErrors: [],

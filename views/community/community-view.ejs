@@ -2,7 +2,7 @@
 <html>
     <head>
         <title><%= community.name %></title>
-        <%- include('partials/nav') %>
+        <%- include('../partials/nav') %>
     </head>
 
     <body>
@@ -28,6 +28,6 @@
         <% if (posts.length == 0) { %>
             This community currently has no posts, feel free to create a post for this community <a href="/post/create">here</a>!
         <% } %>
-        <%- include('partials/post') %>
+        <%- include('../partials/post') %>
     </body>
 </html>

@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8">
 		<title><%= post.title %></title>
-		<%- include('partials/nav') %>
+		<%- include('../partials/nav') %>
 	</head>
 
 	<body>
@@ -53,9 +53,9 @@
 
 		<!-- Comments + comment form -->
 		<div id="comments">
-			<%- include('partials/comment-create', { postId: post._id }) %>
+			<%- include('../partials/comment-create', { postId: post._id }) %>
 			<hr>
-			<%- include('partials/comment', { comments }) %>
+			<%- include('../partials/comment', { comments }) %>
 		</div>
 	</body>
 </html>

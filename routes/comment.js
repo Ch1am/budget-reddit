@@ -1,15 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const commentController = require("../controllers/commentController");
-const multer = require("multer");
-const upload = multer({ storage: multer.memoryStorage() });
 const middleware = require("../middleware/auth");
 
 // POST create new comment
 router.post(
   "/post/:postId/comment",
   middleware.isLoggedIn,
-  upload.single("image"),
   commentController.createComment,
 );
 
@@ -17,7 +14,6 @@ router.post(
 router.post(
   "/comment/:id/edit",
   middleware.isLoggedIn,
-  upload.single("image"),
   commentController.editComment,
 );
 

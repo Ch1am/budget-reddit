@@ -28,11 +28,9 @@
               </div>
 
               <!-- comment image -->
-              <% if (comment.imageBase64) { %>
-                <img src="data:<%= comment.imageType %>;base64,<%= comment.imageBase64 %>" alt="Comment image"
-                  class="post-image" width="20%" height="20%" />
+                <% if (comment.image) { %>
+                  <img src="<%= comment.image %>" class="comment-image" class="comment-image" width="10%" height="10%" />
                 <% } %>
-
                   <!-- comment text -->
                   <p class="post-snippet">
                     <%= comment.content %>

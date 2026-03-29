@@ -13,10 +13,7 @@ const postSchema = new mongoose.Schema({
   authorId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   title: { type: String, required: true },
   desc: { type: String, required: true },
-  image: {
-    data: { type: Buffer, default: null },
-    contentType: { type: String, default: null },
-  },
+  image: {type: String, default: null},
   community: { type: mongoose.Schema.Types.ObjectId, ref: "Community", default: null },
   votes: { type: Number, default: 0 },
   voters: [voterSchema],

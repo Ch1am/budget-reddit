@@ -56,25 +56,6 @@ exports.getSinglePost = async (req, res) => {
 			const comment = rawComments[i];
 			const commentObj = comment.toObject();
 
-			// Convert comment image (Buffer) to base64 string for EJS
-			let imageBase64 = null;
-			const imageData =
-				commentObj.image && commentObj.image.data ? commentObj.image.data : null;
-
-			if (imageData) {
-				try {
-					if (Buffer.isBuffer(imageData)) {
-						imageBase64 = imageData.toString("base64");
-					} else if (typeof imageData === "string") {
-						imageBase64 = Buffer.from(imageData, "binary").toString("base64");
-					} else if (imageData.buffer) {
-						imageBase64 = Buffer.from(imageData.buffer).toString("base64");
-					}
-				} catch (e) {
-					console.error("Comment image conversion error:", e.message);
-				}
-			}
-
 			// Highlight comment vote button for the current user (if logged in)
 			let userVote = null;
 			if (sessionUserId) {
@@ -92,36 +73,16 @@ exports.getSinglePost = async (req, res) => {
 			comments.push({
 				...commentObj,
 				displayAuthor,
-				imageBase64,
-				imageType: commentObj.image ? commentObj.image.contentType : null,
 				userVote,
 			});
 		}
-
-		// Convert post image to base64 for EJS
-		let imageBase64 = null; // set the imgb64 to null first
-		if (post.image && post.image.data) {
-			try {
-				if (Buffer.isBuffer(post.image.data)) {
-					imageBase64 = post.image.data.toString("base64");
-				} else if (typeof post.image.data === "string") {
-					imageBase64 = Buffer.from(post.image.data, "binary").toString("base64");
-				} else if (post.image.data.buffer) {
-					imageBase64 = Buffer.from(post.image.data.buffer).toString("base64");
-				}
-			} catch (e) {
-				console.error("Image conversion error:", e.message);
-			}
-		}
-
 		res.render("post/post-view", {
 			post: {
 				...post,
 				displayAuthor:
 					(post.authorId && post.authorId.name) ||
 					"Deleted-User",
-				imageBase64,
-				imageType: post.image ? post.image.contentType : null,
+				imageType: post.image ? post.image : null,
 			},
 			comments,
 			timeAgo,
@@ -141,8 +102,15 @@ exports.getUserPost = async (req, res) => {
 	try {
 		const userInfo = await User.findByUserID(req.session.user);
 		const posts = await Post.getPostsByAuthorId(userInfo._id);
+    // resolve display author for each post
+    const postsWithAuthor = posts.map((post) => {
+      return {
+        ...post.toObject(),
+        displayAuthor: (post.authorId && post.authorId.name) || 'Deleted-User'
+      };
+    });
 
-		res.render("post/myPost", { posts, timeAgo });
+		res.render("post/myPost", { posts:postsWithAuthor, timeAgo });
 	} catch (error) {
 		console.error(error);
 		res.status(500).send("Error loading your posts");
@@ -172,12 +140,12 @@ exports.createPost = async (req, res) => {
 		return res.render('post/post-create', { error: 'Title and description are required' });
 	}
 
-	const image = req.file ? { data: req.file.buffer, contentType: req.file.mimetype } : { data: null, contentType: null };
+	const image = req.body.image || null; //saving image URL 
 	const currentUser = await User.findByUserID(req.session.user) 
 
 	const r = await Post.createPost({
 		title,
-		image,
+		image: image || null,
 		community: community == "None_Selected" ? null : community,
 		desc,
 		authorId: currentUser._id,

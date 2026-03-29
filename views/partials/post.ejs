@@ -37,13 +37,8 @@
             <a href="/post/<%= post._id %>" class="post-title"><%= post.title %></a>
             <br /><br />
 
-            <% if (post.imageBase64) { %>
-              <img
-                src="data:<%= post.imageType %>;base64,<%= post.imageBase64 %>"
-                alt="<%= post.title %>"
-                class="post-image"
-                width="50%" height="50%"/>
-              <br />
+            <% if (post.image) { %>
+              <img src="<%= post.image %>" alt="<%= post.title %>" class="post-image">
             <% } %>
 
             <!-- Snippet -->

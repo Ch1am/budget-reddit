@@ -10,10 +10,9 @@
     <span>Editing</span>
   </div>
 
-  <% if (comment.imageBase64) { %>
-    <img src="data:<%= comment.imageType %>;base64,<%= comment.imageBase64 %>" alt="Comment image" class="post-image"
-      width="20%" height="20%" />
-    <% } %>
+      <% if (comment.image) { %>
+        <img src="<%= comment.image %>" alt="<%= comment.title %>" class="comment-image">
+      <% } %>
 
       <form id="edit-comment-<%= comment._id %>" action="/comment/<%= comment._id %>/edit" method="POST"
         class="comment-edit-form">

@@ -1,34 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8">
-		<title>Create Post</title>
-	</head>
 
-	<body>
-		<%- include('../partials/nav') %>
+<head>
+	<meta charset="UTF-8">
+	<title>Create Post</title>
+</head>
+
+<body>
+	<%- include('../partials/nav') %>
 		<h1>Create a Post</h1>
 
-		<form action="/post/create" method="POST" enctype="multipart/form-data">
+		<form action="/post/create" method="POST">
 			<label>Title</label><br>
 			<input type="text" name="title" required><br><br>
 
-			<label>Image file</label><br>
-			<input type="file" name="image" accept="image/*"><br><br>
+			<label>Image URL</label><br>
+			<input type="text" name="image" placeholder="https://..."><br><br>
 
 			<label>Community</label><br>
 			<select name="community">
 				<% if (!communities) { %>
 					<option value="None_Selected">No communities joined</option>
-				<% } else { %>
-					<option value="None_Selected">No communities selected</option>
-				<% } %>
-				
-				<% if (communities && communities.length > 0) { %>
-					<% communities.forEach(c => { %>
-						<option value="<%= c._id %>"><%= c.name %></option>
-					<% }) %>
-				<% } %>
+					<% } else { %>
+						<option value="None_Selected">No communities selected</option>
+						<% } %>
+
+							<% if (communities && communities.length> 0) { %>
+								<% communities.forEach(c=> { %>
+									<option value="<%= c._id %>">
+										<%= c.name %>
+									</option>
+									<% }) %>
+										<% } %>
 			</select><br><br>
 			<label>Description</label><br>
 			<textarea name="desc" rows="4" cols="40" required></textarea><br><br>
@@ -39,5 +42,6 @@
 		<a href="/home">Cancel</a>
 
 		<%- include('../partials/footer') %>
-	</body>
+</body>
+
 </html>

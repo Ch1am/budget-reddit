@@ -21,9 +21,7 @@ exports.createComment = async (req, res) => {
     const hasImage = !!req.file;
 
     // check if user did upload an image and if so store it other null
-    const image = hasImage
-      ? { data: req.file.buffer, contentType: req.file.mimetype }
-      : { data: null, contentType: null };
+    const image = req.body.image || null;
 
     // stop comment that has no text and image
     if (!hasText && !hasImage) return res.redirect(`/post/${postId}`);

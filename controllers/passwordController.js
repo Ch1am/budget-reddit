@@ -79,10 +79,19 @@ exports.register = async (req, res) => {
 
         if (!newName) error.push("Name is required.");
         if (!newEmail) error.push("Email is required.");
-        if (!newPassword) error.push("Password is required.");
+        if (!newPassword) {
+            error.push("Password is required.");
+        } else {
+            if (newPassword.length < 8) error.push("Password must be at least 8 characters in length.");
+            if (!/[A-Z]/.test(newPassword)) error.push("Password must contain at least one uppercase letter.");
+            if (!/[a-z]/.test(newPassword)) error.push("Password must contain at least one lowercase letter.");
+            if (!/[0-9]/.test(newPassword)) error.push("Password must contain at least one number.");
+            if (!/[^A-Za-z0-9]/.test(newPassword)) error.push("Password must contain at least one special character.");
+        }
+
         if (!confirmPassword) error.push("Password confirmation is required.");
         if (!confirmPassword && newPassword) error.push("Please confirm your password.");
-        if (newPassword && confirmPassword && newPassword !== confirmPassword) error.push("The passwords do not match. Please try again.");
+        if (newPassword && confirmPassword && newPassword !== confirmPassword && newPassword.length >= 8) error.push("The passwords do not match. Please try again.");
         if (newEmail && newPassword && confirmPassword && existing && newPassword == confirmPassword) error.push("This email address has already been used to register an account before.");
 
         if (error.length >= 1) {

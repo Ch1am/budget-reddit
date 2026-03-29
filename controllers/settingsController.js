@@ -74,9 +74,17 @@ exports.changePassword = async (req, res) => {
             errors.push("The current password and the new password cannot be the same!")
         }
 
+        if (newPassword.length < 8) errors.push("Password must be at least 8 characters in length.");
+        if (!/[A-Z]/.test(newPassword)) errors.push("Password must contain at least one uppercase letter.");
+        if (!/[a-z]/.test(newPassword)) errors.push("Password must contain at least one lowercase letter.");
+        if (!/[0-9]/.test(newPassword)) errors.push("Password must contain at least one number.");
+        if (!/[^A-Za-z0-9]/.test(newPassword)) errors.push("Password must contain at least one special character.");
+
         if (newPassword !== confirmPassword) {
             errors.push("The new password and the confirmation password do not match. Please try again")
         }
+
+        
 
         if (errors.length > 0) {
             res.render("settings/settings", {

@@ -14,7 +14,7 @@ const commentSchema = new mongoose.Schema({
     image: {type: String, default:null},
     content: { type: String, required: false, default: "" },
     votes: { type: Number, default: 0 },
-    voters: [voterSchema],z
+    voters: [voterSchema],
 });
 
 const Comment = mongoose.model("Comment", commentSchema, "comment");

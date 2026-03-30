@@ -15,7 +15,7 @@ router.post('/:id/downvote', middleware.isLoggedIn, homeController.downvote);
 
 // POST share (stub)
 router.post('/:id/share', (req, res) => {
-  res.redirect('/home');
+	res.redirect('/home');
 });
 
 module.exports = router;

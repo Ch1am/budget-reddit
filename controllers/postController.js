@@ -4,6 +4,7 @@ const User = require("./../models/registerModel")
 const Community = require("./../models/communityModel")
 const Comment = require("../models/commentModel");
 const collectionModel = require("../models/collectionModel");
+const mongoose = require("mongoose");
 
 exports.getSinglePost = async (req, res) => {
 	try {
@@ -103,11 +104,11 @@ exports.getUserPost = async (req, res) => {
 		const userInfo = await User.findByUserID(req.session.user);
 		const posts = await Post.getPostsByAuthorId(userInfo._id); //using getPostsByAuthorId retrieves all posts where userID = the logged in user ID
 		// resolve display author for each post	
-    const postsWithAuthor = posts.map((post) => {
-      return {
-        ...post.toObject(),
-        displayAuthor: (post.authorId && post.authorId.name) || 'Deleted-User'
-      };
+		const postsWithAuthor = posts.map((post) => {
+		return {
+			...post.toObject(),
+			displayAuthor: (post.authorId && post.authorId.name) || 'Deleted-User'
+		};
     });
 		res.render("post/myPost", { posts:postsWithAuthor, timeAgo });
 
@@ -179,7 +180,19 @@ exports.editPost = async (req, res) => {
 
 exports.deletePost = async (req, res) => {
 	//delete all comments under this post.
-	await Comment.deleteCommentsByPostId(req.params.id);
-	await Post.deletePost(req.params.id);
+
+	const postID = req.params.id
+	const post = await Post.getPostById(postID);
+
+	if (post) {
+		if (post.community) {
+			const communityID = new mongoose.Types.ObjectId(post.community); 
+			await Community.deletePostFromCommunity(communityID, postID);
+		}
+
+		await Comment.deleteCommentsByPostId(req.params.id);
+		await Post.deletePost(req.params.id);
+	}
+
 	res.redirect("/home");
 };

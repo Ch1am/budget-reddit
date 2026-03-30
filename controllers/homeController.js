@@ -10,7 +10,17 @@ exports.displayAllPost = async (req, res) => {
 	try {
 		const session = req.session
 		// user information
-		let posts = await postModel.getAllPost();
+		const query = req.query.query
+		let posts = []
+
+		console.log(query)
+		if (query && query.length > 0) {
+			posts = await postModel.getPostByGeneralSearch(query);
+			console.log(posts)
+		} else {
+			posts = await postModel.getAllPost();
+		}
+		
 		posts = await Promise.all(posts.map(async (p) => {
 			const pObj = typeof p.toObject === "function" ? p.toObject() : p;
 			if (p.community) {
@@ -54,7 +64,8 @@ exports.displayAllPost = async (req, res) => {
 					"Deleted-User",
 				userVote: existingVote ? existingVote.voteType : null,
 				imageBase64,
-				imageType: post.image ? post.image.contentType : null
+				imageType: post.image ? post.image.contentType : null,
+				query
 			};
 		});
 
@@ -74,73 +85,73 @@ exports.displayAllPost = async (req, res) => {
 }
 
 exports.upvote = async (req, res) => {
-  const id = req.params.id;
-  const sessionUserId = req.session?.user;
+	const id = req.params.id;
+	const sessionUserId = req.session?.user;
 
-  try {
-    const post = await postModel.getPostById(id);
-    const existingVote = (post.voters || []).find(
-      (v) => v.userId?.toString() === sessionUserId.toString(),
-    );
+	try {
+		const post = await postModel.getPostById(id);
+		const existingVote = (post.voters || []).find(
+		(v) => v.userId?.toString() === sessionUserId.toString(),
+		);
 
-    if (!existingVote) {
-      await postModel.updateVote(id, sessionUserId, 'upvote', 1);
-    } else if (existingVote.voteType === 'upvote') {
-      await postModel.updateVote(id, sessionUserId, null, -1);
-    } else {
-      await postModel.updateVote(id, sessionUserId, 'upvote', 2);
-    }
-  } catch (error) {
-    console.error(error);
-  }
-  res.redirect(`/home#post-${id}`);
+		if (!existingVote) {
+		await postModel.updateVote(id, sessionUserId, 'upvote', 1);
+		} else if (existingVote.voteType === 'upvote') {
+		await postModel.updateVote(id, sessionUserId, null, -1);
+		} else {
+		await postModel.updateVote(id, sessionUserId, 'upvote', 2);
+		}
+	} catch (error) {
+		console.error(error);
+	}
+	res.redirect(`/home#post-${id}`);
 };
 
 exports.downvote = async (req, res) => {
-  const id = req.params.id;
-  const sessionUserId = req.session?.user;
+	const id = req.params.id;
+	const sessionUserId = req.session?.user;
 
-  try {
-    const post = await postModel.getPostById(id);
-    const existingVote = (post.voters || []).find(
-      (v) => v.userId?.toString() === sessionUserId.toString(),
-    );
+	try {
+		const post = await postModel.getPostById(id);
+		const existingVote = (post.voters || []).find(
+		(v) => v.userId?.toString() === sessionUserId.toString(),
+		);
 
-    if (!existingVote) {
-      await postModel.updateVote(id, sessionUserId, 'downvote', -1);
-    } else if (existingVote.voteType === 'downvote') {
-      await postModel.updateVote(id, sessionUserId, null, 1);
-    } else {
-      await postModel.updateVote(id, sessionUserId, 'downvote', -2);
-    }
-  } catch (error) {
-    console.error(error);
-  }
-  res.redirect(`/home#post-${id}`);
+		if (!existingVote) {
+		await postModel.updateVote(id, sessionUserId, 'downvote', -1);
+		} else if (existingVote.voteType === 'downvote') {
+		await postModel.updateVote(id, sessionUserId, null, 1);
+		} else {
+		await postModel.updateVote(id, sessionUserId, 'downvote', -2);
+		}
+	} catch (error) {
+		console.error(error);
+	}
+	res.redirect(`/home#post-${id}`);
 };
 
 // Collection routes are now handled by `collectionController`.
 // These exports remain only as delegations for any old references.
 exports.showAddCollection = (req, res) =>
-  collectionController.showAddCollection(req, res);
+	collectionController.showAddCollection(req, res);
 
 exports.addCollection = (req, res) =>
-  collectionController.addCollection(req, res);
+	collectionController.addCollection(req, res);
 
 exports.showCollections = (req, res) =>
-  collectionController.showCollections(req, res);
+	collectionController.showCollections(req, res);
 
 exports.displayPostInCollection = (req, res) =>
-  collectionController.displayPostInCollection(req, res);
+	collectionController.displayPostInCollection(req, res);
 
 exports.renameCollection = (req, res) =>
-  collectionController.renameCollection(req, res);
+	collectionController.renameCollection(req, res);
 
 exports.deleteCollection = (req, res) =>
-  collectionController.deleteCollection(req, res);
+	collectionController.deleteCollection(req, res);
 
 exports.removePostsFromCollection = (req, res) =>
-  collectionController.removePostsFromCollection(req, res);
+	collectionController.removePostsFromCollection(req, res);
 
 exports.showRenameCollection = (req, res) =>
-  collectionController.showRenameCollection(req, res);
+	collectionController.showRenameCollection(req, res);

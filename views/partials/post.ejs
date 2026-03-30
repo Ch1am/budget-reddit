@@ -72,7 +72,12 @@
                   type="submit"
                   class="vote-up <%= post.userVote === 'upvote' ? 'selected' : '' %>"
                 >
-                  <img src="/icons/vote_up_arrow.svg" alt="upvote" width="20" height="20" />
+                  <img
+                    src="<%= post.userVote === 'upvote' ? '/icons/upvote_true.svg' : '/icons/vote_up_arrow.svg' %>"
+                    alt="upvote"
+                    width="20"
+                    height="20"
+                  />
                 </button>
               </form>
 
@@ -90,7 +95,12 @@
                   type="submit"
                   class="vote-down <%= post.userVote === 'downvote' ? 'selected' : '' %>"
                 >
-                  <img src="/icons/vote_down_arrow.svg" alt="downvote" width="20" height="20" />
+                  <img
+                    src="<%= post.userVote === 'downvote' ? '/icons/downvote_true.svg' : '/icons/vote_down_arrow.svg' %>"
+                    alt="downvote"
+                    width="20"
+                    height="20"
+                  />
                 </button>
               </form>
 

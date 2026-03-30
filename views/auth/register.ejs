@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Register</title>
+        <!-- style sheets are removed temporarily
+            <link rel="stylesheet" href="/css/register.css">
+        -->
+    </head>
+    <body>
+        <h1>Register</h1>
+
+        <% if (error && error.length >= 1) { %>
+            The following issues have occured:
+            <ol>
+                <% for (let i of error) { %>
+                    <li><%= i %></li>
+                <% } %>
+            </ol>
+        <% } %>
+
+        <form action="/register" method="post">
+            <table>
+                <tr>
+                    <td>Name:</td>
+                    <td><input type="name" name="regisname" value="<%= newName ? newName : "" %>" ></td>
+                </tr>
+                <tr>
+                    <td>Email:</td>
+                    <td><input type="email" name="regisemail" value="<%= newEmail ? newEmail : "" %>"></td>
+                </tr>
+                <tr>
+                    <td>Password:</td>
+                    <td><input type="password" name="regispassword" value="<%= newPassword ? newPassword : "" %>"></td>
+                </tr>
+                <tr>
+                    <td>Confirm Password:</td>
+                    <td><input type="password" name="regisconfirmpassword" value="<%= confirmPassword ? confirmPassword : "" %>"></td>
+                </tr>
+            </table>
+
+            <input type="submit" value="Register">
+        </form>
+        <%- include('../partials/footer') %>
+
+
+        <!-- <div class = "register-card">
+        <h1>Register</h1><br>
+        <div class = "input-group">
+            <p class = "name">
+                Name<br>
+                <input type = "name" name = "regisname" >
+            </p> 
+        </div>
+        <div class = "input-group">
+            <p class = "email">
+                Email<br>
+                <input type = "email" name = "regisemail">
+            </p> 
+        </div>
+        
+        <div class = "input-group">
+            <p class = "password">
+                Password<br>
+                <input type = "password" name = "regispassword">
+            </p> 
+        </div>
+        <div class = "input-group">
+            <p class = "password">
+                Confirm Password<br>
+                <input type = "password" name = "regisconfirmpassword">
+            </p> 
+        </div>
+        <button class = "btn-login" type = "submit">Register</button>
+        </div> -->
+    </body>
+</html>
+
+

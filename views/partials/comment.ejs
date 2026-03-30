@@ -1,0 +1,75 @@
+<% comments.forEach((comment, index) => { %>
+
+  <% const commentAuthorId = comment.authorId?._id?.toString() || comment.authorId?.toString() || null %>
+  <% const isOwner = sessionUserId && commentAuthorId && sessionUserId.toString() === commentAuthorId %>
+  <% const canDelete = isAdmin || isOwner %>
+  <% const canEdit = isOwner %>
+  <% const isEditing = editCommentId && isOwner && editCommentId.toString() === comment._id.toString() %>
+
+      <% if (isEditing) { %>
+        <%- include('./comment-edit', { comment, postId, timeAgo }) %>
+          <% } else { %>
+            <article class="comment-card" id="comment-<%= comment._id %>">
+              <!--- Username and time created -->
+              <div class="comment-meta">
+                <span>u/<%= comment.displayAuthor || "Deleted-User" %></span>
+                &nbsp;&bull;&nbsp;
+                <time datetime="<%= comment.createdAt %>">
+                  <%= timeAgo(comment.createdAt) %>
+                </time>
+
+                <% if (canEdit) { %>
+                  &nbsp;&bull;&nbsp;
+                  <a href="/post/<%= postId %>?editCommentId=<%= comment._id %>">Edit</a>
+                <% } %>
+                <% if (canDelete) { %>
+                  <form action="/comment/<%= comment._id %>/delete" method="POST" style="display:inline">
+                    <button type="submit">Delete</button>
+                  </form>
+                <% } %>
+              </div>
+
+              <!-- comment image -->
+                <% if (comment.image) { %>
+                  <img src="<%= comment.image %>" class="comment-image" class="comment-image" width="10%" height="10%" />
+                <% } %>
+                  <!-- comment text -->
+                  <p class="post-snippet">
+                    <%= comment.content %>
+                  </p>
+
+                  <!--vote buttons area -->
+                  <div class="post-actions"
+                    style="display: flex; align-items: center; justify-content: flex-start; gap: 12px;">
+                    <div class="vote-pill" style="display: flex; align-items: center; gap: 10px;">
+                      <!-- upvote -->
+                      <form action="/comment/<%= comment._id %>/upvote" method="POST"
+                        onsubmit="this.querySelector('button').disabled=true">
+                        <button type="submit" class="vote-up <%= comment.userVote === 'upvote' ? 'selected' : '' %>">
+                          <img src="/icons/vote_up_arrow.svg" alt="upvote" width="20" height="20" />
+                        </button>
+                      </form>
+
+                      <span class="vote-count">
+                        <%= comment.votes %>
+                      </span>
+
+                      <!-- downvote -->
+                      <form action="/comment/<%= comment._id %>/downvote" method="POST"
+                        onsubmit="this.querySelector('button').disabled=true">
+                        <button type="submit"
+                          class="vote-down <%= comment.userVote === 'downvote' ? 'selected' : '' %>">
+                          <img src="/icons/vote_down_arrow.svg" alt="downvote" width="20" height="20" />
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+
+            </article>
+            <% } %>
+
+              <!-- add a line horizental line between each comment but also prevent it from being added to the last comment -->
+              <% if (index < comments.length - 1) { %>
+                <hr class="comment-divider" />
+                <% } %>
+                  <% }) %>

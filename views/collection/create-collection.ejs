@@ -1,0 +1,26 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Show Collection</title>
+  
+</head>
+<body>
+    <%- include('../partials/nav') %>
+    <form action="/home/new-collection" method="post">
+        Title of Collection: <input type="text" name="title" required>
+        <button type="submit">Create</button>
+    </form>
+    <!--%if (msg && result) {%>
+        %=msg%>
+    %}%> --> 
+    <%if (msg ) {%>
+        <%=msg%>
+    <%}%>  <!--missing title appears even tho its the first time-->
+    <br><br>
+    <a href="/home/my-collection">My Collections</a>
+
+    <%- include('../partials/footer') %>
+</body>
+</html>

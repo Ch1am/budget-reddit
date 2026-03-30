@@ -25,11 +25,12 @@ exports.createComment = async (req, res) => {
     const trimmedText = typeof content === "string" ? content.trim() : "";
     // check if there's text content
     const hasText = trimmedText.length > 0;
-    // check if user uploaded an image
-    const hasImage = !!req.file;
-
-    // check if user did upload an image and if so store it other null
-    const image = req.body.image || null;
+    // URL-only image field. We accept any non-empty string here.
+    const image =
+      typeof req.body.image === "string" && req.body.image.trim()
+        ? req.body.image.trim()
+        : null;
+    const hasImage = Boolean(image);
 
     // stop comment that has no text and image
     if (!hasText && !hasImage) return res.redirect(`/post/${postId}`);

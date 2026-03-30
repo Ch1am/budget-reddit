@@ -1,4 +1,8 @@
 <table border="1">
+  <% if (posts.length == 0) { %>
+    No posts found <%= locals.query ? `found with the query "${query}"` : "" %>.
+    <br><br>
+  <% } %>
   <% posts.forEach((post, index) => { %>
     <% if (index !== 0) { %>
       <tr>

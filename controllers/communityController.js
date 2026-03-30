@@ -237,56 +237,58 @@ exports.leaveCommunity = async(req, res) => {
 }
 
 exports.renderManageCommunity = async(req, res) => {
-    const communityID = req.params.communityID;
-    const userID = req.session.user;
-    const community = await Community.findCommunityById(communityID)
-    const user = await User.findByUserID(userID);
-    const isAdmin = await Community.findAdminInCommunity(communityID, userID);
+    try {        
+        const communityID = req.params.communityID;
+        const userID = req.session.user;
+        const community = await Community.findCommunityById(communityID)
+        const user = await User.findByUserID(userID);
+        const isAdmin = await Community.findAdminInCommunity(communityID, userID);
 
-    if (!isAdmin) {
-        return res.send(`
-            You do not have authorization to visit this page. You will be redirected back to the community page in 3 seconds...
-            <script>
-                setTimeout(() => {
-                    window.location.href = "/community";
-                }, 3000);
-            </script>
-        `)
-    }
-
-    community.admins = await Promise.all(
-        community.admins.map(async a => {
-            return await User.findByUserID(a)
+        if (!isAdmin) {
+            return res.send(`
+                You do not have authorization to visit this page. You will be redirected back to the community page in 3 seconds...
+                <script>
+                    setTimeout(() => {
+                        window.location.href = "/community";
+                    }, 3000);
+                </script>
+            `)
         }
-    ))
 
-    community.users = await Promise.all(
-        community.users.map(async u => {
-            return await User.findByUserID(u)
-        })
-    )
+        // map first then return those that aren't null
+        community.admins = (await Promise.all(
+            community.admins.map(u => User.findByUserID(u))
+        )).filter(Boolean);
 
-    community.posts = await Promise.all(
-        community.posts.map(async p => {
-            return await Post.getPostById(p)
-        })
-    )
+        community.users = (await Promise.all(
+            community.users.map(u => User.findByUserID(u))
+        )).filter(Boolean);
 
-    if (!community) {
-        return res.send(`
-            This community does not seem to exist. You will be redirected back to the community page in 3 seconds...
-            <script>
-                setTimeout(() => {
-                    window.location.href = "/community";
-                }, 3000);
-            </script>
-        `)
-    } else {
-        res.render("community/community-manage", {
-            community,
-            user
-        })
+        community.posts = (await Promise.all(
+            community.posts.map(p => Post.getPostById(p))
+        )).filter(Boolean);
+
+        if (!community) {
+            return res.send(`
+                This community does not seem to exist. You will be redirected back to the community page in 3 seconds...
+                <script>
+                    setTimeout(() => {
+                        window.location.href = "/community";
+                    }, 3000);
+                </script>
+            `)
+        } else {
+            res.render("community/community-manage", {
+                community,
+                user
+            })
+        }
+    } catch (err) {
+        console.error(err);
+        return res.status(500).send("Something went wrong.");
     }
+
+    
 }
 
 exports.removeAdmin = async(req, res) => {

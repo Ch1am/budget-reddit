@@ -2,7 +2,7 @@
 	<a href="/home" class="logo">Budget Reddit</a>
 
 	<form action="/home" method="GET" class="nav-search">
-		<input type="text" name="query" placeholder="Search posts..." value="">
+		<input type="text" name="query" placeholder="Search posts..." value=<%= locals.query ? query : "" %>>
 		<button type="submit">Search</button>
 	</form>
 

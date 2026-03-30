@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Managing <%= community.name %></title>
+    </head>
+
+    <body>
+        <%- include('../partials/nav') %>
+        <h1><%= community.name %> community management panel</h1>
+        <a href="/community/<%= community._id %>">Back</a>
+
+        <table>
+            <form action="/community/<%= community._id %>/manage/save" method="post">
+                <tr>
+                    <td>Community name:</td>
+                    <td><input type="text" name="comName" value="<%= community.name %>" size="21"></td>
+                </tr>
+                <tr>
+                    <td>Community description:</td>
+                    <td><textarea name="comDesc" cols="22"><%= community.description %></textarea></td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <input type="hidden" name="communityID" value="<%= community._id %>">
+                        <input type="submit" value="Save changes">
+                    </td>
+                </tr>
+            </form>
+
+            <tr>
+                <td colspan="2">
+                    <hr>
+                </td>
+            </tr>
+            <tr>
+                <td>Admins (<%= community.admins.length %>):</td>
+                <td>
+                    <table>
+                        <% community.admins.forEach(a => { %>
+                            <tr>
+                                <td>
+                                    <%= a.name  %> 
+                                    <%= a.name == user.name ? "(You)" : "" %>
+                                </td>
+                                <td>
+                                    <form action="/community/<%= community._id %>/manage/removeAdmin" method="post">
+                                        <input type="hidden" name="adminID" value="<%= a._id %>">
+                                        <input type="submit" value="Remove">
+                                    </form>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <hr>
+                </td>
+            </tr>
+            <tr>
+                <td>Community members (<%= community.users.length %>):</td>
+                <td>
+                    <table>
+                        <% community.users.forEach(u => { %>
+                            <tr>
+                                <td><%= u.name  %> <%= u.name == user.name ? "(You)" : "" %></td>
+                                <td>
+                                    <form action="/community/<%= community._id %>/manage/removeUser" method="post">
+                                        <input type="hidden" name="userID" value="<%= u._id %>">
+                                        <input type="submit" value="Remove">
+                                    </form>
+                                </td>
+
+                                <% if (!community.admins.some(admin => admin._id.toString() === u._id.toString())) { %>
+                                    <td>
+                                        <form action="/community/<%= community._id %>/manage/makeAdmin" method="post">
+                                            <input type="hidden" name="userID" value="<%= u._id %>">
+                                            <input type="submit" value="Make admin">
+                                        </form>
+                                    </td>
+                                <% } %>
+                            </tr>
+                        <% }) %>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <h3><u>Danger Zone</u></h3>
+                    Please keep in mind that all actions taken <br>
+                    in this section is <strong>IRREVERSIBLE</strong>.
+                    <br><br>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Posts (<%= community.posts.length %>):
+                </td>
+                <td>
+                    <table>
+                        <% if (community.posts.length == 0) { %>
+                            No posts yet
+                        <% } %>
+
+                        <% community.posts.forEach(p => { %>
+                            <tr>
+                                <td><i><%= p.title  %></i> by <strong><%= p.author %></strong> <%= p.author == user.name ? "(You)" : "" %></td>
+                                <td>
+                                    <form action="/community/<%= community._id %>/manage/deletePost" method="post">
+                                        <input type="hidden" name="postID" value="<%= p._id %>">
+                                        <input type="submit" value="Delete">
+                                    </form>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <br>
+                    <form action="/community/<%= community._id %>/manage/deleteCommunity" method="post">
+                        <input type="hidden" name="communityID" value="<%= community._id %>">
+                        <input type="submit" value="Delete this community">
+                    </form>
+                </td>
+            </tr>
+        </table>
+        <%- include('../partials/footer') %>
+    </body>
+</html>

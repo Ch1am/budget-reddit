@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Posts</title>
+  <!-- <link rel="stylesheet" href="/css/landing.css"> -->
+</head>
+
+<body>
+  <%- include('../partials/nav') %>
+
+  <h1>My Posts</h1>
+  <% if (posts.length === 0) { %>
+  <p>You have no posts yet.</p>
+  <% } else { %>
+  <% posts.forEach((post) => { %>
+  <div>
+    <a href="/post/<%= post._id %>"><%= post.title %></a>
+    <p>by u/<%= post.displayAuthor || post.author || "Deleted-User" %> | <%= timeAgo(post.createdAt) %></p>
+    <p><%= post.desc %></p>
+    <a href="/post/<%= post._id %>/edit">Edit</a>
+    <form action="/post/<%= post._id %>/delete" method="POST" style="display:inline">
+      <button type="submit">Delete</button>
+    </form>
+  </div>
+  <hr>
+  <% }) %>
+  <% } %>
+
+  <a href="/home">Back to Home</a>
+  <%- include('../partials/footer') %>
+</body>
+
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title><%= community.name %> deletion confirmation</title>
+    </head>
+
+    <body>
+        <%- include('../partials/nav') %>
+        <h1>Confirm deletion of <%= community.name %></h1>
+        <p>Are you sure you want to delete the following community</p>
+        <table border="1">
+            <tr>
+                <th>Community ID:</th>
+                <td><%= community._id %></td>
+            </tr>
+            <tr>
+                <th>Community name:</th>
+                <td><%= community.name %></td>
+            </tr>
+            <tr>
+                <th>Number of members:</th>
+                <td><%= community.users.length %></td>
+            </tr>
+            <tr>
+                <th>Number of admins:</th>
+                <td><%= community.admins.length %></td>
+            </tr>
+        </table>
+        <br>
+        <form action="/community/<%= community._id %>/manage/delete" method="post">
+            <input type="hidden" name="communityID" value="<%= community._id %>">
+            <input type="submit" value="Cancel deletion" name="confirmedDeletion">
+            <input type="submit" value="CONFIRM deletion" name="confirmedDeletion">
+        </form>
+        <%- include('../partials/footer') %>
+    </body>
+</html>

@@ -115,7 +115,7 @@ exports.register = async (req, res) => {
                 res.send("There was an error when creating your account.")
             } else {
                 res.send(`
-                    Your account has been created. Welcome to memeit, ${result.name}!<br><br>
+                    Your account has been created. Welcome to MemeIt, ${result.name}!<br><br>
                     You will be redirected to the login page in 3 seconds...
                     <script>
                         setTimeout(() => {
@@ -164,7 +164,7 @@ exports.changePassword = async (req, res) => {
     }
 
     if (!emailerrormessage) {
-        userInfo = await findByemail(email)
+        userInfo = await User.findByEmail(email);
         if (!userInfo)
             emailerrormessage = "Couldn't find your account"
     }
@@ -172,7 +172,7 @@ exports.changePassword = async (req, res) => {
         confirmpasserrormessage = "Passwords do not match"
     }
     if (!emailerrormessage && !passworderrormessage && !confirmpasserrormessage) {
-        await editUser(email, newpassword);
+        await User.editUser(email, newpassword);
         html = `Password has been changed`
     }
     return res.render("forgot", { email, newpassword, confirmpassword, emailerrormessage, passworderrormessage, confirmpasserrormessage, html })

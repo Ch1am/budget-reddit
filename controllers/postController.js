@@ -76,6 +76,7 @@ exports.getSinglePost = async (req, res) => {
 				userVote,
 			});
 		}
+
 		res.render("post/post-view", {
 			post: {
 				...post,

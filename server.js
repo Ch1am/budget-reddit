@@ -1,5 +1,3 @@
-const dns = require('dns');
-dns.setServers(['1.1.1.1']);
 const dotenv = require('dotenv');
 // Prefer host-provided environment variables (e.g. Render),
 // but still support local dev via config.env.
@@ -23,6 +21,15 @@ process.on("uncaughtException", (err) => {
 	console.error("Uncaught exception:", err);
 	process.exit(1);
 });
+
+// Some environments disallow overriding DNS resolvers; don't crash if so.
+try {
+	const dns = require("dns");
+	dns.setServers(["1.1.1.1"]);
+	console.log("[startup] custom DNS servers set");
+} catch (e) {
+	console.error("[startup] WARNING: could not set custom DNS servers:", e);
+}
 
 const express = require("express");
 const server = express();

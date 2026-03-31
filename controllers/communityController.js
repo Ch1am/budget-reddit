@@ -181,6 +181,19 @@ exports.joinCommunity = async(req, res) => {
     try {
         const session = req.session
         const communityID = req.params.communityID;
+        const userInCommunity = await Community.findUserInCommunity(communityID, session.user);
+
+        if (userInCommunity) {
+            return res.send(`
+                You have already joined the community. You will be redirected to the community page in 3 seconds...
+                <script>
+                    setTimeout(() => {
+                        window.location.href = "/community/${communityID}";
+                    }, 3000);
+                </script>
+            `)
+        }
+
         const addCommunity = await Community.addUserToCommunity(communityID, session.user);
         const addUser = await User.addUserToCommunityUserSide(communityID, session.user);
 
@@ -204,9 +217,21 @@ exports.joinCommunity = async(req, res) => {
 exports.leaveCommunity = async(req, res) => {
     const communityID = req.params.communityID;
     const userID = req.session.user
+    const userInCommunity = await Community.findUserInCommunity(communityID, session.user);
+
+    if (!userInCommunity) {
+        return res.send(`
+            You are not currently in the community. You will be redirected to the community page in 3 seconds...
+            <script>
+                setTimeout(() => {
+                    window.location.href = "/community/${communityID}";
+                }, 3000);
+            </script>
+        `)
+    }
+    
     const community = await Community.findCommunityById(communityID);
     const userAdminCheck = await Community.findAdminInCommunity(communityID, userID);
-
 
     if (userAdminCheck) {
         return res.send(`

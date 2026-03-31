@@ -106,12 +106,12 @@ exports.getUserPost = async (req, res) => {
 		const posts = await Post.getPostsByAuthorId(userInfo._id); //using getPostsByAuthorId retrieves all posts where userID = the logged in user ID
 		// resolve display author for each post	
 		const postsWithAuthor = posts.map((post) => {
-		return {
-			...post.toObject(),
-			displayAuthor: (post.authorId && post.authorId.name) || 'Deleted-User'
-		};
-    });
-		res.render("post/myPost", { posts:postsWithAuthor, timeAgo });
+			return {
+				...post.toObject(),
+				displayAuthor: (post.authorId && post.authorId.name) || 'Deleted-User'
+			};
+		});
+		res.render("post/myPost", { posts: postsWithAuthor, timeAgo });
 
 	} catch (error) {
 		console.error(error);
@@ -120,85 +120,124 @@ exports.getUserPost = async (req, res) => {
 };
 
 exports.getCreatePost = async (req, res) => {
-	const user = await User.findByUserID(req.session.user)
-	let communities = user.communities
-	const com = []
+	try {
+		const user = await User.findByUserID(req.session.user)
+		let communities = user.communities
+		const com = []
 
-	for (const c of communities) {
-        const r = await Community.findCommunityById(c);
-        com.push(r);
-    }
+		for (const c of communities) {
+			const r = await Community.findCommunityById(c);
+			com.push(r);
+		}
 
-	res.render('post/post-create', {
-		user, 
-		communities: com,
-		error: req.query.error || null //handles any error queries which occur when creating the post
-	})
+		res.render('post/post-create', {
+			user,
+			communities: com,
+			error: req.query.error || null //handles any error queries which occur when creating the post
+		})
+	} catch (error) {
+		console.error(error);
+		res.status(500).send("Error loading create post page");
+	}
 }
 
 exports.createPost = async (req, res) => {
-	const { title, community, desc } = req.body;
+	try {
+		const { title, community, desc } = req.body;
 
-	if (!title || !title.trim() || !desc || !desc.trim()) {
-		return res.redirect('/post/create?error=Title and description are required');
-	}
+		if (!title || !title.trim() || !desc || !desc.trim()) {
+			return res.redirect('/post/create?error=Title and description are required');
+		}
 
-	const image = req.body.image || null; //saving image URL 
-	const currentUser = await User.findByUserID(req.session.user) 
+		const image = req.body.image ? req.body.image.trim() : null;
 
-	const r = await Post.createPost({
-		title,
-		image: image || null,
-		community: community == "None_Selected" ? null : community,
-		desc,
-		authorId: currentUser._id,
-		votes: 0,
-		voters: [],
-		commentCount: 0,
-		createdAt: new Date()
-	});
+		const currentUser = await User.findByUserID(req.session.user)
 
-	if (community !== "None_Selected") {
-		await Community.addPostToCommunity(community, req.session.user, r._id)
-	}
+		const r = await Post.createPost({
+			title,
+			image: image || null,
+			community: community == "None_Selected" ? null : community,
+			desc,
+			authorId: currentUser._id,
+			votes: 0,
+			voters: [],
+			commentCount: 0,
+			createdAt: new Date()
+		});
 
-	if (!r) {
-		res.send("An error has occured, please try again later");
-	} else {
-		res.redirect('/home');
+		if (community !== "None_Selected") {
+			let isMember = false;
+			for (const c of currentUser.communities) {
+				if (c.toString() === community) {
+					isMember = true;
+					break;
+				}
+			}
+
+			if (!isMember) {
+				return res.redirect('/post/create?error=You are not a member of that community');
+			}
+
+			await Community.addPostToCommunity(community, req.session.user, r._id)
+		}
+
+		if (!r) {
+			res.send("An error has occured, please try again later");
+		} else {
+			res.redirect('/home');
+		}
+	} catch (error) {
+		console.error(error);
+		res.status(500).send("Error creating post");
 	}
 };
 
 exports.getEditPost = async (req, res) => {
-	const post = await Post.getPostById(req.params.id);
-	res.render("post/post-edit", { post, error: req.query.error || null });
+	try {
+		const post = await Post.getPostById(req.params.id);
+		res.render("post/post-edit", { post, error: req.query.error || null });
+	} catch (error) {
+		console.error(error);
+		res.status(500).send("Error loading edit post page");
+	}
 };
 
 exports.editPost = async (req, res) => {
-	const { title, image, tag, desc } = req.body;
-  if (!title || !title.trim() || !desc || !desc.trim()) {
-    return res.redirect(`/post/${req.params.id}/edit?error=Title and description are required`);
-  }
+	try {
+		const { title, image, tag, desc } = req.body;
 
-	await Post.updatePost(req.params.id, { title, image, desc, tag });
-	res.redirect(`/post/${req.params.id}`);
+		if (!title || !title.trim() || !desc || !desc.trim()) {
+			return res.redirect(`/post/${req.params.id}/edit?error=Title and description are required`);
+		}
+
+		await Post.updatePost(req.params.id, { title, image, desc, tag });
+		res.redirect(`/post/${req.params.id}`);
+	} catch (error) {
+		console.error(error);
+		res.status(500).send("Error updating post");
+	}
 };
 
 exports.deletePost = async (req, res) => {
-	//delete all comments under this post.
+	try {
+		//delete all comments under this post.
 
-	const postID = req.params.id
-	const post = await Post.getPostById(postID);
+		const postID = req.params.id
+		const post = await Post.getPostById(postID);
 
-	if (post) {
-		if (post.community) {
-			const communityID = new mongoose.Types.ObjectId(post.community); 
-			await Community.deletePostFromCommunity(communityID, postID);
+		if (post) {
+			if (post.community) {
+				const communityID = new mongoose.Types.ObjectId(post.community);
+				await Community.deletePostFromCommunity(communityID, postID);
+			}
+
+			await Comment.deleteCommentsByPostId(req.params.id);
+			await Post.deletePost(req.params.id);
 		}
 
-		await Comment.deleteCommentsByPostId(req.params.id);
-		await Post.deletePost(req.params.id);
+		res.redirect("/home");
+	} catch (error) {
+		console.error(error);
+		res.status(500).send("Error deleting post");
 	}
-
-	res.redirect("/home");
 };

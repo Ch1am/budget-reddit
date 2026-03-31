@@ -1,4 +1,4 @@
-# Budget Reddit
+# MemeIt
 
 **Course:** IS113 Web Application Development - AY2025/2026 Semester 2
 
@@ -28,7 +28,7 @@
 
 ## Overview
 
-Budget Reddit is a full-stack web application inspired by Reddit. It allows users to upload and share memes via image uploads or external links. Posts are ranked dynamically by community votes, with the most popular content surfacing to the top. Users can organise content into communities, bookmark posts into personal collections, and engage with others through comments.
+MemeIt is a full-stack web application inspired by Reddit. It allows users to upload and share memes via image uploads or external links. Posts are ranked dynamically by community votes, with the most popular content surfacing to the top. Users can organise content into communities, bookmark posts into personal collections, and engage with others through comments.
 
 ---
 

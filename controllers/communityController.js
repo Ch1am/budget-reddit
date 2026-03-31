@@ -128,7 +128,7 @@ exports.renderCommunity = async(req, res) => {
 
         rawPosts.forEach(pDoc => {
             const p = typeof pDoc.toObject === "function" ? pDoc.toObject() : pDoc;
-            if (p.community && p.community.toString() === communityID) {
+            if (p.community && p.community._id.toString() === communityID) {
                 p.community = community
                 posts.push(p);
             }
@@ -217,7 +217,7 @@ exports.joinCommunity = async(req, res) => {
 exports.leaveCommunity = async(req, res) => {
     const communityID = req.params.communityID;
     const userID = req.session.user
-    const userInCommunity = await Community.findUserInCommunity(communityID, session.user);
+    const userInCommunity = await Community.findUserInCommunity(communityID, userID);
 
     if (!userInCommunity) {
         return res.send(`
@@ -323,6 +323,18 @@ exports.removeAdmin = async(req, res) => {
         const userID = req.session.user;
 
         const community = await Community.findCommunityById(communityID);
+        const userAdmin = await Community.findAdminInCommunity(communityID, userID);
+    
+        if (!userAdmin) {
+            return res.send(`
+                You are not an administrator. Please ensure you have the correct credentials before initiating the deletion action. You will be redirected back to the community page in 3 seconds...
+                <script>
+                    setTimeout(() => {
+                        window.location.href = "/community/${communityID}"
+                    }, 3000);
+                </script>
+            `)
+        }
 
         if (!community) {
             return res.send(`
@@ -388,6 +400,18 @@ exports.removeUser = async(req, res) => {
         const community = await Community.findCommunityById(communityID);
         const targetAdmin = await Community.findAdminInCommunity(communityID, targetID);
 
+        const userAdmin = await Community.findAdminInCommunity(communityID, userID);
+    
+        if (!userAdmin) {
+            return res.send(`
+                You are not an administrator. Please ensure you have the correct credentials before initiating the deletion action. You will be redirected back to the community page in 3 seconds...
+                <script>
+                    setTimeout(() => {
+                        window.location.href = "/community/${communityID}"
+                    }, 3000);
+                </script>
+            `)
+        }
 
         if (!community) {
             return res.send(`
@@ -438,6 +462,19 @@ exports.addAdmin = async (req, res) => {
 
     const target = await User.findByUserID(targetID);
     const community = await Community.findCommunityById(communityID);
+    const userAdmin = await Community.findAdminInCommunity(communityID, userID);
+    
+    if (!userAdmin) {
+        return res.send(`
+            You are not an administrator. Please ensure you have the correct credentials before initiating the deletion action. You will be redirected back to the community page in 3 seconds...
+            <script>
+                setTimeout(() => {
+                    window.location.href = "/community/${communityID}"
+                }, 3000);
+            </script>
+        `)
+    }
+
 
     if (!community) {
         return res.send(`
@@ -604,10 +641,21 @@ exports.deletePost = async(req, res) => {
     const userID = req.session.user;
     const postID = req.body.postID;
 
-    console.log(postID)
-
     const community = await Community.findCommunityById(communityID);
     const post = await Post.getPostById(postID);
+
+    const userAdmin = await Community.findAdminInCommunity(communityID, userID);
+    
+    if (!userAdmin) {
+        return res.send(`
+            You are not an administrator. Please ensure you have the correct credentials before initiating the deletion action. You will be redirected back to the community page in 3 seconds...
+            <script>
+                setTimeout(() => {
+                    window.location.href = "/community/${communityID}"
+                }, 3000);
+            </script>
+        `)
+    }
 
     if (!community) {
         return res.send(`

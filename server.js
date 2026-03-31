@@ -6,6 +6,14 @@ const dotenv = require('dotenv');
 dotenv.config();
 dotenv.config({ path: './config.env' });
 
+console.log("[startup] node", process.version, "pid", process.pid);
+console.log("[startup] env", {
+	HAS_DB: Boolean(process.env.DB),
+	HAS_SECRET: Boolean(process.env.SECRET),
+	PORT: process.env.PORT || null,
+	NODE_ENV: process.env.NODE_ENV || null,
+});
+
 process.on("unhandledRejection", (reason) => {
 	console.error("Unhandled promise rejection:", reason);
 	process.exit(1);

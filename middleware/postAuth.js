@@ -1,22 +1,48 @@
+const mongoose = require('mongoose');
 const Post = require('../models/postModel');
 const User = require('../models/registerModel');
 
 const isPostOwnerOrAdmin = async (req, res, next) => {
   try {
-    const post = await Post.getPostById(req.params.id);
-    const userInfo = await User.findByUserID(req.session.user);
-    const isAdmin = userInfo?.type === 'admin';
+    const postId = req.params.id;
 
-    const isOwner =
-      post.authorId &&
-      (post.authorId._id ? post.authorId._id.toString() : post.authorId.toString()) ===
-        userInfo._id.toString();
-
-    if (!isOwner && !isAdmin) {
-      return res.redirect(`/post/${req.params.id}`);
+    // 1. Invalid Mongo ID format
+    if (!mongoose.Types.ObjectId.isValid(postId)) {
+      return res.status(400).send('Invalid post ID');
     }
 
-    // attach to req so controller can use it without fetching again
+    // 2. Post not found
+    const post = await Post.getPostById(postId);
+    if (!post) {
+      return res.status(404).send('Post not found');
+    }
+
+    // 3. Session user missing
+    if (!req.session.user) {
+      return res.status(401).send('Login required');
+    }
+
+    // 4. User not found
+    const userInfo = await User.findByUserID(req.session.user);
+    if (!userInfo) {
+      return res.status(401).send('Invalid session user');
+    }
+
+    const isAdmin = userInfo.type === 'admin';
+
+    const authorId = post.authorId && post.authorId._id
+      ? post.authorId._id.toString()
+      : post.authorId
+      ? post.authorId.toString()
+      : null;
+
+    const isOwner = authorId === userInfo._id.toString();
+
+    // 5. Exists, but user not allowed
+    if (!isOwner && !isAdmin) {
+      return res.status(403).send('Authorization error');
+    }
+
     req.post = post;
     req.userInfo = userInfo;
     req.isAdmin = isAdmin;
@@ -24,7 +50,7 @@ const isPostOwnerOrAdmin = async (req, res, next) => {
     next();
   } catch (error) {
     console.error(error);
-    res.status(500).send('Authorization error');
+    return res.status(500).send('Internal server error');
   }
 };
 

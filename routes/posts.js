@@ -8,7 +8,7 @@ const postAuth = require("../middleware/postAuth");
 router.get('/create', middleware.isLoggedIn, postController.getCreatePost);
 
 // POST create form
-router.post('/create', postController.createPost);
+router.post('/create',middleware.isLoggedIn, postController.createPost);
 
 // add to collection
 router.get('/:id/add-to-collection', middleware.isLoggedIn, collectionController.showCollectionDetails);

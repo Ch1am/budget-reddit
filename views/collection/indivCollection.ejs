@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <title><%=collection.title%></title>
 </head>
-<a href="/home">Home</a>
-<a href="/home/my-collection">Collections</a>
+<!--<a href="/home">Home</a>
+<a href="/home/my-collection">Collections</a>-->
 <body>
   <%- include('../partials/nav') %>
     <h1><%= collection.title %></h1>
@@ -17,7 +17,15 @@
             <!-- <a href="/post/<%= post._id %>">Author: <%=post.author%> <br></a> -->
             Author: <%=post.author%><br>
             Title: <%=post.title%> <br>
-            Desc: <%=post.desc%> <br>
+            Desc:
+            <%let sentence = post.desc.split(' ')%>
+            <%if (sentence.length > 30) {%>
+                <%= sentence.slice(0,31).join(' ') %>
+                ...
+                <br><br>
+            <%} else {%>
+                <%=post.desc%> <br><br>
+            <%}%>
             Post ID: <%= post._id %><br>
             <a href="/post/<%= post._id %>">View Details</a><br><br>
             <form action="/home/collection/<%= collection.title %>/remove-post" method="post">

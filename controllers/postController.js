@@ -130,15 +130,16 @@ exports.getCreatePost = async (req, res) => {
 
 	res.render('post/post-create', {
 		user, 
-		communities: com
+		communities: com,
+		error: req.query.error || null //handles any error queries which occur when creating the post
 	})
 }
 
 exports.createPost = async (req, res) => {
 	const { title, community, desc } = req.body;
 
-	if (!title || !desc) {
-		return res.render('post/post-create', { error: 'Title and description are required' });
+	if (!title || !title.trim() || !desc || !desc.trim()) {
+		return res.redirect('/post/create?error=Title and description are required');
 	}
 
 	const image = req.body.image || null; //saving image URL 
@@ -169,11 +170,15 @@ exports.createPost = async (req, res) => {
 
 exports.getEditPost = async (req, res) => {
 	const post = await Post.getPostById(req.params.id);
-	res.render("post/post-edit", { post });
+	res.render("post/post-edit", { post, error: req.query.error || null });
 };
 
 exports.editPost = async (req, res) => {
 	const { title, image, tag, desc } = req.body;
+  if (!title || !title.trim() || !desc || !desc.trim()) {
+    return res.redirect(`/post/${req.params.id}/edit?error=Title and description are required`);
+  }
+
 	await Post.updatePost(req.params.id, { title, image, desc, tag });
 	res.redirect(`/post/${req.params.id}`);
 };

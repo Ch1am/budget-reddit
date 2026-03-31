@@ -140,4 +140,5 @@ vite.config.ts.timestamp-*
 
 node_modules/
 .history
+.claude/
 CLAUDE.md

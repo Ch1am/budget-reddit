@@ -16,8 +16,10 @@
 			<img src="<%= post.image %>" alt="<%= post.title %>" class="post-image">
 			<% } %>
 
-			<!-- Use the ID -->
-			<p>Post ID: <%= post._id %></p>
+			<!-- how to use the ID -->
+			<!-- <p>Post ID: <%= post._id %></p> -->
+
+			<p> <%= post.desc %></p>
 
 			<% if (!collectionList) {%>
 				<form action="/post/<%= post._id %>/add-to-collection" method="get">

@@ -46,7 +46,12 @@
                       <form action="/comment/<%= comment._id %>/upvote" method="POST"
                         onsubmit="this.querySelector('button').disabled=true">
                         <button type="submit" class="vote-up <%= comment.userVote === 'upvote' ? 'selected' : '' %>">
-                          <img src="/icons/vote_up_arrow.svg" alt="upvote" width="20" height="20" />
+                          <img
+                            src="<%= comment.userVote === 'upvote' ? '/icons/upvote_true.svg' : '/icons/vote_up_arrow.svg' %>"
+                            alt="upvote"
+                            width="20"
+                            height="20"
+                          />
                         </button>
                       </form>
 
@@ -59,7 +64,12 @@
                         onsubmit="this.querySelector('button').disabled=true">
                         <button type="submit"
                           class="vote-down <%= comment.userVote === 'downvote' ? 'selected' : '' %>">
-                          <img src="/icons/vote_down_arrow.svg" alt="downvote" width="20" height="20" />
+                          <img
+                            src="<%= comment.userVote === 'downvote' ? '/icons/downvote_true.svg' : '/icons/vote_down_arrow.svg' %>"
+                            alt="downvote"
+                            width="20"
+                            height="20"
+                          />
                         </button>
                       </form>
                     </div>

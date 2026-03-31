@@ -12,6 +12,17 @@
 
   <% if (collectionList && collectionList.length === 0) { %>
     <p>No collection yet.</p> 
+
+    Create your collection here:
+    
+    <br>
+    <form action="/home/new-collection" method="post">
+        <button type="submit">Create Collection</button>
+    </form>
+    <br><br>
+    <form action="/" method="get">
+        <button type="submit">Home</button>
+    </form>
     
   <% } else { %>
     <h2>Collection List</h2>
@@ -48,10 +59,6 @@
         <hr>
     <%})%>
     
-    
-  <% } %>
-    
-
     <br><br>
     <form action="/home/new-collection" method="post">
         <button type="submit">Create Collection</button>
@@ -60,6 +67,11 @@
     <form action="/" method="get">
         <button type="submit">Home</button>
     </form>
+    
+  <% } %>
+    
+
+    
     
     
     

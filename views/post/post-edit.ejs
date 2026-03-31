@@ -10,16 +10,16 @@
   <%- include('../partials/nav') %>
   <form action="/post/<%= post._id %>/edit" method="POST">
 
-    <label>Title</label><br>
+    <label>Title:</label><br>
     <input type="text" name="title" value="<%= post.title %>" required><br><br>
 
-    <label>Image URL</label><br>
+    <label>Image URL:</label><br>
 		<input type="text" name="image" value="<%= post.image || '' %>"><br><br>
 
-    <label>Tag</label><br>
-    <input type="text" name="tag" value="<%= post.tag || '' %>"><br><br>
+    <label>Community:</label><br>
+    <b><%= post.community?.name || 'None' %>  </b><br><br>
 
-    <label>Description</label><br>
+    <label>Description:</label><br>
     <textarea name="desc" rows="4" cols="40" required><%= post.desc %></textarea><br><br>
 
     <button type="submit">Save</button>

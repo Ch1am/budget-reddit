@@ -58,23 +58,20 @@ exports.createPost = async (postData) => {
 	return await post.save();
 };
 
-// updateVote updates vote count and voters array
+// updateVote updates vote count and voters array atomically
 exports.updateVote = async (id, userId, voteType, voteChange) => {
-	const post = await Post.findById(id);
+	// Atomically remove existing vote and update count
+	await Post.findByIdAndUpdate(id, {
+		$pull: { voters: { userId } }, //as 
+		$inc: { votes: voteChange },
+	});
 
-	// Remove existing vote if any
-	post.voters = (post.voters || []).filter((v) => v.userId?.toString() !== userId.toString());
-
-	// Add new vote if not removing
+	// Atomically add new vote if not removing
 	if (voteType !== null) {
-		post.voters.push({ userId, voteType });
+		await Post.findByIdAndUpdate(id, {
+			$push: { voters: { userId, voteType } },
+		});
 	}
-
-	// Update vote total
-	post.votes += voteChange;
-
-	// Save to MongoDB
-	await post.save();
 };
 
 // Editing logged-in user's post

@@ -28,7 +28,15 @@
                     <%collection.posts.slice(0, 4).forEach(post => {%>
                             Author: <%=post.author%> <br>
                             Title: <%=post.title%> <br>
-                            Desc: <%=post.desc%> <br><br>
+                            Desc: 
+                            <%let sentence = post.desc.split(' ')%>
+                            <%if (sentence.length > 30) {%>
+                                <%= sentence.slice(0,31).join(' ') %>
+                                ...
+                                <br><br>
+                            <%} else {%>
+                                <%=post.desc%> <br><br>
+                            <%}%>
 
                         
                        

@@ -55,8 +55,10 @@ exports.showCollections = async (req, res) => {
 // GET /home/collection/:title
 exports.displayPostInCollection = async (req, res) => {
   const collectionTitle = req.params.title;
-
   try {
+    if (!req.session || !req.session.user) {
+      return res.redirect('/login')
+    }
     const collection = await collectionModel.findByTitle(
       collectionTitle,
       req.session.user,

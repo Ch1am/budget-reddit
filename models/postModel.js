@@ -25,13 +25,13 @@ const Post = mongoose.model("Post", postSchema, "posts");
 
 // Function getAllPost retrieves all posts
 exports.getAllPost = async () => {
-	return await Post.find().populate("authorId", "name type");
+	return await Post.find().populate("authorId", "name type").populate("community", "name");
 };
 
 // Function getPostByGeneralSearch retrieves post with querty
 exports.getPostByGeneralSearch = async (searchQuery) => {
     if (!searchQuery) {
-        return await Post.find().populate("authorId", "name type");
+        return await Post.find().populate("authorId", "name type").populate("community", "name");
     }
 
     return await Post.find({
@@ -39,17 +39,17 @@ exports.getPostByGeneralSearch = async (searchQuery) => {
             { title: { $regex: searchQuery, $options: "i" } },
             { desc: { $regex: searchQuery, $options: "i" } }
         ]
-    }).populate("authorId", "name type");
+    }).populate("authorId", "name type").populate("community", "name");
 };
 
 // Function to get a single post by id
 exports.getPostById = async (id) => {
-	return await Post.findById(id).populate("authorId", "name type");
+	return await Post.findById(id).populate("authorId", "name type").populate("community", "name");
 };
 
 // Function getPostsByAuthorId retrieves posts made by user id (preferred).
 exports.getPostsByAuthorId = async (authorId) => {
-	return await Post.find({ authorId }).populate("authorId", "name type");
+	return await Post.find({ authorId }).sort({ createdAt: -1 }).populate("authorId", "name type").populate("community", "name");
 };
 
 // Function createPost creates and saves a new post

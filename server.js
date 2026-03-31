@@ -6,6 +6,16 @@ const dotenv = require('dotenv');
 dotenv.config();
 dotenv.config({ path: './config.env' });
 
+process.on("unhandledRejection", (reason) => {
+	console.error("Unhandled promise rejection:", reason);
+	process.exit(1);
+});
+
+process.on("uncaughtException", (err) => {
+	console.error("Uncaught exception:", err);
+	process.exit(1);
+});
+
 const express = require("express");
 const server = express();
 const path = require("path");
@@ -20,6 +30,13 @@ const settingsRoute = require("./routes/settings.js")
 const postRoutes = require("./routes/posts");
 const communityRoutes = require("./routes/community.js")
 const commentRouter = require("./routes/comment");
+
+if (!process.env.SECRET) {
+	throw new Error("Missing required env var SECRET (used for sessions)");
+}
+if (!process.env.DB) {
+	throw new Error("Missing required env var DB (Mongo connection string)");
+}
 
 // session config
 server.use(session({
@@ -53,9 +70,7 @@ async function connectDB() {
 		await mongoose.connect(process.env.DB);
 		console.log("MongoDB connected successfully");
 	} catch (error) {
-		console.error("MongoDB connection failed:", error.message);
-		require('dotenv').config();
-		console.log('URI:', process.env.MONGO_URI);
+		console.error("MongoDB connection failed:", error);
 		process.exit(1);
 		
 	}

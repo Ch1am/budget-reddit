@@ -39,10 +39,10 @@ Budget Reddit is a full-stack web application inspired by Reddit. It allows user
 | **Authentication** | User registration and login with securely hashed passwords |
 | **Post Management** | Create, view, edit, and delete meme posts (image upload or link) |
 | **Voting** | Upvote and downvote posts; posts are ranked by net vote count |
-| **Comments** | Add and edit comments on any post |
+| **Comments** | Add, edit, delete, and vote on comments on any post |
 | **Communities** | Create and manage subreddit-style community spaces |
 | **Collections** | Place specific posts into a personalized collection to view in the future |
-| **Account Settings** | Update account details and change password |
+| **Account Settings** | Update username, change password, or delete your account |
 | **Relative Timestamps** | Posts and comments display human-readable time (e.g. "2 hours ago") |
 
 ---
@@ -111,7 +111,7 @@ budget-reddit/
 │   └── partials/               # Reusable components: nav, footer, post card, comment
 │
 └── public/                     # Statically served assets
-    ├── css/                    # Per-page stylesheets (unusedZ)
+    ├── css/                    # Per-page stylesheets
     ├── icons/                  # SVG icons (vote arrows, comment, settings, etc.)
     └── uploads/                # User-uploaded image files
 ```
@@ -137,7 +137,6 @@ git clone https://github.com/Ch1am/budget-reddit.git
 cd budget-reddit
 ```
 
-vv May need to change this closer to the submission date vv 
 **2. Switch to the main/development branch**
 
 ```bash

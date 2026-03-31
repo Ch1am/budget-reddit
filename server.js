@@ -40,16 +40,18 @@ const communityRoutes = require("./routes/community.js")
 const commentRouter = require("./routes/comment");
 
 if (!process.env.SECRET) {
-	throw new Error("Missing required env var SECRET (used for sessions)");
+	console.error("[startup] WARNING: missing env var SECRET (sessions will use a temporary fallback)");
 }
 if (!process.env.DB) {
-	throw new Error("Missing required env var DB (Mongo connection string)");
+	console.error("[startup] WARNING: missing env var DB (Mongo will not connect)");
 }
+
+const sessionSecret = process.env.SECRET || "dev-secret-do-not-use-in-prod";
 
 // session config
 server.use(session({
 	name: "session",
-	secret: process.env.SECRET,
+	secret: sessionSecret,
 	resave: false,
 	saveUninitialized: false,
 	cookie: {
@@ -75,6 +77,7 @@ server.use("/", commentRouter);
 // async function to connect to DB
 async function connectDB() {
 	try {
+		if (!process.env.DB) return;
 		await mongoose.connect(process.env.DB, {
 			serverSelectionTimeoutMS: 5000,
 			connectTimeoutMS: 5000,

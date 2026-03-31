@@ -75,12 +75,15 @@ server.use("/", commentRouter);
 // async function to connect to DB
 async function connectDB() {
 	try {
-		await mongoose.connect(process.env.DB);
+		await mongoose.connect(process.env.DB, {
+			serverSelectionTimeoutMS: 5000,
+			connectTimeoutMS: 5000,
+		});
 		console.log("MongoDB connected successfully");
 	} catch (error) {
 		console.error("MongoDB connection failed:", error);
-		process.exit(1);
-		
+		// On Render, the service must bind a port quickly.
+		// Keep the server running so logs are visible and the port stays open.
 	}
 };
 
@@ -93,4 +96,5 @@ function startServer() {
 	});
 }
 
-connectDB().then(startServer);
+startServer();
+connectDB();

@@ -1,6 +1,9 @@
 const dns = require('dns');
 dns.setServers(['1.1.1.1']);
 const dotenv = require('dotenv');
+// Prefer host-provided environment variables (e.g. Render),
+// but still support local dev via config.env.
+dotenv.config();
 dotenv.config({ path: './config.env' });
 
 const express = require("express");
@@ -60,11 +63,10 @@ async function connectDB() {
 
 
 function startServer() {
-	const hostname = "127.0.0.1"; 
-	const port = 8000;
+	const port = process.env.PORT || 8000;
 	
-	server.listen(port, hostname, () => {
-		console.log(`Server running at http://${hostname}:${port}/`);
+	server.listen(port, () => {
+		console.log(`Server running on port ${port}`);
 	});
 }
 

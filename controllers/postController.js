@@ -1,5 +1,6 @@
 const Post = require('../models/postModel')
 const timeAgo = require("../functions/timeAgo")
+const { validateImageUrl } = require("../functions/validateImageUrl")
 const User = require("./../models/registerModel")
 const Community = require("./../models/communityModel")
 const Comment = require("../models/commentModel");
@@ -22,6 +23,7 @@ exports.getSinglePost = async (req, res) => {
 		// get the current logged in user and check if they are an admin
 		const currentUser = await User.findByUserID(sessionUserId);
 		const isAdmin = currentUser?.type === "admin";
+		const commentImageInvalid = req.query.invalidImage === "1";
 
 		// if post dont exist still provide fields that can be used
 		if (!postDoc) {
@@ -34,6 +36,7 @@ exports.getSinglePost = async (req, res) => {
 				sessionUserId,
 				isAdmin,
 				editCommentId,
+				commentImageInvalid,
 			});
 		}
 		const post = postDoc.toObject();
@@ -92,6 +95,7 @@ exports.getSinglePost = async (req, res) => {
 			sessionUserId,
 			isAdmin,
 			editCommentId,
+			commentImageInvalid,
 		});
 	} catch (error) {
 		console.error(error);
@@ -150,6 +154,11 @@ exports.createPost = async (req, res) => {
 		}
 
 		const image = req.body.image ? req.body.image.trim() : null;
+		if (image && !validateImageUrl(image)) {
+			return res.redirect(
+				"/post/create?error=Image URL must include .png, .jpg, .jpeg, .gif, or .webp",
+			);
+		}
 
 		const currentUser = await User.findByUserID(req.session.user)
 
@@ -208,6 +217,16 @@ exports.editPost = async (req, res) => {
 
 		if (!title || !title.trim() || !desc || !desc.trim()) {
 			return res.redirect(`/post/${req.params.id}/edit?error=Title and description are required`);
+		}
+
+		if (
+			typeof image === "string" &&
+			image.trim() &&
+			!validateImageUrl(image.trim())
+		) {
+			return res.redirect(
+				`/post/${req.params.id}/edit?error=Image URL must include .png, .jpg, .jpeg, .gif, or .webp`,
+			);
 		}
 
 		await Post.updatePost(req.params.id, { title, image, desc, tag });

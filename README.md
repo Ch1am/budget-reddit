@@ -96,14 +96,16 @@ budget-reddit/
 │   └── collectionModel.js      # Collection schema
 │
 ├── middleware/
-│   └── auth.js                 # Session-based authentication
+│   ├── auth.js                 # Session-based authentication guards (isLoggedIn, redirectIfLoggedIn)
+│   ├── postAuth.js             # Post edit/delete authorisation (owner or community admin)
+│   └── commentAuth.js          # Comment edit/delete authorisation (owner or community admin)
 │
 ├── functions/
 │   └── timeAgo.js              # Utility: converts timestamps to relative time strings
 │
 ├── views/                      # EJS templates
 │   ├── landing.ejs
-│   ├── auth/                   # login.ejs, register.ejs
+│   ├── auth/                   # login.ejs, register.ejs, forgot.ejs
 │   ├── post/                   # post-create, post-edit, post-view, myPost
 │   ├── community/              # community, community-view, community-create, community-manage, etc.
 │   ├── collection/             # show-collection, create-collection, rename-collection, etc.
@@ -140,7 +142,7 @@ cd budget-reddit
 **2. Switch to the main/development branch**
 
 ```bash
-git checkout main/develop
+git checkout main
 ```
 
 
@@ -212,7 +214,7 @@ Navigate to the landing page and click **Sign Up** to create a new account. Once
 ### Creating a Post
 
 1. From the home feed, click **+ Post Meme**
-2. Enter a title and either upload an image file or paste an external image link << might need changing.
+2. Enter a title and paste an external image URL.
 3. Optionally assign the post to a Community.
 4. Add a description to talk in depth on what your post is about.
 5. Submit and the post will appear in the feed and be open for voting.
@@ -227,7 +229,7 @@ Each post displays upvote (▲) and downvote (▼) controls. Clicking either adj
 
 ### Comments
 
-Open any post to access the comment section. Users can add new comments and edit their own existing comments.
+Open any post to access the comment section. Users can add new comments, edit their own existing comments, and delete them.
 
 ![Example post page](./readme-images/examplePost.png)
 

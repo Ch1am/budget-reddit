@@ -28,7 +28,7 @@ exports.loginAction = async (req, res) => {
         }
 
         if (error.length == 0) {
-            let userInfo = await User.findByEmail(filledEmail);
+            let userInfo = await User.findByEmail(filledEmail.toLowerCase());
 
             if (!userInfo) {
                 error.push("Couldn't find your account.")
@@ -79,6 +79,8 @@ exports.register = async (req, res) => {
 
         if (!newName) error.push("Name is required.");
         if (!newEmail) error.push("Email is required.");
+        if(newEmail && !newEmail.includes(".com"))
+            error.push("Enter a proper email domain");
         if (!newPassword) {
             error.push("Password is required.");
         } else {
@@ -105,7 +107,7 @@ exports.register = async (req, res) => {
         } else {
             const result = await User.addUser({
                 name: newName,
-                email: newEmail,
+                email: newEmail.toLowerCase(),
                 password: await bcrypt.hash(newPassword, 10),
                 type: "user",
                 communities: []
@@ -135,47 +137,68 @@ exports.password = async (req, res) => {
         email = null
         newpassword = null
         confirmpassword = null
-        emailerrormessage = null
-        passworderrormessage = null
-        confirmpasserrormessage = null
+        error = []
         html = null
-        res.render("forgot", { email, newpassword, confirmpassword, emailerrormessage, passworderrormessage, confirmpasserrormessage, html })
+        res.render("auth/forgot", { email, newpassword, confirmpassword, error, html })
     } catch (error) {
         console.log(error)
     }
 }
 exports.changePassword = async (req, res) => {
-    email = req.body.email
-    newpassword = req.body.newpassword
-    confirmpassword = req.body.confirmnewpass
-    emailerrormessage = null
-    passworderrormessage = null
-    confirmpasserrormessage = null
-    html = null
+    try {
+        let email = req.body.email
+        let newpassword = req.body.newpassword
+        let confirmpassword = req.body.confirmpassword
+        let error = []
+        let html = null
+        let userInfo = await User.findByEmail(email.toLowerCase());
 
-    if (!email) {
-        emailerrormessage = "Email is required"
+        if (!email) {
+            error.push("Email is required")
+        }
+        if(email && !email.includes(".com"))
+            error.push("Enter a proper email domain")
+        if (!userInfo) {
+            error.push("Couldn't find your account")
+        }
+        if (!newpassword && userInfo) {
+            error.push("New Password is required")
+        
+        
+        } else if (newpassword && userInfo) {
+            if (newpassword.length < 8) error.push("Password must be at least 8 characters in length.");
+            if (!/[A-Z]/.test(newpassword)) error.push("Password must contain at least one uppercase letter.");
+            if (!/[a-z]/.test(newpassword)) error.push("Password must contain at least one lowercase letter.");
+            if (!/[0-9]/.test(newpassword)) error.push("Password must contain at least one number.");
+            if (!/[^A-Za-z0-9]/.test(newpassword)) error.push("Password must contain at least one special character.");
+        }
+        if (!confirmpassword && newpassword && userInfo) error.push("Please confirm your password.");
+        if (newpassword && confirmpassword && newpassword !== confirmpassword && newpassword.length >= 8 && userInfo) error.push("The passwords do not match. Please try again.")
+        if (userInfo && newpassword && confirmpassword && newpassword == confirmpassword && error.length == 0){
+            let passwordCompare = await bcrypt.compare(newpassword, userInfo.password)
+            if (passwordCompare) {
+                error.push("The current password and the new password cannot be the same!")
+            } else {
+                let changedpassword = await bcrypt.hash(newpassword, 10)
+                await User.editUser(email.toLowerCase(), userInfo.name, changedpassword, userInfo.type);
+                console.log('Password has been changed')
+                return res.send(`
+                        Your password has been changed. Welcome back to MemeIt, ${userInfo.name}!<br><br>
+                        You will be redirected to the login page in 3 seconds...
+                        <script>
+                            setTimeout(() => {
+                                window.location.href = "/login";
+                            }, 3000);
+                        </script>
+                    `)
+            }
+        }
+        return res.render("auth/forgot", { email, newpassword, confirmpassword, error, html })
+    } catch(err) {
+        console.log(err)
     }
-    if (!newpassword) {
-        passworderrormessage = "New Password is required"
-    }
-    if (newpassword && !confirmpassword) {
-        confirmpasserrormessage = "Please confirm your new password"
-    }
-
-    if (!emailerrormessage) {
-        userInfo = await User.findByEmail(email);
-        if (!userInfo)
-            emailerrormessage = "Couldn't find your account"
-    }
-    if (!passworderrormessage && !confirmpasserrormessage && newpassword !== confirmpassword) {
-        confirmpasserrormessage = "Passwords do not match"
-    }
-    if (!emailerrormessage && !passworderrormessage && !confirmpasserrormessage) {
-        await User.editUser(email, newpassword);
-        html = `Password has been changed`
-    }
-    return res.render("forgot", { email, newpassword, confirmpassword, emailerrormessage, passworderrormessage, confirmpasserrormessage, html })
+    
+    
 
 }
 // const filePath = "password-data.json";

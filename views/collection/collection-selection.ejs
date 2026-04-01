@@ -12,6 +12,17 @@
 
   <% if (collectionList && collectionList.length === 0) { %>
     <p>No collection yet.</p> 
+
+    Create your collection here:
+    
+    <br>
+    <form action="/home/new-collection" method="post">
+        <button type="submit">Create Collection</button>
+    </form>
+    <br><br>
+    <form action="/" method="get">
+        <button type="submit">Home</button>
+    </form>
     
   <% } else { %>
     <h2>Collection List</h2>
@@ -28,7 +39,15 @@
                     <%collection.posts.slice(0, 4).forEach(post => {%>
                             Author: <%=post.author%> <br>
                             Title: <%=post.title%> <br>
-                            Desc: <%=post.desc%> <br><br>
+                            Desc: 
+                            <%let sentence = post.desc.split(' ')%>
+                            <%if (sentence.length > 30) {%>
+                                <%= sentence.slice(0,31).join(' ') %>
+                                ...
+                                <br><br>
+                            <%} else {%>
+                                <%=post.desc%> <br><br>
+                            <%}%>
 
                         
                        
@@ -40,10 +59,6 @@
         <hr>
     <%})%>
     
-    
-  <% } %>
-    
-
     <br><br>
     <form action="/home/new-collection" method="post">
         <button type="submit">Create Collection</button>
@@ -52,6 +67,11 @@
     <form action="/" method="get">
         <button type="submit">Home</button>
     </form>
+    
+  <% } %>
+    
+
+    
     
     
     

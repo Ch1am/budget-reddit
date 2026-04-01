@@ -2,13 +2,13 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>Login</title>
+        <title>Register</title>
         <!-- style sheets are removed temporarily
-            <link rel="stylesheet" href="/css/login.css">
+            <link rel="stylesheet" href="/css/register.css">
         -->
     </head>
     <body>
-        <h1>Login</h1>
+        <h1>Change Password</h1>
 
         <% if (error && error.length >= 1) { %>
             The following issues have occured:
@@ -17,31 +17,27 @@
                     <li><%= i %></li>
                 <% } %>
             </ol>
-            <br>
         <% } %>
 
-        <form action = "/login" method = "post">
+        <form action="/forgot" method="post">
             <table>
                 <tr>
                     <td>Email:</td>
-                    <td><input type = "email" name = "email" placeholder = "Email" value = "<%= filledEmail %>"></td>
+                    <td><input type="email" name="email" value="<%= email ? email : "" %>"></td>
                 </tr>
                 <tr>
                     <td>Password:</td>
-                    <td><input type = "password" name = "password" placeholder = "********" value = "<%= filledPassword %>"></td>
+                    <td><input type="password" name="newpassword" value="<%= newpassword ? newpassword : "" %>"></td>
                 </tr>
                 <tr>
+                    <td>Confirm Password:</td>
+                    <td><input type="password" name="confirmpassword" value="<%= confirmpassword ? confirmpassword : "" %>"></td>
+                </tr>
             </table>
-            <br>
-            <input type="submit" value="LOGIN">
-            <br>
-            <a href="/forgot">Forgot password</a>
-            <br>
-            Don't have an account? <a href = "/register">Sign Up</a>
-            
+
+            <input type="submit" value="Change password">
         </form>
         <%- include('../partials/footer') %>
+
     </body>
 </html>
-
-

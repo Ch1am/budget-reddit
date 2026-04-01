@@ -1,6 +1,6 @@
 # MemeIt
 
-**Course:** IS113 Web Application Development - AY2025/2026 Semester 2
+**Course:** IS113 Web Application Development G4 (Group 5) - AY2025/2026 Semester 2
 
 **Group members:** 
 1. Lew Jing Yuan 

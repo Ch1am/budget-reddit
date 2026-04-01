@@ -44,7 +44,16 @@ exports.showCollections = async (req, res) => {
   let msg = null;
 
   try {
-    const collectionList = await collectionModel.retrieveAll(req.session.user);
+    let collectionList = await collectionModel.retrieveAll(req.session.user);
+    if (collectionList && collectionList.length==0) {
+      defaultCollection = {
+        title : 'Favourite',
+        user: req.session.user,
+        posts: [],
+      }
+      result = await collectionModel.createCollection(defaultCollection)
+      collectionList = await collectionModel.retrieveAll(req.session.user)
+    }
     return res.render("collection/show-collection", { collectionList, msg });
   } catch (error) {
     console.error(error);
@@ -132,7 +141,16 @@ exports.showCollectionDetails = async (req, res) => {
 
   try {
     const post = await postModel.getPostById(postId);
-    const collectionList = await collectionModel.retrieveAll(req.session.user);
+    let collectionList = await collectionModel.retrieveAll(req.session.user);
+    if (collectionList && collectionList.length==0) {
+      defaultCollection = {
+        title : 'Favourite',
+        user: req.session.user,
+        posts: [],
+      }
+      result = await collectionModel.createCollection(defaultCollection)
+      collectionList = await collectionModel.retrieveAll(req.session.user)
+    }
     return res.render("collection/collection-selection", { collectionList, post });
   } catch (error) {
     console.error(error);

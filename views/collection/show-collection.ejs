@@ -8,10 +8,7 @@
 
 <body>
     <%- include('../partials/nav') %>
-    <% if (collectionList && collectionList.length==0) { %>
-        <p>No collection yet.</p>
-
-        <% } else { %>
+    
             <h1>Collection List</h1>
 
 
@@ -23,20 +20,20 @@
                     No posts added. <br><br>
                     
                     <%} else {%>
-                        <%collection.posts.slice(0, 4).forEach(post=> {%>
+                        <%collection.posts.slice(0, 3).forEach(post=> {%>
 
-                            Author: <%=post.author%> <br>
-                            Title: <%=post.title%> <br>
+                            <h3><%= post.title %></h1>
+			                <p>by u/<%= post.author || "Deleted-User" %></p>
                             Desc: 
                             <%let sentence = post.desc.split(' ')%>
                             <%if (sentence.length > 30) {%>
-                                <%= sentence.slice(0,31).join(' ') %>
+                                <%= sentence.slice(0,30).join(' ') %>
                                 ...
                                 <br><br>
                             <%} else {%>
                                 <%=post.desc%> <br><br>
                             <%}%>
-                            <a href="/post/<%= post._id %>">View Details</a><br><br>
+                            <!-- <a href="/post/<%= post._id %>">View Details</a><br><br> -->
 
 
 
@@ -57,7 +54,7 @@
                                             <%})%>
 
 
-                                                <% } %>
+                                                
 
                                                     <br><br>
                                                     <form action="/home/new-collection" method="get">

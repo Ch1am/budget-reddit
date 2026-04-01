@@ -14,23 +14,35 @@
         No post added.
     <%}  else {%>
         <%collection.posts.forEach (post => {%>
-            <!-- <a href="/post/<%= post._id %>">Author: <%=post.author%> <br></a> -->
-            Author: <%=post.author%><br>
-            Title: <%=post.title%> <br>
-            Desc:
-            <%let sentence = post.desc.split(' ')%>
-            <%if (sentence.length > 30) {%>
-                <%= sentence.slice(0,31).join(' ') %>
+            <!-- <a href="/post/<= post._id %>">Author: <=post.author%> <br></a> -->
+            <!-- Author: <=post.author%><br>
+            Title: <=post.title%> <br>
+            Desc: -->
+            <!-- <let sentence = post.desc.split(' ')%>
+            <if (sentence.length > 30) {%>
+                < sentence.slice(0,30).join(' ') %>
                 ...
                 <br><br>
-            <%} else {%>
-                <%=post.desc%> <br><br>
-            <%}%>
-            Post ID: <%= post._id %><br>
+            <} else {%>
+                <=post.desc%> <br><br>
+            <}%>
+            Post ID: <= post._id %><br> -->
+            <h3><%= post.title %></h1>
+			<p>by u/<%= post.author || "Deleted-User" %></p>
+			<% if (post.image) { %>
+			<img src="<%= post.image %>" alt="<%= post.title %>" class="post-image">
+			<% } %>
+
+			<!-- how to use the ID -->
+			<!-- <p>Post ID: <%= post._id %></p> -->
+			<table border="1" style="width:600px; height:150px;">
+				<tr><td style="vertical-align:top;"><%= post.desc %></td></tr>
+			</table>
+
             <a href="/post/<%= post._id %>">View Details</a><br><br>
             <form action="/home/collection/<%= collection.title %>/remove-post" method="post">
                 <input type="hidden" name="postId" value="<%= post._id %>">
-                <button type = "submit" onclick="return confirm('Remove this post from the collection?')">Delete Post</button>
+                <button type = "submit" onclick="return confirm('Remove this post from the collection?')">Remove Post</button>
             </form>
             <br>
             <hr>

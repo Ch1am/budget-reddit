@@ -5,7 +5,11 @@
     <label for="comment-image" class="btn-icon" title="Attach image">
       <img src="/icons/image.svg" alt="Add image" width="20" height="20" />
         <label>Image URL</label><br>
-        <input type="text" name="image" placeholder="https://..."><br><br>
+        <input type="text" name="image" id="comment-image" placeholder="https://...">
+        <% if (commentImageInvalid) { %>
+          <div class="comment-image-url-error" role="alert" style="color:#b00020;font-size:0.875rem;margin-top:0.25rem;">invalid url</div>
+        <% } %>
+        <br><br>
     </label>
 
     <div class="comment-form-right">

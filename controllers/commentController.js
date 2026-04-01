@@ -1,5 +1,6 @@
 const Comment = require("../models/commentModel");
 const User = require("../models/registerModel");
+const validateImageUrl = require("../functions/validateImageUrl");
 
 // getCommentById populates authorId to { _id, name, ... } — compare real ids, not authorId.toString()
 function getCommentAuthorIdString(comment) {
@@ -31,6 +32,10 @@ exports.createComment = async (req, res) => {
         ? req.body.image.trim()
         : null;
     const hasImage = Boolean(image);
+
+    if (hasImage && !validateImageUrl(image)) {
+      return res.redirect(`/post/${postId}`);
+    }
 
     // stop comment that has no text and image
     if (!hasText && !hasImage) return res.redirect(`/post/${postId}`);

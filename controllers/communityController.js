@@ -312,8 +312,6 @@ exports.renderManageCommunity = async(req, res) => {
         console.error(err);
         return res.status(500).send("Something went wrong.");
     }
-
-    
 }
 
 exports.removeAdmin = async(req, res) => {
@@ -385,7 +383,8 @@ exports.removeAdmin = async(req, res) => {
             return res.send("An error has occured when trying to remove an admin, please try again later.")
         }
     } catch (e) {
-        console.error(e)
+        console.error(e);
+        return res.status(500).send("Something went wrong.");
     }
 
 }
@@ -452,6 +451,7 @@ exports.removeUser = async(req, res) => {
         }
     } catch (e) {
         console.error(e)
+        return res.status(500).send("Something went wrong.");
     }
 }
 
@@ -505,117 +505,40 @@ exports.addAdmin = async (req, res) => {
 }
 
 exports.deleteCommunityRenderConfirmation = async (req, res) => {
-    const communityID_params = req.params.communityID;
-    const communityID = req.body.communityID;
-    const userID = req.session.user;
+    try {
+        const communityID_params = req.params.communityID;
+        const communityID = req.body.communityID;
+        const userID = req.session.user;
 
-    if (communityID_params !== communityID) {
-        return res.send(`
-            Invalid community deletion. You will be redirected back to the community in 3 seconds...
-            <script>
-                setTimeout(() => {
-                    window.location.href = "/community/${communityID}"
-                }, 3000);
-            </script>
-        `)
-    }
-
-    const userAdmin = await Community.findAdminInCommunity(communityID, userID);
-    const community = await Community.findCommunityById(communityID);
-    const user = await User.findByUserID(userID);
-
-    if (!userAdmin) {
-        return res.send(`
-            You are not an administrator. Please ensure you have the correct credentials before initiating the deletion action. You will be redirected back to the community page in 3 seconds...
-            <script>
-                setTimeout(() => {
-                    window.location.href = "/community/${communityID}"
-                }, 3000);
-            </script>
-        `)
-    }
-
-    if (!community) {
-        return res.send(`
-            This community does not seem to exist. You will be redirected back to the community page in 3 seconds...
-            <script>
-                setTimeout(() => {
-                    window.location.href = "/community";
-                }, 3000);
-            </script>
-        `)
-    }
-
-    res.render("community/community-deleteConfirmation", {
-        community, 
-        user
-    })
-}
-
-exports.deleteCommunity = async(req, res) => {
-    const communityID_params = req.params.communityID;
-    const communityID = req.body.communityID;
-    const userID = req.session.user;
-    const action = req.body.confirmedDeletion;
-
-    if (communityID_params !== communityID) {
-        return res.send(`
-            Invalid community deletion. You will be redirected back to the community in 3 seconds...
-            <script>
-                setTimeout(() => {
-                    window.location.href = "/community/${communityID}"
-                }, 3000);
-            </script>
-        `)
-    }
-
-    const userAdmin = await Community.findAdminInCommunity(communityID, userID);
-    const community = await Community.findCommunityById(communityID);
-
-    if (!userAdmin) {
-        return res.send(`
-            You are not an administrator. Please ensure you have the correct credentials before initiating the deletion action. You will be redirected back to the community page in 3 seconds...
-            <script>
-                setTimeout(() => {
-                    window.location.href = "/community/${communityID}"
-                }, 3000);
-            </script>
-        `)
-    }
-
-    if (!community) {
-        return res.send(`
-            This community does not seem to exist. You will be redirected back to the community page in 3 seconds...
-            <script>
-                setTimeout(() => {
-                    window.location.href = "/community";
-                }, 3000);
-            </script>
-        `)
-    }
-
-    if (action === "CONFIRM deletion") {
-        const userRemoval = community.users
-        const usersideRemoval = await Promise.all(
-            userRemoval.map(async u => {
-                try {
-                    const r = await User.removeUserFromCommunityUserSide(communityID, u)
-                    console.log(r)
-                    if (!r) {
-                        throw new Error("A user has failed to be removed from the community. Please try again later...");
-                    }
-                    return r
-                } catch (e) {
-                    console.error(e)
-                }
-            })
-        )
-
-        const communitysideRemoval = await Community.deleteCommunityById(communityID);
-
-        if (usersideRemoval && communitysideRemoval) {
+        if (communityID_params !== communityID) {
             return res.send(`
-                The deletion of the community <strong>${community.name}</strong> has been completed! You will be redirected back to the community in 3 seconds...
+                Invalid community deletion. You will be redirected back to the community in 3 seconds...
+                <script>
+                    setTimeout(() => {
+                        window.location.href = "/community/${communityID}"
+                    }, 3000);
+                </script>
+            `)
+        }
+
+        const userAdmin = await Community.findAdminInCommunity(communityID, userID);
+        const community = await Community.findCommunityById(communityID);
+        const user = await User.findByUserID(userID);
+
+        if (!userAdmin) {
+            return res.send(`
+                You are not an administrator. Please ensure you have the correct credentials before initiating the deletion action. You will be redirected back to the community page in 3 seconds...
+                <script>
+                    setTimeout(() => {
+                        window.location.href = "/community/${communityID}"
+                    }, 3000);
+                </script>
+            `)
+        }
+
+        if (!community) {
+            return res.send(`
+                This community does not seem to exist. You will be redirected back to the community page in 3 seconds...
                 <script>
                     setTimeout(() => {
                         window.location.href = "/community";
@@ -623,151 +546,248 @@ exports.deleteCommunity = async(req, res) => {
                 </script>
             `)
         }
-    } else {
-        return res.send(`
-            The deletion of the community has been cancelled. You will be redirected back to the community in 3 seconds...
-            <script>
-                setTimeout(() => {
-                    window.location.href = "/community/${community._id}";
-                }, 3000);
-            </script>
-        `)
+
+        res.render("community/community-deleteConfirmation", {
+            community, 
+            user
+        })
+    } catch (e) {
+        console.error(e)
+        return res.status(500).send("Something went wrong.");
+    }
+}
+
+exports.deleteCommunity = async(req, res) => {
+    try {
+        const communityID_params = req.params.communityID;
+        const communityID = req.body.communityID;
+        const userID = req.session.user;
+        const action = req.body.confirmedDeletion;
+
+        if (communityID_params !== communityID) {
+            return res.send(`
+                Invalid community deletion. You will be redirected back to the community in 3 seconds...
+                <script>
+                    setTimeout(() => {
+                        window.location.href = "/community/${communityID}"
+                    }, 3000);
+                </script>
+            `)
+        }
+
+        const userAdmin = await Community.findAdminInCommunity(communityID, userID);
+        const community = await Community.findCommunityById(communityID);
+
+        if (!userAdmin) {
+            return res.send(`
+                You are not an administrator. Please ensure you have the correct credentials before initiating the deletion action. You will be redirected back to the community page in 3 seconds...
+                <script>
+                    setTimeout(() => {
+                        window.location.href = "/community/${communityID}"
+                    }, 3000);
+                </script>
+            `)
+        }
+
+        if (!community) {
+            return res.send(`
+                This community does not seem to exist. You will be redirected back to the community page in 3 seconds...
+                <script>
+                    setTimeout(() => {
+                        window.location.href = "/community";
+                    }, 3000);
+                </script>
+            `)
+        }
+
+        if (action === "CONFIRM deletion") {
+            const userRemoval = community.users
+            const usersideRemoval = await Promise.all(
+                userRemoval.map(async u => {
+                    try {
+                        const r = await User.removeUserFromCommunityUserSide(communityID, u)
+                        console.log(r)
+                        if (!r) {
+                            throw new Error("A user has failed to be removed from the community. Please try again later...");
+                        }
+                        return r
+                    } catch (e) {
+                        console.error(e)
+                    }
+                })
+            )
+
+            const communitysideRemoval = await Community.deleteCommunityById(communityID);
+
+            if (usersideRemoval && communitysideRemoval) {
+                return res.send(`
+                    The deletion of the community <strong>${community.name}</strong> has been completed! You will be redirected back to the community in 3 seconds...
+                    <script>
+                        setTimeout(() => {
+                            window.location.href = "/community";
+                        }, 3000);
+                    </script>
+                `)
+            }
+        } else {
+            return res.send(`
+                The deletion of the community has been cancelled. You will be redirected back to the community in 3 seconds...
+                <script>
+                    setTimeout(() => {
+                        window.location.href = "/community/${community._id}";
+                    }, 3000);
+                </script>
+            `)
+        }
+    } catch (e) {
+        console.error(e)
+        return res.status(500).send("Something went wrong.");
     }
 }
 
 
 exports.deletePost = async(req, res) => {
-    const communityID = req.params.communityID;
-    const userID = req.session.user;
-    const postID = req.body.postID;
+    try {
+        const communityID = req.params.communityID;
+        const userID = req.session.user;
+        const postID = req.body.postID;
 
-    const community = await Community.findCommunityById(communityID);
-    const post = await Post.getPostById(postID);
+        const community = await Community.findCommunityById(communityID);
+        const post = await Post.getPostById(postID);
 
-    const userAdmin = await Community.findAdminInCommunity(communityID, userID);
-    
-    if (!userAdmin) {
-        return res.send(`
-            You are not an administrator. Please ensure you have the correct credentials before initiating the deletion action. You will be redirected back to the community page in 3 seconds...
-            <script>
-                setTimeout(() => {
-                    window.location.href = "/community/${communityID}"
-                }, 3000);
-            </script>
-        `)
-    }
-
-    if (!community) {
-        return res.send(`
-            This community does not seem to exist. You will be redirected back to the community page in 3 seconds...
-            <script>
-                setTimeout(() => {
-                    window.location.href = "/community";
-                }, 3000);
-            </script>
-        `)
-    }
-
-    if (!post) {
-        return res.send(`
-            This post with ID ${postID} does not seem to exist. You will be redirected back to the community page in 3 seconds...
-            <script>
-                setTimeout(() => {
-                    window.location.href = "/community";
-                }, 3000);
-            </script>
-        `)
-    }
-
-    const resultCommunitySide = await Community.deletePostFromCommunity(communityID, post._id);
-    // Cascade delete all comments under this post.
-    await Comment.deleteCommentsByPostId(post._id);
-    const resultServerSide = await Post.deletePost(post._id);
-
-    if (resultCommunitySide && resultServerSide) {
-        return res.send(`
-            This post with ID ${postID} has been deleted. You will be redirected back to the community page in 3 seconds...
-            <script>
-                setTimeout(() => {
-                    window.location.href = "/community/${communityID}";
-                }, 3000);
-            </script>
-        `)
-    } else {
-        return res.send("An error has occured when trying to make a user an administrator, please try again later.")
-    }
-}
-
-exports.saveChanges = async(req, res) => {
-    const userID = req.session.user
-    const communityID = req.body.communityID
-    const community = await Community.findCommunityById(communityID);
-    const communityName = req.body.comName || null
-    const communityDescription = req.body.comDesc || null
-    const communityExistence = await Community.findCommunityByName(communityName)
-    
-    const errors = []
-
-    if (!communityName || communityName.length == 0) {
-        errors.push("Community name cannot be empty")
-    } else if (communityName.length > 100) {
-        errors.push("Community name length cannot exceed <strong>100 characters</strong>")
-    }
-
-    if (!communityDescription || communityDescription.length == 0) {
-        errors.push("Community description cannot be empty")
-    } else if (communityDescription.length > 800) {
-        errors.push("Community description length cannot exceed <strong>800 characters</strong>")
-    }
-
-    if (community.name == communityName && community.description == communityDescription ) {
-        return res.send(`
-            There are no changes to the name or description. No changes saved.
-            <br>
-            <a href="/community/${communityID}/manage">Go back</a>
-        `)
-    } else if ((communityDescription == community.description) && communityExistence) {
-        errors.push(`The community name ${communityName} is already taken. Please select another one`)
-    }
-
-    let html = []
-    errors.forEach(e => {
-        html.push(`
-            <li>${e}</li>    
-        `)
-    })
-
-    if (errors.length > 0) {
-        res.send(`
-            The following errors have occured:
-            <ul>
-                ${html.join()}
-            <ul>
-            <br>
-            <a href="/community/${communityID}/manage">Go back</a>
-        `)
-    } else {
-        const nameChange = community.name == communityName ? "No changes" : await Community.editCommunityName(communityID, userID, communityName);
-        const descChange = community.description == communityDescription ? "No changes" : await Community.editCommunityDescription(communityID, userID, communityDescription);
-
-        console.log(nameChange, descChange)
-        if ((nameChange || nameChange == "No changes") && (descChange || descChange == "No changes")) {
+        const userAdmin = await Community.findAdminInCommunity(communityID, userID);
+        
+        if (!userAdmin) {
             return res.send(`
-                The following changes have been made. 
-                <ul>
-                    <li>Community name changed: ${nameChange == "No changes" ? "<strong>No changes</strong>" : nameChange.name}</li>
-                    <li>Community description changed: ${descChange == "No changes" ? "<strong>No changes</strong>" : descChange.description}</li>
-                </ul>
-
-                You will be redirected back to the community management page in 3 seconds...
+                You are not an administrator. Please ensure you have the correct credentials before initiating the deletion action. You will be redirected back to the community page in 3 seconds...
                 <script>
                     setTimeout(() => {
-                        window.location.href = "/community/${communityID}/manage";
+                        window.location.href = "/community/${communityID}"
+                    }, 3000);
+                </script>
+            `)
+        }
+
+        if (!community) {
+            return res.send(`
+                This community does not seem to exist. You will be redirected back to the community page in 3 seconds...
+                <script>
+                    setTimeout(() => {
+                        window.location.href = "/community";
+                    }, 3000);
+                </script>
+            `)
+        }
+
+        if (!post) {
+            return res.send(`
+                This post with ID ${postID} does not seem to exist. You will be redirected back to the community page in 3 seconds...
+                <script>
+                    setTimeout(() => {
+                        window.location.href = "/community";
+                    }, 3000);
+                </script>
+            `)
+        }
+
+        const resultCommunitySide = await Community.deletePostFromCommunity(communityID, post._id);
+        // Cascade delete all comments under this post.
+        await Comment.deleteCommentsByPostId(post._id);
+        const resultServerSide = await Post.deletePost(post._id);
+
+        if (resultCommunitySide && resultServerSide) {
+            return res.send(`
+                This post with ID ${postID} has been deleted. You will be redirected back to the community page in 3 seconds...
+                <script>
+                    setTimeout(() => {
+                        window.location.href = "/community/${communityID}";
                     }, 3000);
                 </script>
             `)
         } else {
-            res.send("An error has occured when saving changes to community name and description")
+            return res.send("An error has occured when trying to make a user an administrator, please try again later.")
         }
+    } catch (e) {
+        console.error(e)
+        return res.status(500).send("Something went wrong.");
+    }
+}
+
+exports.saveChanges = async(req, res) => {
+    try {
+        const userID = req.session.user
+        const communityID = req.body.communityID
+        const community = await Community.findCommunityById(communityID);
+        const communityName = req.body.comName || null
+        const communityDescription = req.body.comDesc || null
+        const communityExistence = await Community.findCommunityByName(communityName)
+        
+        const errors = []
+
+        if (!communityName || communityName.length == 0) {
+            errors.push("Community name cannot be empty")
+        } else if (communityName.length > 100) {
+            errors.push("Community name length cannot exceed <strong>100 characters</strong>")
+        }
+
+        if (!communityDescription || communityDescription.length == 0) {
+            errors.push("Community description cannot be empty")
+        } else if (communityDescription.length > 800) {
+            errors.push("Community description length cannot exceed <strong>800 characters</strong>")
+        }
+
+        if (community.name == communityName && community.description == communityDescription ) {
+            return res.send(`
+                There are no changes to the name or description. No changes saved.
+                <br>
+                <a href="/community/${communityID}/manage">Go back</a>
+            `)
+        } else if ((communityDescription == community.description) && communityExistence) {
+            errors.push(`The community name ${communityName} is already taken. Please select another one`)
+        }
+
+        let html = []
+        errors.forEach(e => {
+            html.push(`
+                <li>${e}</li>    
+            `)
+        })
+
+        if (errors.length > 0) {
+            res.send(`
+                The following errors have occured:
+                <ul>
+                    ${html.join()}
+                <ul>
+                <br>
+                <a href="/community/${communityID}/manage">Go back</a>
+            `)
+        } else {
+            const nameChange = community.name == communityName ? "No changes" : await Community.editCommunityName(communityID, userID, communityName);
+            const descChange = community.description == communityDescription ? "No changes" : await Community.editCommunityDescription(communityID, userID, communityDescription);
+
+            console.log(nameChange, descChange)
+            if ((nameChange || nameChange == "No changes") && (descChange || descChange == "No changes")) {
+                return res.send(`
+                    The following changes have been made. 
+                    <ul>
+                        <li>Community name changed: ${nameChange == "No changes" ? "<strong>No changes</strong>" : nameChange.name}</li>
+                        <li>Community description changed: ${descChange == "No changes" ? "<strong>No changes</strong>" : descChange.description}</li>
+                    </ul>
+
+                    You will be redirected back to the community management page in 3 seconds...
+                    <script>
+                        setTimeout(() => {
+                            window.location.href = "/community/${communityID}/manage";
+                        }, 3000);
+                    </script>
+                `)
+            } else {
+                res.send("An error has occured when saving changes to community name and description")
+            }
+        }
+    } catch (e) {
+        console.error(e)
+        return res.status(500).send("Something went wrong.");
     }
 }

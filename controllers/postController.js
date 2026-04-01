@@ -1,6 +1,6 @@
 const Post = require('../models/postModel')
 const timeAgo = require("../functions/timeAgo")
-const validateImageUrl = require("../functions/validateImageUrl")
+const { validateImageUrl } = require("../functions/validateImageUrl")
 const User = require("./../models/registerModel")
 const Community = require("./../models/communityModel")
 const Comment = require("../models/commentModel");
@@ -219,7 +219,7 @@ exports.editPost = async (req, res) => {
 		if (
 			typeof image === "string" &&
 			image.trim() &&
-			!hasAllowedImageExtension(image.trim())
+			!validateImageUrl(image.trim())
 		) {
 			return res.redirect(
 				`/post/${req.params.id}/edit?error=Image URL must include .png, .jpg, .jpeg, .gif, or .webp`,

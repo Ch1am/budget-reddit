@@ -115,7 +115,7 @@ exports.register = async (req, res) => {
                 res.send("There was an error when creating your account.")
             } else {
                 res.send(`
-                    Your account has been created. Welcome to memeit, ${result.name}!<br><br>
+                    Your account has been created. Welcome to MemeIt, ${result.name}!<br><br>
                     You will be redirected to the login page in 3 seconds...
                     <script>
                         setTimeout(() => {

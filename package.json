@@ -15,7 +15,6 @@
   "type": "commonjs",
   "main": "server.js",
   "scripts": {
-    "test": "npm run dev",
     "dev": "nodemon server.js",
     "start": "node server.js"
   },

@@ -18,7 +18,7 @@ exports.renderSettingsPage = async(req, res) => {
 exports.changeUsername = async(req, res) => {
     const session = req.session.user
     const user = await User.findByUserID(session);
-    const newUsername = req.body.newUsername
+    const newUsername = req.body.newUsername.trim();
     const errors = []
     const usernameTaken = await User.findByUsername(newUsername);
 

@@ -23,6 +23,7 @@ exports.getSinglePost = async (req, res) => {
 		// get the current logged in user and check if they are an admin
 		const currentUser = await User.findByUserID(sessionUserId);
 		const isAdmin = currentUser?.type === "admin";
+		const commentImageInvalid = req.query.invalidImage === "1";
 
 		// if post dont exist still provide fields that can be used
 		if (!postDoc) {
@@ -35,6 +36,7 @@ exports.getSinglePost = async (req, res) => {
 				sessionUserId,
 				isAdmin,
 				editCommentId,
+				commentImageInvalid,
 			});
 		}
 		const post = postDoc.toObject();
@@ -93,6 +95,7 @@ exports.getSinglePost = async (req, res) => {
 			sessionUserId,
 			isAdmin,
 			editCommentId,
+			commentImageInvalid,
 		});
 	} catch (error) {
 		console.error(error);

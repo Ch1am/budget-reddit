@@ -56,7 +56,7 @@
 
 		<!-- Comments + comment form -->
 		<div id="comments">
-			<%- include('../partials/comment-create', { postId: post._id }) %>
+			<%- include('../partials/comment-create', { postId: post._id, commentImageInvalid }) %>
 			<hr>
 			<%- include('../partials/comment', { comments, postId: post._id, sessionUserId, isAdmin, editCommentId }) %>
 		</div>

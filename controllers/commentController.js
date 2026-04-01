@@ -34,7 +34,7 @@ exports.createComment = async (req, res) => {
     const hasImage = Boolean(image);
 
     if (hasImage && !validateImageUrl(image)) {
-      return res.redirect(`/post/${postId}`);
+      return res.redirect(`/post/${postId}?invalidImage=1`);
     }
 
     // stop comment that has no text and image

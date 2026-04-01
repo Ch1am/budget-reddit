@@ -1,6 +1,6 @@
 const Comment = require("../models/commentModel");
 const User = require("../models/registerModel");
-const validateImageUrl = require("../functions/validateImageUrl");
+const { validateImageUrl } = require("../functions/validateImageUrl");
 
 // getCommentById populates authorId to { _id, name, ... } — compare real ids, not authorId.toString()
 function getCommentAuthorIdString(comment) {

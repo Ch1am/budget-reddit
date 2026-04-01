@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title><%= post.title %></title>
+	</head>
+
+	<body>
+			<%- include('../partials/nav') %>
+		<% if (!post || post.length===0) { %>
+			<h1>POST does not exist</h1>
+		<% } else { %>
+			<h1><%= post.title %></h1>
+			<p>by u/<%= post.displayAuthor || "Deleted-User" %></p>
+			<% if (post.image) { %>
+			<img src="<%= post.image %>" alt="<%= post.title %>" class="post-image">
+			<% } %>
+
+			<!-- Use the ID -->
+			<p>Post ID: <%= post._id %></p>
+
+			<% if (!collectionList) {%>
+				<form action="/post/<%= post._id %>/add-to-collection" method="get">
+					<button type="submit">Add to Collection</button>
+				</form>
+			<% } else { %>
+				<% let isSaved = false %>
+				<% let collectionSavedTo = null %>
+				<% collectionList.forEach(collection => { %>
+					<% collection.posts.forEach (savedPost => {%>
+						<%if (savedPost._id.toString()===post._id.toString()) {%>
+							<%isSaved = true%>
+							<%collectionSavedTo = collection.title%>
+						<%}%>
+					<%})%>
+				<%})%>
+
+				<% if (isSaved == false) { %>
+					<form action="/post/<%= post._id %>/add-to-collection" method="get">
+						<button type="submit">Add to Collection</button>
+					</form>
+				<%} else {%>
+					Post saved to collection: <%=collectionSavedTo%>
+				<%}%>
+			<%}%>
+		<% } %>
+
+		<% if (locals.currentUser && (currentUser.type === 'admin' || (post.authorId && sessionUserId.toString() === post.authorId.toString()))) { %>
+			<a href="/post/<%= post._id %>/edit">Edit</a>
+			<form action="/post/<%= post._id %>/delete" method="POST" style="display:inline">
+				<button type="submit">Delete</button>
+			</form>
+		<% } %>
+
+		<!-- Comments + comment form -->
+		<div id="comments">
+			<%- include('../partials/comment-create', { postId: post._id }) %>
+			<hr>
+			<%- include('../partials/comment', { comments, postId: post._id, sessionUserId, isAdmin, editCommentId }) %>
+		</div>
+		<%- include('../partials/footer') %>
+	</body>
+</html>

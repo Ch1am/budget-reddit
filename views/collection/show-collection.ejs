@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Show Collection</title>
+</head>
+
+<body>
+    <%- include('../partials/nav') %>
+    <% if (collectionList && collectionList.length==0) { %>
+        <p>No collection yet.</p>
+
+        <% } else { %>
+            <h1>Collection List</h1>
+
+
+            <% collectionList.forEach(collection=> { %>
+
+                <h2><strong><a href="/home/collection/<%=collection.title%>"><%= collection.title %></a></strong></h2>
+                </p>
+                <%if (collection.posts.length==0 ) {%>
+                    No posts added. <br><br>
+                    
+                    <%} else {%>
+                        <%collection.posts.slice(0, 4).forEach(post=> {%>
+
+                            Author: <%=post.author%> <br>
+                            Title: <%=post.title%> <br>
+                            Desc: <%=post.desc%> <br>
+                            <a href="/post/<%= post._id %>">View Details</a><br><br>
+
+
+
+                                    <%})%>
+                                        <!-- <a href="/home/collection/<%= collection._id %>/rename">Rename Collection</a><br><br> -->
+                                        
+                                        <%}%>
+                                        <form action="/home/collection/<%= collection._id %>/rename" method="get" style="display: inline;">
+                                        <button type="submit">Rename Collection</button>
+                                        </form> &nbsp&nbsp                                     
+                                        <form action="/home/delete-collection" method="post" style="display: inline;">
+                                            <input type="hidden" name="collectionId" value="<%= collection._id %>">
+                                            <button type="submit"
+                                                onclick="return confirm('Delete this collection?')">Delete Collection</button>
+                                        </form>
+                                        <hr>
+
+                                            <%})%>
+
+
+                                                <% } %>
+
+                                                    <br><br>
+                                                    <form action="/home/new-collection" method="get">
+                                                        <button type="submit">Create Collection</button>
+                                                    </form>
+                                                    <br><br>
+                                                    <form action="/" method="get">
+                                                        <button type="submit">Home</button>
+                                                    </form>
+                                                    <br><br>
+                                                    <%if (msg) {%>
+                                                        <p>
+                                                            <%= msg %>
+                                                        </p>
+                                                        <%}%>
+
+    <%- include('../partials/footer') %>
+</body>
+
+</html>

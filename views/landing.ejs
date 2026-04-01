@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>MemeIt</title>
+		<!-- <link rel="stylesheet" href="/css/landing.css"> -->
+
+		<%- include('partials/nav') %>
+	</head>
+
+	<body>
+		<section class="hero">
+			<h1>Welcome to MemeIt</h1>
+			<p>A place where you can share memes without thinking about the consequences! Post, vote, comment and share your thoughts like there's no tomorrow</p>
+		</section>
+		<section class="posts">
+			<h2>Top Posts</h2>
+			<%- include('partials/post') %>
+		</section>
+		<%- include('partials/footer') %>
+	</body>
+	
+</html>

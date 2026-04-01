@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset = "UTF-8">
+        <title>Rename Collection</title>
+    </head>
+    <body>
+       <%- include('../partials/nav') %>
+       <h2>Rename "<%= collection.title %>"</h2>
+       <form action = "/home/rename-collection" method = "post">
+            <input type="hidden" name="collectionId" value="<%= collection._id %>">
+            <input type = "text" name = "newTitle" required><br><br>
+            <button type = "submit">Submit</button>
+       </form>
+       <br>
+       <a href="/home/my-collection">Cancel</a>
+       <%- include('../partials/footer') %>
+    </body>
+</html>
+
+

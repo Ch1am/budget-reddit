@@ -5,18 +5,10 @@ const middleware = require("../middleware/auth");
 const commentAuth = require('../middleware/commentAuth');
 
 // POST create new comment
-router.post(
-  "/post/:postId/comment",
-  middleware.isLoggedIn,
-  commentController.createComment,
-);
+router.post("/post/:postId/comment", middleware.isLoggedIn, commentController.createComment);
 
 // POST to update comment
-router.post(
-  "/comment/:id/edit",
-  middleware.isLoggedIn, commentAuth.isCommentOwnerOrAdmin,
-  commentController.editComment,
-);
+router.post("/comment/:id/edit", middleware.isLoggedIn, commentAuth.isCommentOwnerOrAdmin, commentController.editComment);
 
 // POST to handle delete
 router.post("/comment/:id/delete", middleware.isLoggedIn, commentAuth.isCommentOwnerOrAdmin, commentController.deleteComment);

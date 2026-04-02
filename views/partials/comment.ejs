@@ -7,7 +7,7 @@
   <% const isEditing = editCommentId && isOwner && editCommentId.toString() === comment._id.toString() %>
 
       <% if (isEditing) { %>
-        <%- include('./comment-edit', { comment, postId, timeAgo }) %>
+        <%- include('./comment-edit', { comment, postId, timeAgo, commentEditImageInvalid }) %>
           <% } else { %>
             <article class="comment-card" id="comment-<%= comment._id %>">
               <!--- Username and time created -->
@@ -31,7 +31,7 @@
 
               <!-- comment image -->
                 <% if (comment.image) { %>
-                  <img src="<%= comment.image %>" alt="Comment image" class="comment-image" style="max-width: 80%; height: auto;">
+                  <img src="<%= comment.image %>" alt="Comment image" class="comment-image" style="max-width: 50%; height: auto;">
                 <% } %>
                   <!-- comment text -->
                   <p class="post-snippet">

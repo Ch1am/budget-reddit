@@ -24,6 +24,7 @@ exports.getSinglePost = async (req, res) => {
 		const currentUser = await User.findByUserID(sessionUserId);
 		const isAdmin = currentUser?.type === "admin";
 		const commentImageInvalid = req.query.invalidImage === "1";
+		const commentEditImageInvalid = req.query.invalidCommentImage === "1";
 
 		// if post dont exist still provide fields that can be used
 		if (!postDoc) {
@@ -37,6 +38,7 @@ exports.getSinglePost = async (req, res) => {
 				isAdmin,
 				editCommentId,
 				commentImageInvalid,
+				commentEditImageInvalid,
 			});
 		}
 		const post = postDoc.toObject();
@@ -96,6 +98,7 @@ exports.getSinglePost = async (req, res) => {
 			isAdmin,
 			editCommentId,
 			commentImageInvalid,
+			commentEditImageInvalid,
 		});
 	} catch (error) {
 		console.error(error);

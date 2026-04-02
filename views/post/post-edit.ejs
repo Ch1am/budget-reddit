@@ -14,7 +14,7 @@
     <input type="text" name="title" value="<%= post.title %>" required><br><br>
 
     <label>Image URL:</label><br>
-		<input type="text" name="image" value="<%= post.image || '' %>"><br><br>
+		<input type="url" name="image" value="<%= post.image || '' %>" placeholder="https://example.com/image.png"><br><br>
 
     <label>Community:</label><br>
     <b><%= post.community?.name || 'None' %>  </b><br><br>

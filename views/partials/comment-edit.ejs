@@ -14,9 +14,9 @@
 
   </div>
 
-      <% if (comment.image) { %>
-        <img src="<%= comment.image %>" alt="Comment image" style="max-width: 50%; height: auto;">
-      <% } %>
+  <% if (comment.image) { %>
+    <img src="<%= comment.image %>" alt="Comment image" style="max-width: 50%; height: auto;">
+    <% } %>
 
       <form id="edit-comment-<%= comment._id %>" action="/comment/<%= comment._id %>/edit" method="POST"
         class="comment-edit-form">
@@ -26,13 +26,14 @@
         <div>
 
           <label for="comment-edit-image-<%= comment._id %>">Image URL</label><br>
-          <input id="comment-edit-image-<%= comment._id %>" type="url" name="image" value="<%= comment.image || '' %>" style="width: 400px;">
+          <input id="comment-edit-image-<%= comment._id %>" type="url" name="image" value="<%= comment.image || '' %>"
+            style="width: 400px;">
 
           <% if (commentEditImageInvalid) { %>
             <div class="comment-image-url-error" role="alert" style="color:#b00020;font-size:0.875rem;">
               invalid url
             </div>
-          <% } %>
+            <% } %>
         </div>
       </form>
 

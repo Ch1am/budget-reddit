@@ -1,122 +1,98 @@
 <table border="1">
-  <% if (posts.length == 0) { %>
-    No posts found <%= locals.query ? `found with the query "${query}"` : "" %>.
-    <br><br>
-  <% } %>
-  <% posts.forEach((post, index) => { %>
-    <% if (index !== 0) { %>
-      <tr>
-        <td colspan="2" style="text-align: center;">
-          <div style="width: 100%;">
-            <hr class="post-divider" />
-          </div>
-        </td>
-      </tr>
-    <% } %>
-
-    <tr>
-      <td colspan="2">
-        <article
-          id="post-<%= post._id %>"
-          onclick="window.location.href='/post/<%= post._id %>'"
-          class="post-card"
-        >
-          <!-- username + time created -->
-          <div class="post-meta">
-            <span>u/<%= post.displayAuthor || "Deleted-User" %></span>
-            &nbsp;&bull;&nbsp;
-            <time datetime="<%= post.createdAt %>">
-              <%= timeAgo(post.createdAt) %>
-            </time>
-            <% if (post.community && !inCommunity) { %>
-              &nbsp;&bull;&nbsp;
-              <span>
-                Found at <a href="/community/<%= post.community._id %>">r/<%= post.community.name %></a>
-              </span>
-            <% } %>
-          </div>
-
-          <!-- Title -->
-          <div class="post-content">
-            <a href="/post/<%= post._id %>" class="post-title"><%= post.title %></a>
-            <br /><br />
-
-            <% if (post.image) { %>
-              <img src="<%= post.image %>" alt="<%= post.title %>" class="post-image" style="max-width: 80%; height: auto;">
+  <% if (posts.length==0) { %>
+    No posts found <%= locals.query ? `found with the query "${query}" ` : "" %>.
+      <br><br>
+      <% } %>
+        <% posts.forEach((post, index)=> { %>
+          <% if (index !==0) { %>
+            <tr>
+              <td colspan="2" style="text-align: center;">
+                <div style="width: 100%;">
+                  <hr class="post-divider" />
+                </div>
+              </td>
+            </tr>
             <% } %>
 
-            <!-- Snippet -->
-            <p class="post-snippet">
-              <% const desc = (post.desc || "").toString(); %>
-              <%= desc.length > 150 ? desc.slice(0, 150) + "..." : desc %>
-              <% if (desc.length > 150) { %>
-                <a href="/post/<%= post._id %>" class="read-more">read more</a>
-              <% } %>
-            </p>
-          </div>
+              <tr>
+                <td colspan="2">
+                  <article id="post-<%= post._id %>" onclick="window.location.href='/post/<%= post._id %>'"
+                    class="post-card">
+                    <!-- username + time created -->
+                    <div class="post-meta">
+                      <span>u/<%= post.displayAuthor || "Deleted-User" %></span>
+                      &nbsp;&bull;&nbsp;
+                      <time datetime="<%= post.createdAt %>">
+                        <%= timeAgo(post.createdAt) %>
+                      </time>
+                      <% if (post.community && !inCommunity) { %>
+                        &nbsp;&bull;&nbsp;
+                        <span>
+                          Found at <a href="/community/<%= post.community._id %>">r/<%= post.community.name %></a>
+                        </span>
+                        <% } %>
+                    </div>
 
-          <!-- action row -->
-          <div
-            class="post-actions"
-            style="display: flex; align-items: center; justify-content: flex-start; gap: 12px;"
-          >
-            <div class="vote-pill" style="display: flex; align-items: center; gap: 10px;">
-              <!-- upvote -->
-              <form
-                action="/home/<%= post._id %>/upvote"
-                method="POST"
-                onclick="event.stopPropagation()"
-                onsubmit="this.querySelector('button').disabled=true"
-              >
-                <button
-                  type="submit"
-                  class="vote-up <%= post.userVote === 'upvote' ? 'selected' : '' %>"
-                >
-                  <img
-                    src="<%= post.userVote === 'upvote' ? '/icons/upvote_true.svg' : '/icons/vote_up_arrow.svg' %>"
-                    alt="upvote"
-                    width="20"
-                    height="20"
-                  />
-                </button>
-              </form>
+                    <!-- Title -->
+                    <div class="post-content">
+                      <a href="/post/<%= post._id %>" class="post-title">
+                        <%= post.title %>
+                      </a>
+                      <br /><br />
 
-              <!-- vote count -->
-              <span class="vote-count"><%= post.votes %></span>
+                      <% if (post.image) { %>
+                        <img src="<%= post.image %>" alt="<%= post.title %>" class="post-image"
+                          style="max-width: 80%; height: auto;">
+                        <% } %>
 
-              <!-- downvote -->
-              <form
-                action="/home/<%= post._id %>/downvote"
-                method="POST"
-                onclick="event.stopPropagation()"
-                onsubmit="this.querySelector('button').disabled=true"
-              >
-                <button
-                  type="submit"
-                  class="vote-down <%= post.userVote === 'downvote' ? 'selected' : '' %>"
-                >
-                  <img
-                    src="<%= post.userVote === 'downvote' ? '/icons/downvote_true.svg' : '/icons/vote_down_arrow.svg' %>"
-                    alt="downvote"
-                    width="20"
-                    height="20"
-                  />
-                </button>
-              </form>
+                          <!-- Snippet -->
+                          <p class="post-snippet">
+                            <% const desc=(post.desc || "" ).toString(); %>
+                              <%= desc.length> 150 ? desc.slice(0, 150) + "..." : desc %>
+                                <% if (desc.length> 150) { %>
+                                  <a href="/post/<%= post._id %>" class="read-more">read more</a>
+                                  <% } %>
+                          </p>
+                    </div>
 
-              <!-- comments count -->
-              <a
-                href="/post/<%= post._id %>#comments"
-                class="pill-btn"
-                onclick="event.stopPropagation()"
-              >
-                <img src="/icons/comment.svg" alt="comment" width="20" height="20" />
-                <%= post.commentCount %>
-              </a>
-            </div>
-          </div>
-        </article>
-      </td>
-    </tr>
-  <% }) %>
+                    <!-- action row -->
+                    <div class="post-actions"
+                      style="display: flex; align-items: center; justify-content: flex-start; gap: 12px;">
+                      <div class="vote-pill" style="display: flex; align-items: center; gap: 10px;">
+                        <!-- upvote -->
+                        <form action="/home/<%= post._id %>/upvote" method="POST" onclick="event.stopPropagation()"
+                          onsubmit="this.querySelector('button').disabled=true">
+                          <button type="submit" class="vote-up <%= post.userVote === 'upvote' ? 'selected' : '' %>">
+                            <img
+                              src="<%= post.userVote === 'upvote' ? '/icons/upvote_true.svg' : '/icons/vote_up_arrow.svg' %>"
+                              alt="upvote" width="20" height="20" />
+                          </button>
+                        </form>
+
+                        <!-- vote count -->
+                        <span class="vote-count">
+                          <%= post.votes %>
+                        </span>
+
+                        <!-- downvote -->
+                        <form action="/home/<%= post._id %>/downvote" method="POST" onclick="event.stopPropagation()"
+                          onsubmit="this.querySelector('button').disabled=true">
+                          <button type="submit" class="vote-down <%= post.userVote === 'downvote' ? 'selected' : '' %>">
+                            <img
+                              src="<%= post.userVote === 'downvote' ? '/icons/downvote_true.svg' : '/icons/vote_down_arrow.svg' %>"
+                              alt="downvote" width="20" height="20" />
+                          </button>
+                        </form>
+
+                        <!-- comments count -->
+                        <a href="/post/<%= post._id %>#comments" class="pill-btn" onclick="event.stopPropagation()">
+                          <img src="/icons/comment.svg" alt="comment" width="20" height="20" />
+                          <%= post.commentCount %>
+                        </a>
+                      </div>
+                    </div>
+                  </article>
+                </td>
+              </tr>
+              <% }) %>
 </table>

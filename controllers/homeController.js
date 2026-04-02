@@ -23,28 +23,41 @@ exports.displayAllPost = async (req, res) => {
 		}));
 
 		// Sort by net score (votes) descending; tie-break by newest first.
-		const sortedPosts = posts.slice().sort((a, b) => {
-			const voteDiff = (b.votes ?? 0) - (a.votes ?? 0);
-			if (voteDiff !== 0) return voteDiff;
-			return new Date(b.createdAt ?? 0) - new Date(a.createdAt ?? 0);
-		});
+		//use slice to create a new array to avoid mutating the original array
+		const sortedPosts = [...posts].sort((a, b) => {
+			const aVotes = a.votes || 0;
+			const bVotes = b.votes || 0;
+			if (aVotes !== bVotes) 
+				return bVotes - aVotes;
+
+			//use getTime to compare the time
+			const aTime = new Date(a.createdAt || 0).getTime();
+			const bTime = new Date(b.createdAt || 0).getTime();
+			return bTime - aTime;
+		  });
+
+		//get the session user id from the session
 		const sessionUserId = req.session?.user || null;
 
 		const postsWithVotes = sortedPosts.map((post) => {
-			const existingVote = sessionUserId
-				? (post.voters || []).find(
-						(voter) => voter.userId?.toString() === sessionUserId.toString(),
-					)
-				: null;
-			return {
-				...post,
-				displayAuthor:
-					(post.authorId && post.authorId.name) ||
-					"Deleted-User",
-				userVote: existingVote ? existingVote.voteType : null,
-				query,
-			};
-		});
+			const voters = post.voters || [];
+			let existingVote = null;
+
+			//find the vote of the session user if they have voted before
+			if (sessionUserId) {
+				existingVote = voters.find((v) => v.userId && v.userId.toString() === sessionUserId) || null;
+			}
+
+			//get the display author name
+			const displayAuthor =
+				post.authorId && post.authorId.name ? post.authorId.name : "Deleted-User";
+
+			//get the user vote if they have voted before
+			const userVote = existingVote ? existingVote.voteType : null;
+
+			//return the post with the display author name, user vote, and query
+			return { ...post, displayAuthor, userVote, query };
+			});
 
 		res.render("landing", {
 			posts: postsWithVotes,

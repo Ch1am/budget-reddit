@@ -21,7 +21,7 @@ const Comment = mongoose.model("Comment", commentSchema, "comment");
 
 //Function getAllcomment retrieves comments data based on the postId of the post
 exports.getCommentsByPost = async (postId) => {
-    return await Comment.find({ postId });
+    return await Comment.find({ postId }).populate("authorId", "name");
 };
 
 // function getCommentById retrieves comment id for editing and deleting

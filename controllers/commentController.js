@@ -33,7 +33,7 @@ exports.createComment = async (req, res) => {
         : null;
     const hasImage = Boolean(image);
 
-    if (hasImage && !validateImageUrl(image)) {
+    if (hasImage && !(await validateImageUrl(image))) {
       return res.redirect(`/post/${postId}?invalidImage=1`);
     }
 

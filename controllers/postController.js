@@ -154,7 +154,7 @@ exports.createPost = async (req, res) => {
 		}
 
 		const image = req.body.image ? req.body.image.trim() : null;
-		if (image && !validateImageUrl(image)) {
+		if (image && !(await validateImageUrl(image))) {
 			return res.redirect(
 				"/post/create?error=Image URL must include .png, .jpg, .jpeg, .gif, or .webp",
 			);
@@ -222,7 +222,7 @@ exports.editPost = async (req, res) => {
 		if (
 			typeof image === "string" &&
 			image.trim() &&
-			!validateImageUrl(image.trim())
+			!(await validateImageUrl(image.trim()))
 		) {
 			return res.redirect(
 				`/post/${req.params.id}/edit?error=Image URL must include .png, .jpg, .jpeg, .gif, or .webp`,

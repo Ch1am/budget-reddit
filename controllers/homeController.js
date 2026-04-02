@@ -1,19 +1,15 @@
 const postModel = require('../models/postModel');
 const timeAgo = require("../functions/timeAgo")
-const User = require("../models/registerModel")
 const mongoose = require('mongoose');
 const Community = require('../models/communityModel');
-const collectionController = require("./collectionController");
 
 //displayAllPost diplays everything from newest order in the array (added last in the array)
 exports.displayAllPost = async (req, res) => {
 	try {
-		const session = req.session
 		// user information
 		const query = req.query.query
 		let posts = []
 
-		console.log(query)
 		if (query && query.length > 0) {
 			posts = await postModel.getPostByGeneralSearch(query);
 			console.log(posts)
@@ -37,7 +33,6 @@ exports.displayAllPost = async (req, res) => {
 			return new Date(b.createdAt ?? 0) - new Date(a.createdAt ?? 0);
 		});
 		const sessionUserId = req.session?.user || null;
-		const currentUser = sessionUserId ? await User.findByUserID(sessionUserId) : null;
 
 		const postsWithVotes = sortedPosts.map((post) => {
 			//just to test if i up/downvote, whether the button will remain highlighted
@@ -84,21 +79,24 @@ exports.displayAllPost = async (req, res) => {
 	}
 }
 
+//func for upvote button
 exports.upvote = async (req, res) => {
 	const id = req.params.id;
 	const sessionUserId = req.session?.user;
 
 	try {
 		const post = await postModel.getPostById(id);
+
+		//check whether user voted before alr or not
 		const existingVote = (post.voters || []).find(
 		(v) => v.userId?.toString() === sessionUserId.toString(),
 		);
 
-		if (!existingVote) {
+		if (!existingVote) { //if never vote before, add a new upvote
 		await postModel.updateVote(id, sessionUserId, 'upvote', 1);
-		} else if (existingVote.voteType === 'upvote') {
+		} else if (existingVote.voteType === 'upvote') { //if voted before, remove their vote 
 		await postModel.updateVote(id, sessionUserId, null, -1);
-		} else {
+		} else {//voted for downvote before, then switch to upvote, so need +2.
 		await postModel.updateVote(id, sessionUserId, 'upvote', 2);
 		}
 	} catch (error) {
@@ -129,29 +127,3 @@ exports.downvote = async (req, res) => {
 	}
 	res.redirect(`/home#post-${id}`);
 };
-
-// Collection routes are now handled by `collectionController`.
-// These exports remain only as delegations for any old references.
-exports.showAddCollection = (req, res) =>
-	collectionController.showAddCollection(req, res);
-
-exports.addCollection = (req, res) =>
-	collectionController.addCollection(req, res);
-
-exports.showCollections = (req, res) =>
-	collectionController.showCollections(req, res);
-
-exports.displayPostInCollection = (req, res) =>
-	collectionController.displayPostInCollection(req, res);
-
-exports.renameCollection = (req, res) =>
-	collectionController.renameCollection(req, res);
-
-exports.deleteCollection = (req, res) =>
-	collectionController.deleteCollection(req, res);
-
-exports.removePostsFromCollection = (req, res) =>
-	collectionController.removePostsFromCollection(req, res);
-
-exports.showRenameCollection = (req, res) =>
-	collectionController.showRenameCollection(req, res);

@@ -111,7 +111,7 @@ exports.getUserPost = async (req, res) => {
 		// resolve display author for each post	
 		const postsWithAuthor = posts.map((post) => {
 			return {
-				...post.toObject(),
+				...post.toObject(), //converts the mongoose post to a js object 
 				displayAuthor: (post.authorId && post.authorId.name) || 'Deleted-User'
 			};
 		});
@@ -136,7 +136,7 @@ exports.getCreatePost = async (req, res) => {
 
 		res.render('post/post-create', {
 			user,
-			communities: com,
+			communities: com, //will render any communities the user has joined into the dropdown bar
 			error: req.query.error || null //handles any error queries which occur when creating the post
 		})
 	} catch (error) {
@@ -149,12 +149,13 @@ exports.createPost = async (req, res) => {
 	try {
 		const { title, community, desc } = req.body;
 
-		if (!title || !title.trim() || !desc || !desc.trim()) {
+		if (!title || !title.trim() || !desc || !desc.trim()) { //using trim() helps with whitespaces
 			return res.redirect('/post/create?error=Title and description are required');
 		}
 
 		const image = req.body.image ? req.body.image.trim() : null;
-		if (image && !(await validateImageUrl(image))) {
+
+		if (image && !(await validateImageUrl(image))) { 
 			return res.redirect(
 				"/post/create?error=Image URL must include .png, .jpg, .jpeg, .gif, or .webp",
 			);

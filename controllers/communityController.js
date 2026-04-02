@@ -26,8 +26,8 @@ exports.renderCreateCommunity = (req, res) => {
 
 exports.createCommunity = async (req, res) => {
     try {
-        const comName = req.body.communityName || null
-        const comDesc = req.body.communityDescription || null
+        const comName = req.body.communityName.trim() || null
+        const comDesc = req.body.communityDescription.trim() || null
         const communityExistence = await Community.findCommunityByName(comName)
         const errors = []
 
@@ -718,8 +718,8 @@ exports.saveChanges = async(req, res) => {
         const userID = req.session.user
         const communityID = req.body.communityID
         const community = await Community.findCommunityById(communityID);
-        const communityName = req.body.comName || null
-        const communityDescription = req.body.comDesc || null
+        const communityName = req.body.comName.trim() || null
+        const communityDescription = req.body.comDesc.trim() || null
         const communityExistence = await Community.findCommunityByName(communityName)
         
         const errors = []

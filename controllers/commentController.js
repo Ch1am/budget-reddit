@@ -57,20 +57,16 @@ exports.editComment = async (req, res) => {
   try {
     // `commentAuth.isCommentOwnerOrAdmin` middleware attaches the comment.
     const comment = req.comment || (await Comment.getCommentById(req.params.id));
-    if (!comment) 
+    if (!comment)
       return res.redirect("back");
 
     const { content } = req.body;
 
     const image =
-      typeof req.body.image === "string" && req.body.image.trim()
-        ? req.body.image.trim()
-        : null;
+      typeof req.body.image === "string" && req.body.image.trim() ? req.body.image.trim() : null;
 
     if (image && !(await validateImageUrl(image))) {
-      return res.redirect(
-        `/post/${comment.postId}?editCommentId=${comment._id.toString()}&invalidCommentImage=1`,
-      );
+      return res.redirect(`/post/${comment.postId}?editCommentId=${comment._id.toString()}&invalidCommentImage=1`);
     }
 
     await Comment.editComment(req.params.id, { content, image });
@@ -87,7 +83,7 @@ exports.deleteComment = async (req, res) => {
   try {
     // `commentAuth.isCommentOwnerOrAdmin` middleware attaches the comment.
     const comment = req.comment || (await Comment.getCommentById(req.params.id));
-    if (!comment) 
+    if (!comment)
       return res.redirect("back");
 
     await Comment.deleteComment(req.params.id, comment.postId);
@@ -125,7 +121,7 @@ exports.upvoteComment = async (req, res) => {
   } catch (error) {
     console.error(error);
   }
-  
+
   res.redirect(`/post/${comment.postId}`);
 };
 

@@ -11,7 +11,7 @@ const commentSchema = new mongoose.Schema({
     postId: { type: mongoose.Schema.Types.ObjectId, ref: "Post", required: true },
     authorId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     createdAt: { type: Date, default: Date.now },
-    image: {type: String, default:null},
+    image: { type: String, default: null },
     content: { type: String, default: "" },
     votes: { type: Number, default: 0 },
     voters: [voterSchema],
@@ -26,7 +26,7 @@ exports.getCommentsByPost = async (postId) => {
 
 // function getCommentById retrieves comment id for editing and deleting
 exports.getCommentById = async (id) => {
-  return await Comment.findById(id);
+    return await Comment.findById(id);
 };
 
 //function getCommentByAuthor retrieves all comments made by a specific user
@@ -40,25 +40,25 @@ exports.createComment = async (postId, commentData) => {
     await comment.save();
 
     // increase comment post for post when new comment is created
-    await Post.incrementCommentCount(postId,1);
+    await Post.incrementCommentCount(postId, 1);
 
     return comment;
 };
 
 // update vote counts and voters list
 exports.updateCommentVote = async (id, userId, voteType, voteChange) => {
-	// Atomically remove existing vote and update count
-	await Comment.findByIdAndUpdate(id, {
-		$pull: { voters: { userId } }, // remove existing vote if any
-		$inc: { votes: voteChange },
-	});
+    // Atomically remove existing vote and update count
+    await Comment.findByIdAndUpdate(id, {
+        $pull: { voters: { userId } }, // remove existing vote if any
+        $inc: { votes: voteChange },
+    });
 
-	// Atomically add new vote if not removing
-	if (voteType !== null) {
-		await Comment.findByIdAndUpdate(id, {
-			$push: { voters: { userId, voteType } },
-		});
-	}
+    // Atomically add new vote if not removing
+    if (voteType !== null) {
+        await Comment.findByIdAndUpdate(id, {
+            $push: { voters: { userId, voteType } },
+        });
+    }
 };
 
 //editing logged in user post

@@ -10,15 +10,13 @@ const voterSchema = new mongoose.Schema(
 );
 
 // Embedded post snapshot used inside a Collection document
+// old postSchema should delete
 const postSchema = new mongoose.Schema(
   {
     author: { type: String, required: true, default: "guest" },
     title: { type: String, required: true },
     desc: { type: String, required: true },
-    image: {
-      data: { type: Buffer, default: null },
-      contentType: { type: String, default: null },
-    },
+    image: {type: String, default: null},
     community: { type: mongoose.Schema.Types.ObjectId, ref: "Community", default: null },
     votes: { type: Number, default: 0 },
     voters: [voterSchema],

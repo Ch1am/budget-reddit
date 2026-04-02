@@ -21,7 +21,10 @@ exports.addCollection = async (req, res) => {
   let result = null;
   let msg = null;
 
-  if (!title) return res.redirect("/home/new-collection");
+  if (!title || title.trim().length == 0) {
+    msg = 'Please enter a valid title'
+    return res.render("collection/create-collection", { msg });
+  }
 
   const newCollection = {
     title,
@@ -45,15 +48,15 @@ exports.showCollections = async (req, res) => {
 
   try {
     let collectionList = await collectionModel.retrieveAll(req.session.user);
-    if (collectionList && collectionList.length==0) {
-      defaultCollection = {
-        title : 'Favourite',
-        user: req.session.user,
-        posts: [],
-      }
-      result = await collectionModel.createCollection(defaultCollection)
-      collectionList = await collectionModel.retrieveAll(req.session.user)
-    }
+    // if (collectionList && collectionList.length==0) {
+    //   let defaultCollection = {
+    //     title : 'Favourite',
+    //     user: req.session.user,
+    //     posts: [],
+    //   }
+    //   let result = await collectionModel.createCollection(defaultCollection)
+    //   collectionList = await collectionModel.retrieveAll(req.session.user)
+    // }
     return res.render("collection/show-collection", { collectionList, msg });
   } catch (error) {
     console.error(error);
@@ -72,7 +75,24 @@ exports.displayPostInCollection = async (req, res) => {
       collectionTitle,
       req.session.user,
     );
+    if (!collection) {
+      console.log("Collection not found",collectionTitle);
+      
+      return res.redirect('/home/my-collection');
+    }
     return res.render("collection/indivCollection", { collection });
+  } catch (error) {
+    console.error(error);
+    return res.send("Error reading collection");
+  }
+};
+
+// GET /home/collection/:id/rename
+exports.showRenameCollection = async (req, res) => {
+  let msg = null
+  try {
+    const collection = await collectionModel.getCollectionById(req.params.id);
+    return res.render("collection/rename-collection", { collection,msg });
   } catch (error) {
     console.error(error);
     return res.send("Error reading collection");
@@ -82,7 +102,14 @@ exports.displayPostInCollection = async (req, res) => {
 // POST /home/rename-collection
 exports.renameCollection = async (req, res) => {
   const collectionId = req.body.collectionId;
-  const newTitle = req.body.newTitle;
+  const newTitle = req.body.newTitle.trim();
+  let msg = null
+
+  if ( !newTitle || newTitle.length == 0) {
+    msg = 'Please enter a valid title'
+    const collection = await collectionModel.getCollectionById(collectionId);
+    return res.render("collection/rename-collection", { collection,msg });
+  }
 
   try {
     await collectionModel.renameCollection(collectionId, newTitle);
@@ -124,16 +151,7 @@ exports.removePostsFromCollection = async (req, res) => {
   }
 };
 
-// GET /home/collection/:id/rename
-exports.showRenameCollection = async (req, res) => {
-  try {
-    const collection = await collectionModel.getCollectionById(req.params.id);
-    return res.render("collection/rename-collection", { collection });
-  } catch (error) {
-    console.error(error);
-    return res.send("Error reading collection");
-  }
-};
+
 
 // GET /post/:id/add-to-collection
 exports.showCollectionDetails = async (req, res) => {

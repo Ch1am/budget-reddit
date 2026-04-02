@@ -12,6 +12,11 @@
             <input type = "text" name = "newTitle" required><br><br>
             <button type = "submit">Submit</button>
        </form>
+       <br><br>
+       <%if (msg ) {%>
+            <%=msg%>
+        <%}%>  <!--missing title appears even tho its the first time-->
+        <br><br>
        <br>
        <a href="/home/my-collection">Cancel</a>
        <%- include('../partials/footer') %>

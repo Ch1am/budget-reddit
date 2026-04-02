@@ -30,11 +30,14 @@ const isPostOwnerOrAdmin = async (req, res, next) => {
 
     const isAdmin = userInfo.type === 'admin';
 
-    const authorId = post.authorId && post.authorId._id
-      ? post.authorId._id.toString()
-      : post.authorId
-      ? post.authorId.toString()
-      : null;
+    let authorId = null;
+    if (post.authorId) {
+      if (post.authorId._id) {
+        authorId = post.authorId._id.toString(); // the actual mongoose doc, but i just want the id part
+      } else {
+        authorId = post.authorId.toString(); // this is basically just a id string
+      }
+    }
 
     const isOwner = authorId === userInfo._id.toString();
 

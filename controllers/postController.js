@@ -108,11 +108,12 @@ exports.getUserPost = async (req, res) => {
 	try {
 		const userInfo = await User.findByUserID(req.session.user);
 		const posts = await Post.getPostsByAuthorId(userInfo._id); //using getPostsByAuthorId retrieves all posts where userID = the logged in user ID
-		// resolve display author for each post	
+
+		//postsWithAuthor maps to a new array and adds displayAuthor name to the object, so in EJS, i can jst call displayAuthor for the name.
 		const postsWithAuthor = posts.map((post) => {
 			return {
 				...post.toObject(), //converts the mongoose post to a js object 
-				displayAuthor: (post.authorId && post.authorId.name) || 'Deleted-User'
+					displayAuthor: (post.authorId && post.authorId.name) || 'Deleted-User'
 			};
 		});
 		res.render("post/myPost", { posts: postsWithAuthor, timeAgo });
@@ -175,6 +176,7 @@ exports.createPost = async (req, res) => {
 			createdAt: new Date()
 		});
 
+		//a check so that user cant post to a community that they havent joined
 		if (community !== "None_Selected") {
 			let isMember = false;
 			for (const c of currentUser.communities) {
@@ -183,7 +185,6 @@ exports.createPost = async (req, res) => {
 					break;
 				}
 			}
-
 			if (!isMember) {
 				return res.redirect('/post/create?error=You are not a member of that community');
 			}

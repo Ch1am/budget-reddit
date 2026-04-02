@@ -58,18 +58,19 @@ exports.createPost = async (postData) => {
 	return await post.save();
 };
 
-// updateVote updates vote count and voters array atomically
+// updateVote updates vote count and voters array atomically as learnt in lesson 9 extra
+//takes in 4 fields, postID, userID to know who user is, voteType either up or down, and lastly the number change
 exports.updateVote = async (id, userId, voteType, voteChange) => {
 	// Atomically remove existing vote and update count
 	await Post.findByIdAndUpdate(id, {
-		$pull: { voters: { userId } }, //as 
-		$inc: { votes: voteChange },
+		$pull: { voters: { userId } }, // removes the user from the voter array
+		$inc: { votes: voteChange }, //changes the total vote number
 	});
 
 	// Atomically add new vote if not removing
 	if (voteType !== null) {
 		await Post.findByIdAndUpdate(id, {
-			$push: { voters: { userId, voteType } },
+			$push: { voters: { userId, voteType } }, //adds the new user to voter array and their vote type (up/down)
 		});
 	}
 };

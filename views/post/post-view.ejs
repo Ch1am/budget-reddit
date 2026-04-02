@@ -13,7 +13,7 @@
 			<h1><%= post.title %></h1>
 			<p>by u/<%= post.displayAuthor || "Deleted-User" %></p>
 			<% if (post.image) { %>
-			<img src="<%= post.image %>" alt="<%= post.title %>" class="post-image">
+			<img src="<%= post.image %>" alt="<%= post.title %>" class="post-image" style="max-width: 80%; height: auto;">
 			<% } %>
 
 			<!-- how to use the ID -->
@@ -56,7 +56,7 @@
 
 		<!-- Comments + comment form -->
 		<div id="comments">
-			<%- include('../partials/comment-create', { postId: post._id }) %>
+			<%- include('../partials/comment-create', { postId: post._id, commentImageInvalid }) %>
 			<hr>
 			<%- include('../partials/comment', { comments, postId: post._id, sessionUserId, isAdmin, editCommentId }) %>
 		</div>

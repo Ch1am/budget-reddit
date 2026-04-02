@@ -11,7 +11,7 @@
   </div>
 
       <% if (comment.image) { %>
-        <img src="<%= comment.image %>" alt="<%= comment.title %>" class="comment-image">
+        <img src="<%= comment.image %>" alt="Comment image" class="comment-image" style="max-width: 80%; height: auto;">
       <% } %>
 
       <form id="edit-comment-<%= comment._id %>" action="/comment/<%= comment._id %>/edit" method="POST"

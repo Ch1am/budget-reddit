@@ -30,7 +30,7 @@
             <h3><%= post.title %></h1>
 			<p>by u/<%= post.author || "Deleted-User" %></p>
 			<% if (post.image) { %>
-			<img src="<%= post.image %>" alt="<%= post.title %>" class="post-image">
+			<img src="<%= post.image %>" alt="<%= post.title %>" class="post-image" style="max-width: 80%; height: auto;">
 			<% } %>
 
 			<!-- how to use the ID -->

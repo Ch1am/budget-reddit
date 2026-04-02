@@ -61,7 +61,19 @@ exports.editComment = async (req, res) => {
       return res.redirect("back");
 
     const { content } = req.body;
-    await Comment.editComment(req.params.id, { content });
+
+    const image =
+      typeof req.body.image === "string" && req.body.image.trim()
+        ? req.body.image.trim()
+        : null;
+
+    if (image && !(await validateImageUrl(image))) {
+      return res.redirect(
+        `/post/${comment.postId}?editCommentId=${comment._id.toString()}&invalidCommentImage=1`,
+      );
+    }
+
+    await Comment.editComment(req.params.id, { content, image });
 
     res.redirect(`/post/${comment.postId}`);
   } catch (error) {

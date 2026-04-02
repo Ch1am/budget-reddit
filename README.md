@@ -7,7 +7,7 @@
 2. Marcus Chiam
 3. Wong Wing Yee
 4. Kannarak Tansutchatchawarn
-5. Russell
+5. Russell Chiu Dong Xuan
 
 ---
 
@@ -101,7 +101,8 @@ budget-reddit/
 │   └── commentAuth.js          # Comment edit/delete authorisation (owner or community admin)
 │
 ├── functions/
-│   └── timeAgo.js              # Utility: converts timestamps to relative time strings
+│   ├── timeAgo.js              # Utility: converts timestamps to relative time strings
+│   └── timeAgo.js              # Utility: validates whether image URL is a valid image URL or not when creating post/comments
 │
 ├── views/                      # EJS templates
 │   ├── landing.ejs

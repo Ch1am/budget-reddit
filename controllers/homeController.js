@@ -1,6 +1,7 @@
 const postModel = require('../models/postModel');
 const timeAgo = require("../functions/timeAgo")
 const Community = require('../models/communityModel');
+const User = require("../models/registerModel");
 
 exports.displayAllPost = async (req, res) => {
 	try {
@@ -45,7 +46,9 @@ exports.displayAllPost = async (req, res) => {
 
 			//find the vote of the session user if they have voted before
 			if (sessionUserId) {
-				existingVote = voters.find((v) => v.userId && v.userId.toString() === sessionUserId) || null;
+				const sid = sessionUserId.toString();
+				existingVote =
+					voters.find((v) => v.userId && v.userId.toString() === sid) || null;
 			}
 
 			//get the display author name
@@ -74,23 +77,20 @@ exports.displayAllPost = async (req, res) => {
 exports.upvote = async (req, res) => {
 	const id = req.params.id;
 	const userInfo = await User.findByUserID(req.session.user);
-	const username = userInfo.username;
+	const userId = userInfo._id;
 
 	try {
-		//find post and whether this user has voted before anot
 		const post = await postModel.getPostById(id);
-		const existingVote = post.voters.find((v) => v.username === username);
+		const existingVote = post.voters.find(
+			(v) => v.userId && v.userId.toString() === userId.toString(),
+		);
 
-		//handling of whether the vote exist before
 		if (!existingVote) {
-			//if nvr vote before, upvote by 1
-			await postModel.updateVote(id, username, "upvote", 1);
-			//if got upvote before, and user click on upvote again, minus 1
+			await postModel.updateVote(id, userId, "upvote", 1);
 		} else if (existingVote.voteType === "upvote") {
-			await postModel.updateVote(id, username, null, -1);
+			await postModel.updateVote(id, userId, null, -1);
 		} else {
-			//if user downvoted before and now change to upvote, +2
-			await postModel.updateVote(id, username, "upvote", 2);
+			await postModel.updateVote(id, userId, "upvote", 2);
 		}
 	} catch (error) {
 		console.error(error);
@@ -101,19 +101,20 @@ exports.upvote = async (req, res) => {
 exports.downvote = async (req, res) => {
 	const id = req.params.id;
 	const userInfo = await User.findByUserID(req.session.user);
-	const username = userInfo.username;
+	const userId = userInfo._id;
 
 	try {
-		//same logic as upvoting
 		const post = await postModel.getPostById(id);
-		const existingVote = post.voters.find((v) => v.username === username);
+		const existingVote = post.voters.find(
+			(v) => v.userId && v.userId.toString() === userId.toString(),
+		);
 
 		if (!existingVote) {
-			await postModel.updateVote(id, username, "downvote", -1);
+			await postModel.updateVote(id, userId, "downvote", -1);
 		} else if (existingVote.voteType === "downvote") {
-			await postModel.updateVote(id, username, null, 1);
+			await postModel.updateVote(id, userId, null, 1);
 		} else {
-			await postModel.updateVote(id, username, "downvote", -2);
+			await postModel.updateVote(id, userId, "downvote", -2);
 		}
 	} catch (error) {
 		console.error(error);

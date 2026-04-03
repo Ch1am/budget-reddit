@@ -47,7 +47,11 @@ server.use("/", commentRouter);
 // async function to connect to DB
 async function connectDB() {
 	try {
-		await mongoose.connect(process.env.DB);
+		await mongoose.connect(process.env.DB, 
+			{
+				dbName: "memeit"
+			}
+		);
 		console.log("MongoDB connected successfully");
 	} catch (error) {
 		console.error("MongoDB connection failed:", error.message);

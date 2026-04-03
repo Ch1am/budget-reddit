@@ -259,6 +259,14 @@ Access **Settings** from the navigation bar by **clicking** the gear to update a
 
 ---
 
+### AI Declaration
+
+Artificial intelligence was used in this project in the following ways:
+1. Information search
+2. Explaining coding errors
+3. Providing debugging hints
+4. Generating test cases
+
 ## License
 
 This project is licensed under the **ISC License**.

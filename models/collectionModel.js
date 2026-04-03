@@ -107,4 +107,12 @@ exports.getCollectionById = async (id) => {
 	return await Collection.findById(id).populate({ path: 'posts', populate: { path: 'authorId', select: 'name' } });
 };
 
+/**
+ * Remove a post ID from every collection that contains it.
+ * Called when a post is deleted.
+ */
+exports.removePostFromAllCollections = async (postId) => {
+	return await Collection.updateMany({ posts: postId }, { $pull: { posts: postId } });
+};
+
 

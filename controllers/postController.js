@@ -7,33 +7,37 @@ const Comment = require("../models/commentModel");
 const collectionModel = require("../models/collectionModel");
 const mongoose = require("mongoose");
 
-// Populated author looks like { _id, name }; deleted users become null.
 function displayAuthorName(author) {
 	if (author && author.name) return author.name;
 	return "Deleted-User";
 }
 
-// Turn a Mongoose comment into a plain object the EJS partials expect.
-function shapeCommentForView(commentDoc, sessionUserId) {
-	const plain = commentDoc.toObject();
+function commentToObject(commentDoc, sessionUserId) {
+
+	const commentObject = commentDoc.toObject();
 
 	let userVote = null;
-	if (sessionUserId && plain.voters && plain.voters.length > 0) {
-		const myVote = plain.voters.find(
+	// look for a vote if someone is logged in AND the comment has a voters array with entries.
+	if (sessionUserId && commentObject.voters && commentObject.voters.length > 0) {
+		// .find() returns the first matching element, or undefined if none match.
+		const myVote = commentObject.voters.find(
 			(entry) => entry.userId && entry.userId.toString() === sessionUserId.toString(),
 		);
+		// If found, expose their vote type up/down
 		if (myVote) userVote = myVote.voteType;
 	}
 
 	return {
-		...plain,
+		...commentObject,
 		displayAuthor: displayAuthorName(plain.authorId),
+		// highlight vote buttons for the current user.
 		userVote,
 	};
 }
 
 exports.getSinglePost = async (req, res) => {
 	try {
+
 		const sessionUserId = req.session.user;
 
 		const editCommentId =
@@ -41,14 +45,18 @@ exports.getSinglePost = async (req, res) => {
 				? req.query.editCommentId.trim()
 				: null;
 
+		// after a failed imageURL, redirect add ?invalidImage=1 to shows error.
 		const commentImageInvalid = req.query.invalidImage === "1";
 		const commentEditImageInvalid = req.query.invalidCommentImage === "1";
 
+		//to show “Add to Collection” vs “already saved to …” 
 		const collectionList = await collectionModel.retrieveAll(sessionUserId);
+		//to decide if the edit/delete should show
 		const currentUser = await User.findByUserID(sessionUserId);
 		const isAdmin = currentUser?.type === "admin";
 
-		const sharedForTemplate = {
+		//object to pass into res.render for every partial to get the same variables.
+		const renderTemplate = {
 			timeAgo,
 			collectionList,
 			currentUser,
@@ -60,19 +68,21 @@ exports.getSinglePost = async (req, res) => {
 		};
 
 		const postDoc = await Post.getPostById(req.params.id);
-		if (!postDoc) 
-			return res.status(404).send("Post not found");
+		// no post found, return 404, meaning DB is empty
+		if (!postDoc) {
+			return res.status(404).send("No post found <br> Post something to get started!");
+		};
 
 		const post = postDoc.toObject();
 		const commentDocs = await Comment.getCommentsByPost(req.params.id);
-		const comments = commentDocs.map((doc) => shapeCommentForView(doc, sessionUserId));
+		// Turn each DB comment into object for the comment partial.
+		const comments = commentDocs.map((doc) => commentToObject(doc, sessionUserId));
 
 		res.render("post/post-view", {
-			...sharedForTemplate,
+			...renderTemplate,
 			post: {
 				...post,
 				displayAuthor: displayAuthorName(post.authorId),
-				imageType: post.image || null,
 			},
 			comments,
 		});

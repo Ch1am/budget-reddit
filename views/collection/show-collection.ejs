@@ -23,9 +23,9 @@
                         <%collection.posts.slice(0, 3).forEach(post=> {%>
 
                             <h3><%= post.title %></h1>
-			                <p>by u/<%= post.author %></p>
+			                <p>by u/<%= post.authorId ? post.authorId.name : 'Deleted-User' %></p>
                             Desc: 
-                            <%let sentence = post.desc.split(' ')%>
+                            <%let sentence = (post.desc || '').split(' ')%>
                             <%if (sentence.length > 30) {%>
                                 <%= sentence.slice(0,30).join(' ') %>
                                 ...

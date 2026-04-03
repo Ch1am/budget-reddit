@@ -10,7 +10,7 @@ const voterSchema = new mongoose.Schema({
 // Main Post schema
 const postSchema = new mongoose.Schema({
   	//store userId so posts can still render after account deletion.
-	authorId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+	authorId: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
 	title: { type: String, required: true },
 	desc: { type: String, required: true },
 	image: {type: String, default: null},
@@ -88,4 +88,9 @@ exports.deletePost = async (id) => {
 // increase or decrease a post commentCount
 exports.incrementCommentCount = async (postId, delta) => {
 	return await Post.findByIdAndUpdate(postId, { $inc: { commentCount: delta } });
+};
+
+// changes the author into null should their account be deleted
+exports.nullifyAuthor = async (authorId) => {
+	return await Post.updateMany({ authorId }, { $set: { authorId: null } });
 };

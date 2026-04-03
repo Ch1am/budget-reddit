@@ -89,3 +89,8 @@ exports.deletePost = async (id) => {
 exports.incrementCommentCount = async (postId, delta) => {
 	return await Post.findByIdAndUpdate(postId, { $inc: { commentCount: delta } });
 };
+
+// changes the author into null should their account be deleted
+exports.nullifyAuthor = async (authorId) => {
+	return await Post.updateMany({ authorId }, { $set: { authorId: null } });
+};

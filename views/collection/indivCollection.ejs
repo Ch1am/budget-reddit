@@ -28,7 +28,7 @@
             <}%>
             Post ID: <= post._id %><br> -->
             <h3><%= post.title %></h1>
-			<p>by u/<%= post.author %></p>
+			<p>by u/<%= post.authorId ? post.authorId.name : 'Deleted-User' %></p>
 			<% if (post.image) { %>
 			<img src="<%= post.image %>" alt="<%= post.title %>" class="post-image" style="max-width: 80%; height: auto;">
 			<% } %>

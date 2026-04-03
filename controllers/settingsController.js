@@ -2,6 +2,7 @@ const User = require("../models/registerModel");
 const bcrypt = require("bcrypt");
 const Community = require("../models/communityModel");
 const collection = require("../models/collectionModel");
+const postModel = require("../models/postModel");
 
 exports.renderSettingsPage = async(req, res) => {
     const user = await User.findByUserID(req.session.user);
@@ -200,10 +201,7 @@ exports.deleteAccountAction = async (req, res) => {
     console.log(r2)
     const r3 = await User.deleteAccount(user._id);
     
-    const r4 = await collection.updateMany(
-        { "authorId": user._id }, 
-        { $set: { "authorName": "Deleted-User", "authorId": null } }
-    );
+    const r4 = await postModel.nullifyAuthor(user._id);
 
     if (r2 && r3) {
         req.session.destroy(() => {

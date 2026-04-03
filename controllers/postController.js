@@ -69,7 +69,11 @@ exports.getSinglePost = async (req, res) => {
 
 		const postDoc = await Post.getPostById(req.params.id);
 		if (!postDoc) {
-			return res.status(404).send("No post found <br> Post something to get started!");
+			return res.status(404).send(`No post found <br> Post might have been deleted or does not exist! <br> You will be redirected back to home in 3 seconds... <script>
+				setTimeout(() => {
+					window.location.href = "/home";
+				}, 3000);
+			</script>`);
 		};
 
 		const post = postDoc.toObject();

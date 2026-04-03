@@ -10,7 +10,7 @@ const voterSchema = new mongoose.Schema({
 // Main Post schema
 const postSchema = new mongoose.Schema({
   	//store userId so posts can still render after account deletion.
-	authorId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+	authorId: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
 	title: { type: String, required: true },
 	desc: { type: String, required: true },
 	image: {type: String, default: null},

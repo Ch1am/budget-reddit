@@ -147,6 +147,11 @@ exports.removePostsFromCollection = async (req, res) => {
 		collectionTitle,
 		req.session.user,
 		);
+
+		if (!collection) {
+			return res.redirect('/home/my-collection');
+		}
+		
 		await collectionModel.removePostFromCollection(collection._id, postId);
 		return res.redirect(`/home/collection/${collectionTitle}`);
 	} catch (error) {
@@ -163,6 +168,18 @@ exports.showCollectionDetails = async (req, res) => {
 
 	try {
 		const post = await postModel.getPostById(postId);
+		
+		if (!post) {
+			return res.send(`
+                This post doesn't seem to exist... You will be redirected back to the home page in 3 seconds...
+                <script>
+                    setTimeout(() => {
+                        window.location.href = "/home";
+                    }, 3000);
+                </script>
+            `)
+		}
+
 		let collectionList = await collectionModel.retrieveAll(req.session.user);
 		if (collectionList && collectionList.length==0) {
 		defaultCollection = {

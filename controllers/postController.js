@@ -252,6 +252,7 @@ exports.deletePost = async (req, res) => {
 			}
 
 			await Comment.deleteCommentsByPostId(req.params.id);
+			await collectionModel.removePostFromAllCollections(req.params.id);
 			await Post.deletePost(req.params.id);
 		}
 

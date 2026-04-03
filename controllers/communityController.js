@@ -5,6 +5,7 @@ const User = require("../models/registerModel");
 const timeAgo = require("../functions/timeAgo");
 const session = require("express-session");
 const Comment = require("../models/commentModel");
+const collectionModel = require("../models/collectionModel");
 
 exports.communityLanding = async (req, res) => {
     const communities = await Community.getAllCommunities()
@@ -693,6 +694,7 @@ exports.deletePost = async(req, res) => {
         const resultCommunitySide = await Community.deletePostFromCommunity(communityID, post._id);
         // Cascade delete all comments under this post.
         await Comment.deleteCommentsByPostId(post._id);
+        await collectionModel.removePostFromAllCollections(post._id);
         const resultServerSide = await Post.deletePost(post._id);
 
         if (resultCommunitySide && resultServerSide) {

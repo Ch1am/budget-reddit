@@ -15,7 +15,7 @@
   "type": "commonjs",
   "main": "server.js",
   "scripts": {
-    "test": "npm install && npm prune && npm start",
+    "test": "npm install && npm prune",
     "dev": "nodemon server.js",
     "start": "node server.js"
   },

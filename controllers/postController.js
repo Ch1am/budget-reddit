@@ -29,7 +29,7 @@ function commentToObject(commentDoc, sessionUserId) {
 
 	return {
 		...commentObject,
-		displayAuthor: displayAuthorName(plain.authorId),
+		displayAuthor: displayAuthorName(commentObject.authorId),
 		// highlight vote buttons for the current user.
 		userVote,
 	};
@@ -68,7 +68,6 @@ exports.getSinglePost = async (req, res) => {
 		};
 
 		const postDoc = await Post.getPostById(req.params.id);
-		// no post found, return 404, meaning DB is empty
 		if (!postDoc) {
 			return res.status(404).send("No post found <br> Post something to get started!");
 		};

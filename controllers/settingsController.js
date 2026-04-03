@@ -1,7 +1,7 @@
 const User = require("../models/registerModel");
 const bcrypt = require("bcrypt");
 const Community = require("../models/communityModel");
-const { deleteUserCollection } = require("../models/collectionModel");
+const collection = require("../models/collectionModel");
 
 exports.renderSettingsPage = async(req, res) => {
     const user = await User.findByUserID(req.session.user);
@@ -196,9 +196,14 @@ exports.deleteAccountAction = async (req, res) => {
         }
     }
 
-    const r2 = await deleteUserCollection(user._id);
+    const r2 = await collection.deleteUserCollection(user._id);
     console.log(r2)
     const r3 = await User.deleteAccount(user._id);
+    
+    const r4 = await collection.updateMany(
+        { "authorId": user._id }, 
+        { $set: { "authorName": "Deleted-User", "authorId": null } }
+    );
 
     if (r2 && r3) {
         req.session.destroy(() => {

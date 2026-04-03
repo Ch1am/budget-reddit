@@ -100,23 +100,24 @@ exports.deleteComment = async (req, res) => {
 exports.upvoteComment = async (req, res) => {
   const id = req.params.id;
   const userInfo = await User.findByUserID(req.session.user);
-  const username = userInfo.username;
+  const userId = userInfo._id;
   const comment = await Comment.getCommentById(id);
 
   try {
-    //find post and whether this user has voted before anot
-    const existingVote = comment.voters.find((v) => v.username === username);
+    const existingVote = comment.voters.find(
+      (v) => v.userId && v.userId.toString() === userId.toString(),
+    );
 
     //handling of whether the vote exist before
     if (!existingVote) {
       //if nvr vote before, upvote by 1
-      await Comment.updateCommentVote(id, username, "upvote", 1);
+      await Comment.updateCommentVote(id, userId, "upvote", 1);
       //if got upvote before, and user click on upvote again, minus 1
     } else if (existingVote.voteType === "upvote") {
-      await Comment.updateCommentVote(id, username, null, -1);
+      await Comment.updateCommentVote(id, userId, null, -1);
     } else {
       //if user downvoted before and now change to upvote, +2
-      await Comment.updateCommentVote(id, username, "upvote", 2);
+      await Comment.updateCommentVote(id, userId, "upvote", 2);
     }
   } catch (error) {
     console.error(error);
@@ -130,19 +131,20 @@ exports.upvoteComment = async (req, res) => {
 exports.downvoteComment = async (req, res) => {
   const id = req.params.id;
   const userInfo = await User.findByUserID(req.session.user);
-  const username = userInfo.username;
+  const userId = userInfo._id;
   const comment = await Comment.getCommentById(id);
 
   try {
-    //same logic as upvoting
-    const existingVote = comment.voters.find((v) => v.username === username);
+    const existingVote = comment.voters.find(
+      (v) => v.userId && v.userId.toString() === userId.toString(),
+    );
 
     if (!existingVote) {
-      await Comment.updateCommentVote(id, username, "downvote", -1);
+      await Comment.updateCommentVote(id, userId, "downvote", -1);
     } else if (existingVote.voteType === "downvote") {
-      await Comment.updateCommentVote(id, username, null, 1);
+      await Comment.updateCommentVote(id, userId, null, 1);
     } else {
-      await Comment.updateCommentVote(id, username, "downvote", -2);
+      await Comment.updateCommentVote(id, userId, "downvote", -2);
     }
   } catch (error) {
     console.error(error);

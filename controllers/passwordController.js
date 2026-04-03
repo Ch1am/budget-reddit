@@ -1,5 +1,6 @@
 const User = require('./../models/registerModel');
-const bcrypt = require("bcryptjs");
+const bcrypt = require("bcrypt");
+const collectionModel = require('./../models/collectionModel');
 
 exports.showLogin = async (req, res) => {
     try {
@@ -116,6 +117,14 @@ exports.register = async (req, res) => {
             if (!result) {
                 res.send("There was an error when creating your account.")
             } else {
+                //creating default collection once acc is created
+                const defaultCollection = {
+                    title: 'Favourite',
+                    user: result._id,
+                    posts:[]
+                }
+                await collectionModel.createCollection(defaultCollection)
+
                 res.send(`
                     Your account has been created. Welcome to MemeIt, ${result.name}!<br><br>
                     You will be redirected to the login page in 3 seconds...

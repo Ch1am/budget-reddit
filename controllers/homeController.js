@@ -1,105 +1,96 @@
 const postModel = require('../models/postModel');
 const timeAgo = require("../functions/timeAgo")
-const User = require("../models/registerModel")
-const mongoose = require('mongoose');
 const Community = require('../models/communityModel');
-const collectionController = require("./collectionController");
+const User = require("../models/registerModel");
 
-//displayAllPost diplays everything from newest order in the array (added last in the array)
 exports.displayAllPost = async (req, res) => {
 	try {
-		const session = req.session
-		// user information
-		const query = req.query.query
+		const query = typeof req.query?.query === "string" ? req.query.query.trim() : "";
 		let posts = []
 
-		console.log(query)
-		if (query && query.length > 0) {
+		if (query.length > 0) {
 			posts = await postModel.getPostByGeneralSearch(query);
-			console.log(posts)
 		} else {
 			posts = await postModel.getAllPost();
 		}
-		
+
 		posts = await Promise.all(posts.map(async (p) => {
 			const pObj = typeof p.toObject === "function" ? p.toObject() : p;
 			if (p.community) {
 				pObj.community = await Community.findCommunityById(p.community);
 			}
-			
-			return pObj; 
+
+			return pObj;
 		}));
 
 		// Sort by net score (votes) descending; tie-break by newest first.
-		const sortedPosts = posts.slice().sort((a, b) => {
-			const voteDiff = (b.votes ?? 0) - (a.votes ?? 0);
-			if (voteDiff !== 0) return voteDiff;
-			return new Date(b.createdAt ?? 0) - new Date(a.createdAt ?? 0);
+		//use slice to create a new array to avoid mutating the original array
+		const sortedPosts = [...posts].sort((a, b) => {
+			const aVotes = a.votes || 0;
+			const bVotes = b.votes || 0;
+			if (aVotes !== bVotes)
+				return bVotes - aVotes;
+
+			//use getTime to compare the time
+			const aTime = new Date(a.createdAt || 0).getTime();
+			const bTime = new Date(b.createdAt || 0).getTime();
+			return bTime - aTime;
 		});
+
+		//get the session user id from the session
 		const sessionUserId = req.session?.user || null;
-		const currentUser = sessionUserId ? await User.findByUserID(sessionUserId) : null;
 
 		const postsWithVotes = sortedPosts.map((post) => {
-			//just to test if i up/downvote, whether the button will remain highlighted
-			const existingVote = sessionUserId
-				? (post.voters || []).find(
-						(voter) => voter.userId?.toString() === sessionUserId.toString(),
-					)
-				: null;
+			const voters = post.voters || [];
+			let existingVote = null;
 
-			//converting the img buffer to base64 string for ejs
-			let imageBase64 = null;
-			if (post.image && post.image.data) {
-				const buf = Buffer.isBuffer(post.image.data)
-					? post.image.data
-					: post.image.data.buffer
-						? Buffer.from(post.image.data.buffer)
-						: Buffer.from(post.image.data);
-				imageBase64 = buf.toString('base64');
+			//find the vote of the session user if they have voted before
+			if (sessionUserId) {
+				const sid = sessionUserId.toString();
+				existingVote =
+					voters.find((v) => v.userId && v.userId.toString() === sid) || null;
 			}
-			return {
-				...post,
-				displayAuthor:
-					(post.authorId && post.authorId.name) ||
-					"Deleted-User",
-				userVote: existingVote ? existingVote.voteType : null,
-				imageBase64,
-				imageType: post.image ? post.image.contentType : null,
-				query
-			};
+
+			//get the display author name
+			const displayAuthor =
+				post.authorId && post.authorId.name ? post.authorId.name : "Deleted-User";
+
+			//get the user vote if they have voted before
+			const userVote = existingVote ? existingVote.voteType : null;
+
+			//return the post with the display author name, user vote, and query
+			return { ...post, displayAuthor, userVote, query };
 		});
 
-		let data = req.query.query
-		data = data ? data : undefined
 		res.render("landing", {
 			posts: postsWithVotes,
-			query: data,
+			query: query.length > 0 ? query : undefined,
 			timeAgo,
 			inCommunity: false
 		})
 	} catch (error) {
 		console.error(error);
-		console.log('Mongoose state:', mongoose.connection.readyState);
 		res.send("Error reading database " + error.message);
 	}
 }
 
 exports.upvote = async (req, res) => {
 	const id = req.params.id;
-	const sessionUserId = req.session?.user;
+	const userInfo = await User.findByUserID(req.session.user);
+	const userId = userInfo._id;
 
 	try {
 		const post = await postModel.getPostById(id);
-		const existingVote = (post.voters || []).find(
-		(v) => v.userId?.toString() === sessionUserId.toString(),
+		const existingVote = post.voters.find(
+			(v) => v.userId && v.userId.toString() === userId.toString(),
 		);
 
 		if (!existingVote) {
-		await postModel.updateVote(id, sessionUserId, 'upvote', 1);
-		} else if (existingVote.voteType === 'upvote') {
-		await postModel.updateVote(id, sessionUserId, null, -1);
+			await postModel.updateVote(id, userId, "upvote", 1);
+		} else if (existingVote.voteType === "upvote") {
+			await postModel.updateVote(id, userId, null, -1);
 		} else {
-		await postModel.updateVote(id, sessionUserId, 'upvote', 2);
+			await postModel.updateVote(id, userId, "upvote", 2);
 		}
 	} catch (error) {
 		console.error(error);
@@ -109,49 +100,24 @@ exports.upvote = async (req, res) => {
 
 exports.downvote = async (req, res) => {
 	const id = req.params.id;
-	const sessionUserId = req.session?.user;
+	const userInfo = await User.findByUserID(req.session.user);
+	const userId = userInfo._id;
 
 	try {
 		const post = await postModel.getPostById(id);
-		const existingVote = (post.voters || []).find(
-		(v) => v.userId?.toString() === sessionUserId.toString(),
+		const existingVote = post.voters.find(
+			(v) => v.userId && v.userId.toString() === userId.toString(),
 		);
 
 		if (!existingVote) {
-		await postModel.updateVote(id, sessionUserId, 'downvote', -1);
-		} else if (existingVote.voteType === 'downvote') {
-		await postModel.updateVote(id, sessionUserId, null, 1);
+			await postModel.updateVote(id, userId, "downvote", -1);
+		} else if (existingVote.voteType === "downvote") {
+			await postModel.updateVote(id, userId, null, 1);
 		} else {
-		await postModel.updateVote(id, sessionUserId, 'downvote', -2);
+			await postModel.updateVote(id, userId, "downvote", -2);
 		}
 	} catch (error) {
 		console.error(error);
 	}
 	res.redirect(`/home#post-${id}`);
 };
-
-// Collection routes are now handled by `collectionController`.
-// These exports remain only as delegations for any old references.
-exports.showAddCollection = (req, res) =>
-	collectionController.showAddCollection(req, res);
-
-exports.addCollection = (req, res) =>
-	collectionController.addCollection(req, res);
-
-exports.showCollections = (req, res) =>
-	collectionController.showCollections(req, res);
-
-exports.displayPostInCollection = (req, res) =>
-	collectionController.displayPostInCollection(req, res);
-
-exports.renameCollection = (req, res) =>
-	collectionController.renameCollection(req, res);
-
-exports.deleteCollection = (req, res) =>
-	collectionController.deleteCollection(req, res);
-
-exports.removePostsFromCollection = (req, res) =>
-	collectionController.removePostsFromCollection(req, res);
-
-exports.showRenameCollection = (req, res) =>
-	collectionController.showRenameCollection(req, res);

@@ -4,10 +4,10 @@
 
 **Group members:** 
 1. Lew Jing Yuan 
-2. Marcus Chiam
+2. Marcus Chiam Hao Yi
 3. Wong Wing Yee
 4. Kannarak Tansutchatchawarn
-5. Russell
+5. Russell Chiu Dong Xuan
 
 ---
 
@@ -28,7 +28,7 @@
 
 ## Overview
 
-MemeIt is a full-stack web application inspired by Reddit. It allows users to upload and share memes via image uploads or external links. Posts are ranked dynamically by community votes, with the most popular content surfacing to the top. Users can organise content into communities, bookmark posts into personal collections, and engage with others through comments.
+MemeIt is a web application inspired by Reddit. It allows users to upload and share memes via image external links. Posts are ranked dynamically by community votes, with the most popular content surfacing to the top. Users can organise content into communities, bookmark posts into personal collections, and engage with others through comments.
 
 ---
 
@@ -37,7 +37,7 @@ MemeIt is a full-stack web application inspired by Reddit. It allows users to up
 | Feature | Description |
 |---|---|
 | **Authentication** | User registration and login with securely hashed passwords |
-| **Post Management** | Create, view, edit, and delete meme posts (image upload or link) |
+| **Post Management** | Create, view, edit, and delete meme posts (image link) |
 | **Voting** | Upvote and downvote posts; posts are ranked by net vote count |
 | **Comments** | Add, edit, delete, and vote on comments on any post |
 | **Communities** | Create and manage subreddit-style community spaces |
@@ -97,11 +97,12 @@ budget-reddit/
 │
 ├── middleware/
 │   ├── auth.js                 # Session-based authentication guards (isLoggedIn, redirectIfLoggedIn)
-│   ├── postAuth.js             # Post edit/delete authorisation (owner or community admin)
-│   └── commentAuth.js          # Comment edit/delete authorisation (owner or community admin)
+│   ├── postAuth.js             # Post edit/delete authorisation (Post owner or admin)
+│   └── commentAuth.js          # Comment edit/delete authorisation (Comment owner or admin)
 │
 ├── functions/
-│   └── timeAgo.js              # Utility: converts timestamps to relative time strings
+│   ├── timeAgo.js              # Utility: converts timestamps to relative time strings
+│   └── validateImageURL.js     # Utility: validates whether image URL is a valid image URL or not when creating post/comments
 │
 ├── views/                      # EJS templates
 │   ├── landing.ejs

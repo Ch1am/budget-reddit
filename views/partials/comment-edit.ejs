@@ -1,32 +1,51 @@
-<article class="comment-card comment-card--editing" id="comment-<%= comment._id %>">
+<article id="comment-<%= comment._id %>">
   <!-- Username and time created -->
   <div class="comment-meta">
+
     <span>u/<%= comment.displayAuthor || "Deleted-User" %></span>
     &nbsp;&bull;&nbsp;
+
     <time datetime="<%= comment.createdAt %>">
       <%= timeAgo(comment.createdAt) %>
     </time>
+
     &nbsp;&bull;&nbsp;
     <span>Editing</span>
+
   </div>
 
-      <% if (comment.image) { %>
-        <img src="<%= comment.image %>" alt="Comment image" class="comment-image" style="max-width: 80%; height: auto;">
-      <% } %>
+  <% if (comment.image) { %>
+    <img src="<%= comment.image %>" alt="Comment image" style="max-width: 50%; height: auto;">
+    <% } %>
 
       <form id="edit-comment-<%= comment._id %>" action="/comment/<%= comment._id %>/edit" method="POST"
         class="comment-edit-form">
+
         <textarea name="content" rows="4" cols="60"><%= comment.content %></textarea>
+
+        <div>
+
+          <label for="comment-edit-image-<%= comment._id %>">Image URL</label><br>
+          <input id="comment-edit-image-<%= comment._id %>" type="url" name="image" value="<%= comment.image || '' %>"
+            style="width: 400px;">
+
+          <% if (commentEditImageInvalid) { %>
+            <div class="comment-image-url-error" role="alert" style="color:#b00020;font-size:0.875rem;">
+              invalid url
+            </div>
+            <% } %>
+        </div>
       </form>
 
-      <div class="comment-edit-actions" style="display:flex; gap:10px; align-items:center; margin-top:8px;">
-        <a href="/post/<%= postId %>" class="btn-secondary">
-          Cancel</a>
+      <div>
+        <a href="/post/<%= postId %>" class="btn-secondary">Cancel</a>
 
         <form id="delete-comment-<%= comment._id %>" action="/comment/<%= comment._id %>/delete" method="POST"
-          class="comment-delete-form" style="margin:0;"></form>
+          class="comment-delete-form" style="margin:0;">
+        </form>
 
         <button type="submit" class="btn-danger" form="delete-comment-<%= comment._id %>">Delete</button>
         <button type="submit" class="btn-primary" form="edit-comment-<%= comment._id %>">Submit</button>
+
       </div>
 </article>

@@ -10,7 +10,7 @@ const isCommentOwnerOrAdmin = async (req, res, next) => {
     const isOwner =
       comment.authorId &&
       (comment.authorId._id ? comment.authorId._id.toString() : comment.authorId.toString()) ===
-        userInfo._id.toString();
+      userInfo._id.toString();
 
     if (!isOwner && !isAdmin) {
       return res.redirect('back');

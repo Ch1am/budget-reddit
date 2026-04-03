@@ -11,8 +11,8 @@ const commentSchema = new mongoose.Schema({
     postId: { type: mongoose.Schema.Types.ObjectId, ref: "Post", required: true },
     authorId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     createdAt: { type: Date, default: Date.now },
-    image: {type: String, default:null},
-    content: { type: String, required: false, default: "" },
+    image: { type: String, default: null },
+    content: { type: String, default: "" },
     votes: { type: Number, default: 0 },
     voters: [voterSchema],
 });
@@ -21,17 +21,17 @@ const Comment = mongoose.model("Comment", commentSchema, "comment");
 
 //Function getAllcomment retrieves comments data based on the postId of the post
 exports.getCommentsByPost = async (postId) => {
-    return await Comment.find({ postId }).populate("authorId", "name type");
+    return await Comment.find({ postId }).populate("authorId", "name");
 };
 
 // function getCommentById retrieves comment id for editing and deleting
 exports.getCommentById = async (id) => {
-  return await Comment.findById(id).populate("authorId", "name type");
+    return await Comment.findById(id);
 };
 
 //function getCommentByAuthor retrieves all comments made by a specific user
 exports.getCommentByAuthorId = async (authorId) => {
-    return await Comment.find({ authorId }).populate("authorId", "name type");
+    return await Comment.find({ authorId });
 };
 
 //Function createComment to create a new comment and insert into mongo
@@ -47,25 +47,18 @@ exports.createComment = async (postId, commentData) => {
 
 // update vote counts and voters list
 exports.updateCommentVote = async (id, userId, voteType, voteChange) => {
-    const comment = await Comment.findById(id);
-    if (!comment) return;
-
-    // remove existing vote if any
-    comment.voters = comment.voters.filter((v) => {
-      if (v.userId == null) {
-        return true;
-      }
-      return v.userId.toString() !== userId.toString();
+    // Atomically remove existing vote and update count
+    await Comment.findByIdAndUpdate(id, {
+        $pull: { voters: { userId } }, // remove existing vote if any
+        $inc: { votes: voteChange },
     });
-    // add new vote if not there
-    if (voteType !== null) {
-        comment.voters.push({ userId, voteType });
-    }
-    // update vote count
-    comment.votes = (comment.votes || 0) + voteChange;
 
-    // save back to MongoDB
-    await comment.save();
+    // Atomically add new vote if not removing
+    if (voteType !== null) {
+        await Comment.findByIdAndUpdate(id, {
+            $push: { voters: { userId, voteType } },
+        });
+    }
 };
 
 //editing logged in user post

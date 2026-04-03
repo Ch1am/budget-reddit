@@ -2,14 +2,6 @@ const Comment = require("../models/commentModel");
 const User = require("../models/registerModel");
 const { validateImageUrl } = require("../functions/validateImageUrl");
 
-// getCommentById populates authorId to { _id, name, ... } — compare real ids, not authorId.toString()
-function getCommentAuthorIdString(comment) {
-  if (!comment || !comment.authorId) return null;
-  const author = comment.authorId;
-  if (author._id) return author._id.toString();
-  return author.toString();
-}
-
 // POST `/post/:postId/comment`
 exports.createComment = async (req, res) => {
   try {
@@ -17,7 +9,7 @@ exports.createComment = async (req, res) => {
     const userInfo = await User.findByUserID(req.session.user);
 
     // Comment text comes from the form body.
-    const { content } = req.body;
+    const content = req.body.content;
 
     // get the postID from url
     const postId = req.params.postId;
@@ -33,6 +25,7 @@ exports.createComment = async (req, res) => {
         : null;
     const hasImage = Boolean(image);
 
+    //send back to the post page if the image url is invalid
     if (hasImage && !(await validateImageUrl(image))) {
       return res.redirect(`/post/${postId}?invalidImage=1`);
     }
@@ -62,23 +55,21 @@ exports.createComment = async (req, res) => {
 // POST `/comment/:id/edit`
 exports.editComment = async (req, res) => {
   try {
-    const userInfo = await User.findByUserID(req.session.user);
-    const isAdmin = userInfo && userInfo.type === "admin";
-
-    const comment = await Comment.getCommentById(req.params.id);
-    if (!comment) {
-      return res.redirect("/home");
-    }
-
-    const authorIdStr = getCommentAuthorIdString(comment);
-    const isOwner =
-      authorIdStr && authorIdStr === userInfo._id.toString();
-    if (!isOwner && !isAdmin) {
-      return res.redirect(`/post/${comment.postId}`);
-    }
+    // `commentAuth.isCommentOwnerOrAdmin` middleware attaches the comment.
+    const comment = req.comment || (await Comment.getCommentById(req.params.id));
+    if (!comment)
+      return res.redirect("back");
 
     const { content } = req.body;
-    await Comment.editComment(req.params.id, { content });
+
+    const image =
+      typeof req.body.image === "string" && req.body.image.trim() ? req.body.image.trim() : null;
+
+    if (image && !(await validateImageUrl(image))) {
+      return res.redirect(`/post/${comment.postId}?editCommentId=${comment._id.toString()}&invalidCommentImage=1`);
+    }
+
+    await Comment.editComment(req.params.id, { content, image });
 
     res.redirect(`/post/${comment.postId}`);
   } catch (error) {
@@ -90,20 +81,10 @@ exports.editComment = async (req, res) => {
 // POST `/comment/:id/delete`
 exports.deleteComment = async (req, res) => {
   try {
-    const userInfo = await User.findByUserID(req.session.user);
-    const isAdmin = userInfo && userInfo.type === "admin";
-    const comment = await Comment.getCommentById(req.params.id);
-
-    if (!comment) {
-      return res.redirect("/home");
-    }
-
-    const authorIdStr = getCommentAuthorIdString(comment);
-    const isOwner =
-      authorIdStr && authorIdStr === userInfo._id.toString();
-    if (!isOwner && !isAdmin) {
-      return res.redirect(`/post/${comment.postId}`);
-    }
+    // `commentAuth.isCommentOwnerOrAdmin` middleware attaches the comment.
+    const comment = req.comment || (await Comment.getCommentById(req.params.id));
+    if (!comment)
+      return res.redirect("back");
 
     await Comment.deleteComment(req.params.id, comment.postId);
 
@@ -115,79 +96,59 @@ exports.deleteComment = async (req, res) => {
 };
 
 //POST `/comment/:id/upvote`
+
 exports.upvoteComment = async (req, res) => {
+  const id = req.params.id;
+  const userInfo = await User.findByUserID(req.session.user);
+  const userId = userInfo._id;
+  const comment = await Comment.getCommentById(id);
+
   try {
-    const sessionUserId = req.session.user;
-
-    // Load comment to check existing votes.
-    const comment = await Comment.getCommentById(req.params.id);
-
-    if (!comment) return res.status(404).send("Comment not found");
-
-    const existingVoter = comment.voters?.find(
-      (v) => v.userId?.toString() === sessionUserId.toString(),
+    const existingVote = comment.voters.find(
+      (v) => v.userId && v.userId.toString() === userId.toString(),
     );
-    let voteType = "upvote";
-    let voteChange;
 
-    // check current vote state.
-    if (!existingVoter) {
-      // if no existing vote then just normal upvote
-      voteChange = 1;
-    } else if (existingVoter.voteType === "upvote") {
-      // remove the upvote.
-      voteType = null;
-      voteChange = -1;
+    //handling of whether the vote exist before
+    if (!existingVote) {
+      //if nvr vote before, upvote by 1
+      await Comment.updateCommentVote(id, userId, "upvote", 1);
+      //if got upvote before, and user click on upvote again, minus 1
+    } else if (existingVote.voteType === "upvote") {
+      await Comment.updateCommentVote(id, userId, null, -1);
     } else {
-      // if they got an downvote then remove that and then add the upvote
-      voteChange = 2;
+      //if user downvoted before and now change to upvote, +2
+      await Comment.updateCommentVote(id, userId, "upvote", 2);
     }
-
-    // updates both votes and voters array.
-    await Comment.updateCommentVote(req.params.id, sessionUserId, voteType, voteChange);
-    res.redirect(`/post/${comment.postId}`);
   } catch (error) {
     console.error(error);
-    res.status(500).send("Error upvoting comment");
   }
+
+  res.redirect(`/post/${comment.postId}`);
 };
 
 
 // POST `/comment/:id/downvote`
-// Function to downvote a comment
 exports.downvoteComment = async (req, res) => {
+  const id = req.params.id;
+  const userInfo = await User.findByUserID(req.session.user);
+  const userId = userInfo._id;
+  const comment = await Comment.getCommentById(id);
+
   try {
-
-    const sessionUserId = req.session.user;
-
-    // Load comment to check existing votes.
-    const comment = await Comment.getCommentById(req.params.id);
-
-    if (!comment) return res.status(404).send("Comment not found");
-
-    const existingVoter = comment.voters?.find(
-      (v) => v.userId?.toString() === sessionUserId.toString(),
+    const existingVote = comment.voters.find(
+      (v) => v.userId && v.userId.toString() === userId.toString(),
     );
-    let voteType = "downvote";
-    let voteChange;
 
-    if (!existingVoter) {
-      // if no existing vote then just normal downvote
-      voteChange = -1;
-    } else if (existingVoter.voteType === "downvote") {
-      // if it does then remove their downvote
-      voteType = null;
-      voteChange = 1;
+    if (!existingVote) {
+      await Comment.updateCommentVote(id, userId, "downvote", -1);
+    } else if (existingVote.voteType === "downvote") {
+      await Comment.updateCommentVote(id, userId, null, 1);
     } else {
-      // if they got an upvote then remove that and then remove again to add the downvote
-      voteChange = -2;
+      await Comment.updateCommentVote(id, userId, "downvote", -2);
     }
-
-    // update comment votes 
-    await Comment.updateCommentVote(req.params.id, sessionUserId, voteType, voteChange);
-    res.redirect(`/post/${comment.postId}`);
   } catch (error) {
     console.error(error);
-    res.status(500).send("Error downvoting comment");
   }
+
+  res.redirect(`/post/${comment.postId}`);
 };

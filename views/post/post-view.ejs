@@ -58,7 +58,7 @@
 		<div id="comments">
 			<%- include('../partials/comment-create', { postId: post._id, commentImageInvalid }) %>
 			<hr>
-			<%- include('../partials/comment', { comments, postId: post._id, sessionUserId, isAdmin, editCommentId }) %>
+			<%- include('../partials/comment', { comments, postId: post._id, sessionUserId, isAdmin, editCommentId, commentEditImageInvalid }) %>
 		</div>
 		<%- include('../partials/footer') %>
 	</body>

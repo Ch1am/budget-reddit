@@ -7,88 +7,56 @@ const Comment = require("../models/commentModel");
 const collectionModel = require("../models/collectionModel");
 const mongoose = require("mongoose");
 
+function displayAuthorName(author) {
+	if (author && author.name) return author.name;
+	return "Deleted-User";
+}
+
+function commentToObject(commentDoc, sessionUserId) {
+
+	const commentObject = commentDoc.toObject();
+
+	let userVote = null;
+	// look for a vote if someone is logged in AND the comment has a voters array with entries.
+	if (sessionUserId && commentObject.voters && commentObject.voters.length > 0) {
+		// .find() returns the first matching element, or undefined if none match.
+		const myVote = commentObject.voters.find(
+			(entry) => entry.userId && entry.userId.toString() === sessionUserId.toString(),
+		);
+		// If found, expose their vote type up/down
+		if (myVote) userVote = myVote.voteType;
+	}
+
+	return {
+		...commentObject,
+		displayAuthor: displayAuthorName(commentObject.authorId),
+		// highlight vote buttons for the current user.
+		userVote,
+	};
+}
+
 exports.getSinglePost = async (req, res) => {
 	try {
-		// Used for comment editing UI views/partials/comment.ejs
+
+		const sessionUserId = req.session.user;
+
 		const editCommentId =
 			typeof req.query.editCommentId === "string" && req.query.editCommentId.trim()
 				? req.query.editCommentId.trim()
 				: null;
 
-		// list used by post-view.ejs to render the "Add to Collection" UI.
-		const sessionUserId = req.session.user;
-		const collectionList = await collectionModel.retrieveAll(sessionUserId);
-		const postDoc = await Post.getPostById(req.params.id);
+		// after a failed imageURL, redirect add ?invalidImage=1 to shows error.
+		const commentImageInvalid = req.query.invalidImage === "1";
+		const commentEditImageInvalid = req.query.invalidCommentImage === "1";
 
-		// get the current logged in user and check if they are an admin
+		//to show “Add to Collection” vs “already saved to …” 
+		const collectionList = await collectionModel.retrieveAll(sessionUserId);
+		//to decide if the edit/delete should show
 		const currentUser = await User.findByUserID(sessionUserId);
 		const isAdmin = currentUser?.type === "admin";
-		const commentImageInvalid = req.query.invalidImage === "1";
 
-		// if post dont exist still provide fields that can be used
-		if (!postDoc) {
-			return res.status(404).render("post/post-view", {
-				post: null,
-				comments: [],
-				timeAgo,
-				collectionList,
-				currentUser,
-				sessionUserId,
-				isAdmin,
-				editCommentId,
-				commentImageInvalid,
-			});
-		}
-		const post = postDoc.toObject();
-		// Keep a stable author id string for comparisons in controllers/views.
-		const postAuthorIdStr = post.authorId
-			? (post.authorId._id ? post.authorId._id.toString() : post.authorId.toString())
-			: null;
-
-		// Load comments for this post
-		const rawComments = await Comment.getCommentsByPost(req.params.id);
-
-		// Author name resolution:
-		// We rely on `.populate("authorId", "name")` in the model layer.
-		// - If the user exists: `authorId` is an object like { _id, name, ... }
-		// - If the user was deleted: `authorId` is null
-
-		// convert each comment into a plain JS object
-		const comments = [];
-		for (let i = 0; i < rawComments.length; i++) {
-			const comment = rawComments[i];
-			const commentObj = comment.toObject();
-
-			// Highlight comment vote button for the current user (if logged in)
-			let userVote = null;
-			if (sessionUserId) {
-				const existingVoter = commentObj.voters?.find(
-					(v) => v.userId?.toString() === sessionUserId.toString(),
-				);
-				userVote = existingVoter ? existingVoter.voteType : null;
-			}
-
-			// Resolve display author name
-			const displayAuthor =
-				(commentObj.authorId && commentObj.authorId.name) ||
-				"Deleted-User";
-
-			comments.push({
-				...commentObj,
-				displayAuthor,
-				userVote,
-			});
-		}
-
-		res.render("post/post-view", {
-			post: {
-				...post,
-				displayAuthor:
-					(post.authorId && post.authorId.name) ||
-					"Deleted-User",
-				imageType: post.image ? post.image : null,
-			},
-			comments,
+		//object to pass into res.render for every partial to get the same variables.
+		const renderTemplate = {
 			timeAgo,
 			collectionList,
 			currentUser,
@@ -96,10 +64,41 @@ exports.getSinglePost = async (req, res) => {
 			isAdmin,
 			editCommentId,
 			commentImageInvalid,
+			commentEditImageInvalid,
+		};
+
+		const postDoc = await Post.getPostById(req.params.id);
+		if (!postDoc) {
+			return res.status(404).send(`No post found <br> Post might have been deleted or does not exist! <br> You will be redirected back to home in 3 seconds... <script>
+				setTimeout(() => {
+					window.location.href = "/home";
+				}, 3000);
+			</script>`);
+		};
+
+		const post = postDoc.toObject();
+		const commentDocs = await Comment.getCommentsByPost(req.params.id);
+		// Turn each DB comment into object for the comment partial.
+		const comments = commentDocs.map((doc) => commentToObject(doc, sessionUserId));
+
+		res.render("post/post-view", {
+			...renderTemplate,
+			post: {
+				...post,
+				displayAuthor: displayAuthorName(post.authorId),
+			},
+			comments,
 		});
 	} catch (error) {
-		console.error(error);
-		res.status(500).send("Error reading post");
+		res.send(`
+			Post do not exist!<br><br>
+			You will be redirected to the home page in 3 seconds...
+			<script>
+				setTimeout(() => {
+					window.location.href = "/home";
+				}, 3000);
+			</script>
+		`);
 	}
 };
 
@@ -108,10 +107,11 @@ exports.getUserPost = async (req, res) => {
 	try {
 		const userInfo = await User.findByUserID(req.session.user);
 		const posts = await Post.getPostsByAuthorId(userInfo._id); //using getPostsByAuthorId retrieves all posts where userID = the logged in user ID
-		// resolve display author for each post	
+
+		//postsWithAuthor maps to a new array and adds displayAuthor name to the object, so in EJS, i can jst call displayAuthor for the name.
 		const postsWithAuthor = posts.map((post) => {
 			return {
-				...post.toObject(),
+				...post.toObject(), //converts the mongoose post to a js object 
 				displayAuthor: (post.authorId && post.authorId.name) || 'Deleted-User'
 			};
 		});
@@ -136,7 +136,7 @@ exports.getCreatePost = async (req, res) => {
 
 		res.render('post/post-create', {
 			user,
-			communities: com,
+			communities: com, //will render any communities the user has joined into the dropdown bar
 			error: req.query.error || null //handles any error queries which occur when creating the post
 		})
 	} catch (error) {
@@ -149,11 +149,12 @@ exports.createPost = async (req, res) => {
 	try {
 		const { title, community, desc } = req.body;
 
-		if (!title || !title.trim() || !desc || !desc.trim()) {
+		if (!title || !title.trim() || !desc || !desc.trim()) { //using trim() helps with whitespaces
 			return res.redirect('/post/create?error=Title and description are required');
 		}
 
 		const image = req.body.image ? req.body.image.trim() : null;
+
 		if (image && !(await validateImageUrl(image))) {
 			return res.redirect(
 				"/post/create?error=Image URL must include .png, .jpg, .jpeg, .gif, or .webp",
@@ -174,6 +175,7 @@ exports.createPost = async (req, res) => {
 			createdAt: new Date()
 		});
 
+		//a check so that user cant post to a community that they havent joined
 		if (community !== "None_Selected") {
 			let isMember = false;
 			for (const c of currentUser.communities) {
@@ -182,7 +184,6 @@ exports.createPost = async (req, res) => {
 					break;
 				}
 			}
-
 			if (!isMember) {
 				return res.redirect('/post/create?error=You are not a member of that community');
 			}

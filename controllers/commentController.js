@@ -70,7 +70,7 @@ exports.editComment = async (req, res) => {
     }
 
     if (!content.trim() && !image) {
-      return res.redirect(`/post/${comment.postId}?editCommentId=${comment._id.toString()}`);
+      await Comment.deleteComment(req.params.id, comment.postId);
     }
 
     await Comment.editComment(req.params.id, { content, image });

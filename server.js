@@ -85,7 +85,11 @@ server.use("/", commentRouter);
 async function connectDB() {
 	try {
 		if (!process.env.DB) return;
-		await mongoose.connect(process.env.DB, {
+		await mongoose.connect(process.env.DB, 
+			{
+				dbName: "memeit"
+			}
+		, {
 			serverSelectionTimeoutMS: 5000,
 			connectTimeoutMS: 5000,
 		});

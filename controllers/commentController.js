@@ -69,6 +69,10 @@ exports.editComment = async (req, res) => {
       return res.redirect(`/post/${comment.postId}?editCommentId=${comment._id.toString()}&invalidCommentImage=1`);
     }
 
+    if (!content.trim() && !image) {
+      return res.redirect(`/post/${comment.postId}?editCommentId=${comment._id.toString()}`);
+    }
+
     await Comment.editComment(req.params.id, { content, image });
 
     res.redirect(`/post/${comment.postId}`);

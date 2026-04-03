@@ -12,6 +12,7 @@
 		<% } else { %>
 			<h1><%= post.title %></h1>
 			<p>by u/<%= post.displayAuthor || "Deleted-User" %></p>
+			
 			<% if (post.image) { %>
 			<img src="<%= post.image %>" alt="<%= post.title %>" class="post-image" style="max-width: 80%; height: auto;">
 			<% } %>
@@ -21,6 +22,13 @@
 			<table border="1" style="width:600px; height:150px;">
 				<tr><td style="vertical-align:top;"><%= post.desc %></td></tr>
 			</table>
+			<% if (locals.currentUser && (currentUser.type === 'admin' || (post.authorId && sessionUserId.toString() === (post.authorId._id ? post.authorId._id.toString() : post.authorId.toString())))) { %>
+			<a href="/post/<%= post._id %>/edit">Edit</a>
+			<form action="/post/<%= post._id %>/delete" method="POST" style="display:inline">
+				<button type="submit">Delete</button>
+			</form>	
+		<% } %>
+			<br><br>
 
 			<% if (!collectionList) {%>
 				<form action="/post/<%= post._id %>/add-to-collection" method="get">
@@ -46,13 +54,7 @@
 				<%}%>
 			<%}%>
 		<% } %>
-
-		<% if (locals.currentUser && (currentUser.type === 'admin' || (post.authorId && sessionUserId.toString() === (post.authorId._id ? post.authorId._id.toString() : post.authorId.toString())))) { %>
-			<a href="/post/<%= post._id %>/edit">Edit</a>
-			<form action="/post/<%= post._id %>/delete" method="POST" style="display:inline">
-				<button type="submit">Delete</button>
-			</form>	
-		<% } %>
+		<br>
 
 		<!-- Comments + comment form -->
 		<div id="comments">

@@ -105,7 +105,7 @@
 
                         <% community.posts.forEach(p => { %>
                             <tr>
-                                <td><i><%= p.title  %></i> by <strong><%= p.author %></strong> <%= p.author == user.name ? "(You)" : "" %></td>
+                                <td><i><%= p.title  %></i> by <strong><%= p.authorId ? p.authorId.name : "[deleted]" %></strong> <%= p.authorId && p.authorId.name == user.name ? "(You)" : "" %></td>
                                 <td>
                                     <form action="/community/<%= community._id %>/manage/deletePost" method="post">
                                         <input type="hidden" name="postID" value="<%= p._id %>">

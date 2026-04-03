@@ -81,14 +81,14 @@ exports.register = async (req, res) => {
 
         if (!newName) error.push("Name is required.");
         if (newName.trim().length == 0) {
-            error.push('Please enter a valid name')
+            error.push('Please enter a valid name.')
         }
         if (newName.length < 3) {
             error.push("Username must have at least 3 characters.")
         } else if (newName.length > 50) {
             error.push("Username cannot have more than 50 characters.")
         } else if (usernameTaken) {
-            error.push(`The username ${newName} is too popular right now. Please try other usernames...`)
+            error.push(`The username ${newName} is too popular right now. Please try other usernames`)
         }
         if (!newEmail) error.push("Email is required.");
         if(newEmail && !newEmail.includes(".com"))
